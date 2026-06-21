@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/Base.astro';
+import Page from '../../components/Page.astro';
+import { profile } from '../../data/content';
+---
+
+<Base
+  lang="en"
+  title={`${profile.name} - ${profile.role.en}`}
+  description={profile.tagline.en}
+>
+  <Page lang="en" />
+</Base>

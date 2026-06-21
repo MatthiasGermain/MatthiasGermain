@@ -1,0 +1,429 @@
+---
+import {
+  profile,
+  experiences,
+  embeddedProjects,
+  webProjects,
+  skills,
+  education,
+  certifications,
+  ui,
+  path,
+  type Lang,
+  type Project,
+} from '../data/content';
+import CommandPalette from './CommandPalette.astro';
+import BootSequence from './BootSequence.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const other: Lang = lang === 'fr' ? 'en' : 'fr';
+
+const nav = [
+  { id: 'experience', label: ui.nav.experience[lang] },
+  { id: 'embedded', label: ui.nav.embedded[lang] },
+  { id: 'web', label: ui.nav.web[lang] },
+  { id: 'skills', label: ui.nav.skills[lang] },
+  { id: 'contact', label: ui.nav.contact[lang] },
+];
+---
+
+<!-- ============================== HEADER ============================== -->
+<header
+  class="fixed inset-x-0 top-0 z-50 border-b border-line bg-ink/80 backdrop-blur-md"
+>
+  <nav class="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
+    <a href={path(lang)} class="font-mono text-sm font-medium text-slate-100">
+      MG<span class="text-accent">.</span>
+    </a>
+
+    <div class="hidden items-center gap-7 md:flex">
+      {
+        nav.map((item) => (
+          <a
+            href={`#${item.id}`}
+            class="text-sm text-slate-400 transition-colors hover:text-accent"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="flex items-center gap-4 font-mono text-xs">
+      <button
+        id="cmdk-open"
+        type="button"
+        aria-label="Open command palette"
+        class="hidden items-center gap-1 rounded-md border border-line px-2 py-1 text-slate-400 transition-colors hover:border-accent hover:text-accent sm:flex"
+      >
+        <span class="text-sm leading-none">⌘</span>K
+      </button>
+      <div class="flex items-center gap-3">
+      <a
+        href={path(lang)}
+        class={lang === 'fr' ? 'text-accent' : 'text-slate-500 hover:text-slate-200'}
+        >FR</a
+      >
+      <span class="text-slate-700">/</span>
+      <a
+        href={path(other)}
+        class={lang === 'en' ? 'text-accent' : 'text-slate-500 hover:text-slate-200'}
+        >EN</a
+      >
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="mx-auto max-w-5xl px-5">
+  <!-- ============================== HERO ============================== -->
+  <section class="relative flex flex-col justify-center pt-28 pb-20 sm:pt-36 sm:pb-28">
+    <div class="grid-bg pointer-events-none absolute inset-0 -z-10"></div>
+    <canvas
+      id="scope"
+      class="pointer-events-none absolute inset-0 -z-10 h-full w-full opacity-25"
+    ></canvas>
+
+    <p class="section-tag mb-5 flex items-center gap-2">
+      <span class="inline-block h-2 w-2 animate-pulse rounded-full bg-accent"></span>
+      {profile.available[lang]}
+    </p>
+
+    <h1 class="text-4xl font-bold tracking-tight text-slate-50 sm:text-6xl">
+      {profile.name}
+    </h1>
+    <p class="mt-3 font-mono text-lg text-accent sm:text-xl">
+      {profile.role[lang]}
+    </p>
+
+    <p class="mt-6 max-w-2xl text-base leading-relaxed text-slate-400 sm:text-lg">
+      {profile.tagline[lang]}
+    </p>
+
+    <div class="mt-9 flex flex-wrap gap-4">
+      <a
+        href="#contact"
+        class="rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-slate-950 transition-opacity hover:opacity-90"
+      >
+        {ui.hero.cta_contact[lang]}
+      </a>
+      <a
+        href="#web"
+        class="rounded-md border border-line px-5 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:border-accent hover:text-accent"
+      >
+        {ui.hero.cta_projects[lang]}
+      </a>
+    </div>
+  </section>
+
+  <!-- =========================== EXPÉRIENCES =========================== -->
+  <section id="experience" class="scroll-mt-24 border-t border-line py-20">
+    <p class="section-tag mb-2">{ui.sections.experience[lang]}</p>
+    <h2 class="mb-12 text-2xl font-bold text-slate-100 sm:text-3xl">
+      {ui.sections.experience[lang]}
+    </h2>
+
+    <div class="space-y-10">
+      {
+        experiences.map((exp) => (
+          <article class="grid gap-4 sm:grid-cols-[1fr_2.2fr]">
+            <div>
+              <p class="font-mono text-xs text-accent">{exp.period[lang]}</p>
+              <h3 class="mt-1 font-semibold text-slate-100">{exp.company}</h3>
+              <p class="text-sm text-slate-400">{exp.role[lang]}</p>
+              <p class="mt-1 text-xs text-slate-500">{exp.place[lang]}</p>
+            </div>
+            <div>
+              <ul class="space-y-2">
+                {exp.highlights[lang].map((h) => (
+                  <li class="flex gap-2.5 text-sm leading-relaxed text-slate-300">
+                    <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-accent" />
+                    {h}
+                  </li>
+                ))}
+              </ul>
+              <div class="mt-4 flex flex-wrap gap-2">
+                {exp.stack.map((s) => (
+                  <span class="rounded border border-line px-2 py-0.5 font-mono text-xs text-slate-400">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ======================== PROJETS EMBARQUÉS ======================== -->
+  <section id="embedded" class="scroll-mt-24 border-t border-line py-20">
+    <p class="section-tag mb-2">{ui.sections.embedded[lang]}</p>
+    <h2 class="text-2xl font-bold text-slate-100 sm:text-3xl">{ui.sections.embedded[lang]}</h2>
+    <p class="mb-12 mt-2 max-w-2xl text-sm text-slate-400">{ui.sections.embedded_sub[lang]}</p>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      {
+        embeddedProjects.map((p) => (
+          <article class="flex flex-col rounded-xl border border-line bg-card p-6">
+            <p class="section-tag">{p.category[lang]}</p>
+            <h3 class="mt-2 text-lg font-semibold text-slate-100">{p.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">{p.summary[lang]}</p>
+            <ul class="mt-4 space-y-1.5">
+              {p.highlights[lang].map((h) => (
+                <li class="flex gap-2.5 text-sm text-slate-300">
+                  <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-accent" />
+                  {h}
+                </li>
+              ))}
+            </ul>
+            <div class="mt-auto pt-5">
+              <div class="flex flex-wrap gap-2">
+                {p.stack.map((s) => (
+                  <span class="rounded border border-line px-2 py-0.5 font-mono text-xs text-slate-400">
+                    {s}
+                  </span>
+                ))}
+              </div>
+              {p.repo && p.repo !== '#' && (
+                <a
+                  href={p.repo}
+                  target="_blank"
+                  rel="noopener"
+                  class="mt-4 inline-block font-mono text-xs text-accent hover:underline"
+                >
+                  {ui.labels.code[lang]} ↗
+                </a>
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ========================= RÉALISATIONS WEB ========================= -->
+  <section id="web" class="scroll-mt-24 border-t border-line py-20">
+    <p class="section-tag mb-2">{ui.sections.web[lang]}</p>
+    <h2 class="text-2xl font-bold text-slate-100 sm:text-3xl">{ui.sections.web[lang]}</h2>
+    <p class="mb-12 mt-2 max-w-2xl text-sm text-slate-400">{ui.sections.web_sub[lang]}</p>
+
+    <div class="space-y-6">
+      {
+        webProjects.map((p: Project, i: number) => (
+          <article class="grid gap-6 overflow-hidden rounded-xl border border-line bg-card md:min-h-96 md:grid-cols-2">
+            <a
+              href={p.url}
+              target="_blank"
+              rel="noopener"
+              class={`group relative block aspect-[16/10] overflow-hidden bg-surface md:aspect-auto ${i % 2 === 1 ? 'md:order-2' : ''}`}
+            >
+              {p.screenshot && (
+                <img
+                  src={p.screenshot}
+                  alt={`Aperçu de ${p.title}`}
+                  loading="lazy"
+                  decoding="async"
+                  class="absolute inset-0 h-full w-full object-cover object-top opacity-90 transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100"
+                />
+              )}
+            </a>
+
+            <div class="flex flex-col justify-center p-6 md:p-8">
+              <p class="section-tag">{p.category[lang]}</p>
+              <div class="mt-2 flex items-center gap-3">
+                <h3 class="text-xl font-semibold text-slate-100">{p.title}</h3>
+                {p.status && (
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 font-mono text-xs text-amber-400">
+                    <span class="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
+                    {p.status[lang]}
+                  </span>
+                )}
+              </div>
+              <p class="mt-3 text-sm leading-relaxed text-slate-400">{p.summary[lang]}</p>
+
+              <p class="mt-4 text-sm text-slate-300">
+                <span class="font-mono text-xs text-accent">{ui.labels.role[lang]} · </span>
+                {p.role[lang]}
+              </p>
+
+              <ul class="mt-3 space-y-1.5">
+                {p.highlights[lang].map((h) => (
+                  <li class="flex gap-2.5 text-sm text-slate-300">
+                    <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-accent" />
+                    {h}
+                  </li>
+                ))}
+              </ul>
+
+              <div class="mt-5 flex flex-wrap gap-2">
+                {p.stack.map((s) => (
+                  <span class="rounded border border-line px-2 py-0.5 font-mono text-xs text-slate-400">
+                    {s}
+                  </span>
+                ))}
+              </div>
+
+              <div class="mt-5 flex flex-wrap gap-4 font-mono text-xs">
+                {p.url && (
+                  <a href={p.url} target="_blank" rel="noopener" class="text-accent hover:underline">
+                    {ui.labels.visit[lang]} ↗
+                  </a>
+                )}
+                {p.demoUrl && (
+                  <a href={p.demoUrl} target="_blank" rel="noopener" class="text-slate-400 hover:text-accent">
+                    {ui.labels.demo[lang]} ↗
+                  </a>
+                )}
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- =========================== COMPÉTENCES =========================== -->
+  <section id="skills" class="scroll-mt-24 border-t border-line py-20">
+    <p class="section-tag mb-2">{ui.sections.skills[lang]}</p>
+    <h2 class="mb-12 text-2xl font-bold text-slate-100 sm:text-3xl">{ui.sections.skills[lang]}</h2>
+
+    <div class="grid gap-8 sm:grid-cols-2">
+      {
+        skills.map((g) => (
+          <div>
+            <h3 class="mb-3 font-mono text-sm text-slate-200">{g.label[lang]}</h3>
+            <div class="flex flex-wrap gap-2">
+              {g.items.map((s) => (
+                <span class="rounded-md border border-line bg-card px-3 py-1 text-sm text-slate-300">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-14 grid gap-10 sm:grid-cols-2">
+      <div>
+        <h3 class="section-tag mb-4">{ui.sections.education[lang]}</h3>
+        <div class="space-y-4">
+          {
+            education.map((e) => (
+              <div>
+                <p class="font-mono text-xs text-accent">{e.period}</p>
+                <p class="mt-0.5 text-sm font-medium text-slate-200">{e.title[lang]}</p>
+                <p class="text-sm text-slate-500">{e.school}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <div>
+        <h3 class="section-tag mb-4">{ui.sections.certifications[lang]}</h3>
+        <ul class="space-y-2">
+          {
+            certifications.map((c) => (
+              <li class="flex gap-2.5 text-sm text-slate-300">
+                <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-accent" />
+                {c[lang]}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== CONTACT ============================== -->
+  <section id="contact" class="scroll-mt-24 border-t border-line py-20">
+    <p class="section-tag mb-2">{ui.sections.contact[lang]}</p>
+    <h2 class="text-2xl font-bold text-slate-100 sm:text-3xl">{ui.sections.contact[lang]}</h2>
+    <p class="mt-2 max-w-xl text-sm text-slate-400">{ui.sections.contact_sub[lang]}</p>
+
+    <div class="mt-8 flex flex-wrap gap-x-8 gap-y-4 font-mono text-sm">
+      <a href={`mailto:${profile.email}`} class="text-accent hover:underline">
+        {profile.email}
+      </a>
+      <a href={`tel:${profile.phone.replace(/\s/g, '')}`} class="text-slate-300 hover:text-accent">
+        {profile.phone}
+      </a>
+      <a href={profile.github} target="_blank" rel="noopener" class="text-slate-300 hover:text-accent">
+        GitHub ↗
+      </a>
+      <a href={profile.linkedin} target="_blank" rel="noopener" class="text-slate-300 hover:text-accent">
+        LinkedIn ↗
+      </a>
+    </div>
+  </section>
+</main>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="border-t border-line">
+  <div
+    class="mx-auto flex max-w-5xl flex-col gap-2 px-5 py-8 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <p>© 2026 {profile.name} - {profile.location[lang]}</p>
+    <p class="font-mono">Astro · Tailwind CSS</p>
+  </div>
+</footer>
+
+<CommandPalette lang={lang} />
+<BootSequence />
+
+<!-- Fond oscilloscope du hero -->
+<script>
+  const cv = document.getElementById('scope') as HTMLCanvasElement | null;
+  const ctx = cv?.getContext('2d');
+
+  if (cv && ctx) {
+    let w = 0;
+    let h = 0;
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const r = cv.getBoundingClientRect();
+      w = r.width;
+      h = r.height;
+      cv.width = w * dpr;
+      cv.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const draw = (t: number) => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#34d399';
+      ctx.beginPath();
+      const mid = h * 0.6;
+      for (let x = 0; x <= w; x += 4) {
+        const p = x / w;
+        const y =
+          mid +
+          Math.sin(p * 11 + t * 0.0016) * 28 * Math.sin(p * 2.6 + t * 0.0005) +
+          Math.sin(p * 38 + t * 0.0038) * 5;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      draw(0);
+    } else {
+      const loop = (t: number) => {
+        draw(t);
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+    }
+  }
+</script>

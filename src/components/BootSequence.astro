@@ -1,0 +1,80 @@
+---
+// Overlay de "boot" type microcontrôleur, joué une fois par session.
+// Désactivé si prefers-reduced-motion, et masqué sans JS (noscript).
+---
+
+<div
+  id="boot"
+  class="fixed inset-0 z-[100] flex items-center justify-center bg-ink"
+  aria-hidden="true"
+>
+  <div class="w-[min(90vw,32rem)] px-6 font-mono text-sm">
+    <pre id="boot-out" class="whitespace-pre-wrap leading-relaxed text-slate-300"></pre>
+    <button id="boot-skip" class="mt-5 text-xs text-slate-600 transition-colors hover:text-accent">
+      skip ↵
+    </button>
+  </div>
+</div>
+
+<noscript>
+  <style>
+    #boot {
+      display: none;
+    }
+  </style>
+</noscript>
+
+<style>
+  #boot {
+    transition: opacity 0.4s ease;
+  }
+</style>
+
+<script>
+  const boot = document.getElementById('boot');
+  const out = document.getElementById('boot-out');
+  const skip = document.getElementById('boot-skip');
+
+  if (boot && out) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const seen = sessionStorage.getItem('boot-done');
+
+    if (reduce || seen) {
+      boot.remove();
+    } else {
+      const lines = [
+        'booting matthias.germain.dev …',
+        '[ ok ] cpu     RISC-V core online',
+        '[ ok ] rtos    FreeRTOS scheduler started',
+        '[ ok ] mount   /projects … 6 found',
+        '[ ok ] net     portfolio ready',
+      ];
+
+      document.documentElement.style.overflow = 'hidden';
+
+      const finish = () => {
+        window.removeEventListener('keydown', onKey);
+        document.documentElement.style.overflow = '';
+        boot.style.opacity = '0';
+        sessionStorage.setItem('boot-done', '1');
+        setTimeout(() => boot.remove(), 400);
+      };
+
+      const onKey = () => finish();
+      window.addEventListener('keydown', onKey);
+      skip?.addEventListener('click', finish);
+
+      let i = 0;
+      const step = () => {
+        if (i < lines.length) {
+          out.textContent += (i ? '\n' : '') + lines[i];
+          i++;
+          setTimeout(step, 200);
+        } else {
+          setTimeout(finish, 350);
+        }
+      };
+      step();
+    }
+  }
+</script>
