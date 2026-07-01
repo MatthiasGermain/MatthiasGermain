@@ -4,14 +4,16 @@ import {
   webProjects,
   embeddedProjects,
   profile,
-  path,
+  variantPath,
   type Lang,
+  type VariantKey,
 } from '../data/content';
 
 interface Props {
   lang: Lang;
+  variant?: VariantKey;
 }
-const { lang } = Astro.props;
+const { lang, variant = 'embedded' } = Astro.props;
 const other: Lang = lang === 'fr' ? 'en' : 'fr';
 
 const sections = [
@@ -138,7 +140,7 @@ const t = {
         </div>
         <div data-item>
           <a
-            href={path(other)}
+            href={variantPath(other, variant)}
             data-cmd
             data-label={`${t.switchLang[lang].toLowerCase()} langue language fr en`}
             class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-slate-300 aria-selected:bg-surface aria-selected:text-accent"

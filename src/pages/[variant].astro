@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import Page from '../components/Page.astro';
+import { profile, variants, type VariantKey } from '../data/content';
+
+export function getStaticPaths() {
+  // Le profil embarqué est servi par `/` (index.astro).
+  return (['web', 'python', 'cicd'] as const).map((variant) => ({ params: { variant } }));
+}
+
+const { variant } = Astro.params as { variant: VariantKey };
+const v = variants[variant];
+---
+
+<Base
+  lang="fr"
+  title={`${profile.name} - ${v.role.fr}`}
+  description={v.tagline.fr}
+>
+  <Page lang="fr" variant={variant} />
+</Base>

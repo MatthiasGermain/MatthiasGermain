@@ -2,32 +2,42 @@
 import {
   profile,
   experiences,
-  embeddedProjects,
-  webProjects,
   skills,
   education,
   certifications,
   ui,
-  path,
+  variants,
+  variantPath,
   type Lang,
   type Project,
+  type VariantKey,
+  type SectionId,
 } from '../data/content';
 import CommandPalette from './CommandPalette.astro';
 import BootSequence from './BootSequence.astro';
 
 interface Props {
   lang: Lang;
+  variant?: VariantKey;
 }
-const { lang } = Astro.props;
-const other: Lang = lang === 'fr' ? 'en' : 'fr';
+const { lang, variant = 'embedded' } = Astro.props;
 
-const nav = [
-  { id: 'experience', label: ui.nav.experience[lang] },
-  { id: 'embedded', label: ui.nav.embedded[lang] },
-  { id: 'web', label: ui.nav.web[lang] },
-  { id: 'skills', label: ui.nav.skills[lang] },
-  { id: 'contact', label: ui.nav.contact[lang] },
-];
+const v = variants[variant];
+
+// Ordre CSS d'une section ; `undefined` = section absente de la variante (masquée).
+const orderOf = (id: SectionId): number | undefined => {
+  const i = v.order.indexOf(id);
+  return i === -1 ? undefined : i;
+};
+
+// Navigation dans l'ordre de la variante. Le libellé « Projets » suit la variante.
+const navLabels: Record<SectionId, string> = {
+  experience: ui.nav.experience[lang],
+  projects: v.projectsTitle[lang],
+  skills: ui.nav.skills[lang],
+  contact: ui.nav.contact[lang],
+};
+const nav = v.order.map((id) => ({ id, label: navLabels[id] }));
 ---
 
 <!-- ============================== HEADER ============================== -->
@@ -35,7 +45,7 @@ const nav = [
   class="fixed inset-x-0 top-0 z-50 border-b border-line bg-ink/80 backdrop-blur-md"
 >
   <nav class="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
-    <a href={path(lang)} class="font-mono text-sm font-medium text-slate-100">
+    <a href={variantPath(lang, variant)} class="font-mono text-sm font-medium text-slate-100">
       MG<span class="text-accent">.</span>
     </a>
 
@@ -63,13 +73,13 @@ const nav = [
       </button>
       <div class="flex items-center gap-3">
       <a
-        href={path(lang)}
+        href={variantPath('fr', variant)}
         class={lang === 'fr' ? 'text-accent' : 'text-slate-500 hover:text-slate-200'}
         >FR</a
       >
       <span class="text-slate-700">/</span>
       <a
-        href={path(other)}
+        href={variantPath('en', variant)}
         class={lang === 'en' ? 'text-accent' : 'text-slate-500 hover:text-slate-200'}
         >EN</a
       >
@@ -89,18 +99,27 @@ const nav = [
 
     <p class="section-tag mb-5 flex items-center gap-2">
       <span class="inline-block h-2 w-2 animate-pulse rounded-full bg-accent"></span>
-      {profile.available[lang]}
+      {v.available[lang]}
     </p>
 
     <h1 class="text-4xl font-bold tracking-tight text-slate-50 sm:text-6xl">
       {profile.name}
     </h1>
     <p class="mt-3 font-mono text-lg text-accent sm:text-xl">
-      {profile.role[lang]}
+      {v.role[lang]}
+    </p>
+
+    <p class="mt-4">
+      <span
+        class="inline-flex items-center gap-2 rounded-full border border-line bg-card px-3 py-1 font-mono text-xs text-slate-400"
+      >
+        <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        {v.badge[lang]}
+      </span>
     </p>
 
     <p class="mt-6 max-w-2xl text-base leading-relaxed text-slate-400 sm:text-lg">
-      {profile.tagline[lang]}
+      {v.tagline[lang]}
     </p>
 
     <div class="mt-9 flex flex-wrap gap-4">
@@ -111,7 +130,7 @@ const nav = [
         {ui.hero.cta_contact[lang]}
       </a>
       <a
-        href="#web"
+        href="#projects"
         class="rounded-md border border-line px-5 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:border-accent hover:text-accent"
       >
         {ui.hero.cta_projects[lang]}
@@ -119,8 +138,10 @@ const nav = [
     </div>
   </section>
 
+  <!-- Sections réordonnées selon la variante (CSS order). -->
+  <div class="flex flex-col">
   <!-- =========================== EXPÉRIENCES =========================== -->
-  <section id="experience" class="scroll-mt-24 border-t border-line py-20">
+  <section id="experience" class="scroll-mt-24 border-t border-line py-20" style={`order:${orderOf('experience')}`} hidden={orderOf('experience') === undefined}>
     <p class="section-tag mb-2">{ui.sections.experience[lang]}</p>
     <h2 class="mb-12 text-2xl font-bold text-slate-100 sm:text-3xl">
       {ui.sections.experience[lang]}
@@ -152,51 +173,14 @@ const nav = [
                   </span>
                 ))}
               </div>
-            </div>
-          </article>
-        ))
-      }
-    </div>
-  </section>
-
-  <!-- ======================== PROJETS EMBARQUÉS ======================== -->
-  <section id="embedded" class="scroll-mt-24 border-t border-line py-20">
-    <p class="section-tag mb-2">{ui.sections.embedded[lang]}</p>
-    <h2 class="text-2xl font-bold text-slate-100 sm:text-3xl">{ui.sections.embedded[lang]}</h2>
-    <p class="mb-12 mt-2 max-w-2xl text-sm text-slate-400">{ui.sections.embedded_sub[lang]}</p>
-
-    <div class="grid gap-5 sm:grid-cols-2">
-      {
-        embeddedProjects.map((p) => (
-          <article class="flex flex-col rounded-xl border border-line bg-card p-6">
-            <p class="section-tag">{p.category[lang]}</p>
-            <h3 class="mt-2 text-lg font-semibold text-slate-100">{p.title}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-slate-400">{p.summary[lang]}</p>
-            <ul class="mt-4 space-y-1.5">
-              {p.highlights[lang].map((h) => (
-                <li class="flex gap-2.5 text-sm text-slate-300">
-                  <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-accent" />
-                  {h}
-                </li>
-              ))}
-            </ul>
-            <div class="mt-auto pt-5">
-              <div class="flex flex-wrap gap-2">
-                {p.stack.map((s) => (
-                  <span class="rounded border border-line px-2 py-0.5 font-mono text-xs text-slate-400">
-                    {s}
-                  </span>
-                ))}
-              </div>
-              {p.repo && p.repo !== '#' && (
-                <a
-                  href={p.repo}
-                  target="_blank"
-                  rel="noopener"
-                  class="mt-4 inline-block font-mono text-xs text-accent hover:underline"
-                >
-                  {ui.labels.code[lang]} ↗
-                </a>
+              {exp.links && (
+                <div class="mt-4 flex flex-wrap gap-4 font-mono text-xs">
+                  {exp.links.map((l) => (
+                    <a href={l.url} target="_blank" rel="noopener" class="text-accent hover:underline">
+                      {l.label} ↗
+                    </a>
+                  ))}
+                </div>
               )}
             </div>
           </article>
@@ -205,15 +189,16 @@ const nav = [
     </div>
   </section>
 
-  <!-- ========================= RÉALISATIONS WEB ========================= -->
-  <section id="web" class="scroll-mt-24 border-t border-line py-20">
-    <p class="section-tag mb-2">{ui.sections.web[lang]}</p>
-    <h2 class="text-2xl font-bold text-slate-100 sm:text-3xl">{ui.sections.web[lang]}</h2>
-    <p class="mb-12 mt-2 max-w-2xl text-sm text-slate-400">{ui.sections.web_sub[lang]}</p>
+  <!-- ============================== PROJETS ============================== -->
+  <!-- Une seule section ; son contenu suit la variante (embarqué / Python / web). -->
+  <section id="projects" class="scroll-mt-24 border-t border-line py-20" style={`order:${orderOf('projects')}`} hidden={orderOf('projects') === undefined}>
+    <p class="section-tag mb-2">{v.projectsTitle[lang]}</p>
+    <h2 class="text-2xl font-bold text-slate-100 sm:text-3xl">{v.projectsTitle[lang]}</h2>
+    <p class="mb-12 mt-2 max-w-2xl text-sm text-slate-400">{v.projectsSub[lang]}</p>
 
-    <div class="space-y-6">
-      {
-        webProjects.map((p: Project, i: number) => (
+    {v.projectsLayout === 'showcase' ? (
+      <div class="space-y-6">
+        {v.projects.map((p: Project, i: number) => (
           <article class="grid gap-6 overflow-hidden rounded-xl border border-line bg-card md:min-h-96 md:grid-cols-2">
             <a
               href={p.url}
@@ -281,13 +266,54 @@ const nav = [
               </div>
             </div>
           </article>
-        ))
-      }
-    </div>
+        ))}
+      </div>
+    ) : (
+      <div class="grid gap-5 sm:grid-cols-2">
+        {v.projects.map((p: Project) => (
+          <article class="flex flex-col rounded-xl border border-line bg-card p-6">
+            <p class="section-tag">{p.category[lang]}</p>
+            <h3 class="mt-2 text-lg font-semibold text-slate-100">{p.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">{p.summary[lang]}</p>
+            <p class="mt-3 text-sm text-slate-300">
+              <span class="font-mono text-xs text-accent">{ui.labels.role[lang]} · </span>
+              {p.role[lang]}
+            </p>
+            <ul class="mt-4 space-y-1.5">
+              {p.highlights[lang].map((h) => (
+                <li class="flex gap-2.5 text-sm text-slate-300">
+                  <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-accent" />
+                  {h}
+                </li>
+              ))}
+            </ul>
+            <div class="mt-auto pt-5">
+              <div class="flex flex-wrap gap-2">
+                {p.stack.map((s) => (
+                  <span class="rounded border border-line px-2 py-0.5 font-mono text-xs text-slate-400">
+                    {s}
+                  </span>
+                ))}
+              </div>
+              {p.repo && p.repo !== '#' && (
+                <a
+                  href={p.repo}
+                  target="_blank"
+                  rel="noopener"
+                  class="mt-4 inline-block font-mono text-xs text-accent hover:underline"
+                >
+                  {ui.labels.code[lang]} ↗
+                </a>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    )}
   </section>
 
   <!-- =========================== COMPÉTENCES =========================== -->
-  <section id="skills" class="scroll-mt-24 border-t border-line py-20">
+  <section id="skills" class="scroll-mt-24 border-t border-line py-20" style={`order:${orderOf('skills')}`} hidden={orderOf('skills') === undefined}>
     <p class="section-tag mb-2">{ui.sections.skills[lang]}</p>
     <h2 class="mb-12 text-2xl font-bold text-slate-100 sm:text-3xl">{ui.sections.skills[lang]}</h2>
 
@@ -340,7 +366,7 @@ const nav = [
   </section>
 
   <!-- ============================== CONTACT ============================== -->
-  <section id="contact" class="scroll-mt-24 border-t border-line py-20">
+  <section id="contact" class="scroll-mt-24 border-t border-line py-20" style={`order:${orderOf('contact')}`} hidden={orderOf('contact') === undefined}>
     <p class="section-tag mb-2">{ui.sections.contact[lang]}</p>
     <h2 class="text-2xl font-bold text-slate-100 sm:text-3xl">{ui.sections.contact[lang]}</h2>
     <p class="mt-2 max-w-xl text-sm text-slate-400">{ui.sections.contact_sub[lang]}</p>
@@ -360,6 +386,7 @@ const nav = [
       </a>
     </div>
   </section>
+  </div>
 </main>
 
 <!-- ============================== FOOTER ============================== -->
@@ -372,7 +399,7 @@ const nav = [
   </div>
 </footer>
 
-<CommandPalette lang={lang} />
+<CommandPalette lang={lang} variant={variant} />
 <BootSequence />
 
 <!-- Fond oscilloscope du hero -->

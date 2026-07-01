@@ -36,6 +36,36 @@ export const profile = {
   } as L,
 };
 
+/* ---------------------------------------------------------------- variantes
+ *  Le site affiche une version adaptée selon le CV depuis lequel on arrive.
+ *  Chaque CV pointe vers sa route :
+ *    /        → profil embarqué (défaut)
+ *    /web     → profil développeur web
+ *    /python  → profil Python / backend
+ *    /cicd    → profil CI/CD & automatisation
+ *  Une SEULE section « Projets » : son contenu (projets embarqués / Python /
+ *  web) change selon la variante. `order` définit l'ordre des sections.
+ *  La constante `variants` est définie plus bas, après les tableaux de projets.
+ * -------------------------------------------------------------------------- */
+export type SectionId = 'experience' | 'projects' | 'skills' | 'contact';
+export type VariantKey = 'embedded' | 'web' | 'python' | 'cicd';
+
+export interface Variant {
+  role: L;
+  tagline: L;
+  available: L;
+  /** Petit libellé affiché dans le hero pour signaler l'orientation du profil. */
+  badge: L;
+  /** Ordre des sections, appliqué à la page et à la navigation. */
+  order: SectionId[];
+  /** Projets affichés dans la section unique « Projets ». */
+  projects: Project[];
+  projectsTitle: L;
+  projectsSub: L;
+  /** `showcase` = grande mise en avant avec captures (web) ; `cards` = grille. */
+  projectsLayout: 'cards' | 'showcase';
+}
+
 /* ------------------------------------------------------------- expériences */
 export interface Experience {
   company: string;
@@ -44,9 +74,31 @@ export interface Experience {
   place: L;
   highlights: L<string[]>;
   stack: string[];
+  /** Liens d'exemple (ex. un site réalisé), affichés sous les technos. */
+  links?: { label: string; url: string }[];
 }
 
 export const experiences: Experience[] = [
+  {
+    company: 'Freelance - Développement web',
+    role: { fr: 'Développeur web · conception & mise en production', en: 'Web developer · design & production deployment' },
+    period: { fr: 'Janvier – Juin 2026', en: 'January – June 2026' },
+    place: { fr: 'Strasbourg, France · web', en: 'Strasbourg, France · web' },
+    highlights: {
+      fr: [
+        'Développement et mise en production de sites et plateformes web pour des clients (agence de communication, plateforme de services), de l\'architecture au déploiement.',
+        "Développement d'une plateforme multilingue (FR/DE/EN) de mise en relation artisans / particuliers (devis, cashback, parrainage), backend Supabase (base de données, stockage).",
+        "Plateforme SaaS pour églises (Narthex) générant des sites multi-pages avec gestion dynamique de contenu (événements, prédications, communauté).",
+      ],
+      en: [
+        'Development and production deployment of websites and web platforms for clients (communication agency, services platform), from architecture to release.',
+        'Development of interfaces and APIs in TypeScript (React / Next.js), front/back integration and API contracts.',
+        'Data modelling and SQL queries (PostgreSQL via Supabase); continuous deployment (Vercel, Git).',
+      ],
+    },
+    stack: ['TypeScript', 'React / Next.js', 'Astro', 'Tailwind CSS', 'Supabase (PostgreSQL)', 'Vercel', 'Git', 'SEO'],
+    links: [{ label: 'ChuTTT', url: 'https://chuttt.ch' }],
+  },
   {
     company: 'Schaeffler Automotive - Bühl',
     role: { fr: 'Stage ingénieur logiciel embarqué (6 mois)', en: 'Embedded software engineering intern (6 months)' },
@@ -152,6 +204,50 @@ export const embeddedProjects: Project[] = [
   },
 ];
 
+/* -------------------------------------------- projets logiciels / clés (Python) */
+export const softwareProjects: Project[] = [
+  {
+    title: 'Détection automatique de défauts (vision industrielle)',
+    category: { fr: 'Projet informatique industriel · Python', en: 'Industrial computing project · Python' },
+    summary: {
+      fr: "Étude de faisabilité de la détection automatique de défauts sur pièces industrielles par traitement d'images et comparaison 3D.",
+      en: 'Feasibility study of automatic defect detection on industrial parts through image processing and 3D comparison.',
+    },
+    role: { fr: "Chef d'équipe (4 personnes)", en: 'Team lead (4 people)' },
+    highlights: {
+      fr: [
+        "Pilotage d'une équipe de 4 sur l'ensemble de l'étude de faisabilité.",
+        "Détection de défauts par traitement d'images et comparaison 3D en Python.",
+      ],
+      en: [
+        'Led a team of 4 across the whole feasibility study.',
+        'Defect detection through image processing and 3D comparison in Python.',
+      ],
+    },
+    stack: ['Python', "Traitement d'images", 'Vision 3D', 'Git'],
+  },
+  {
+    title: 'Communication par lumière visible (VLC)',
+    category: { fr: 'Projet informatique de recherche · Python', en: 'Research computing project · Python' },
+    summary: {
+      fr: "Étude et validation d'une méthode de communication par lumière visible (VLC) : conception d'algorithmes de modulation / décodage sous-échantillonnés.",
+      en: 'Study and validation of a visible light communication (VLC) method: design of subsampled modulation / decoding algorithms.',
+    },
+    role: { fr: 'Conception & validation expérimentale', en: 'Design & experimental validation' },
+    highlights: {
+      fr: [
+        "Conception d'algorithmes de modulation / décodage sous-échantillonnés.",
+        'Validation expérimentale et analyse de performances.',
+      ],
+      en: [
+        'Design of subsampled modulation / decoding algorithms.',
+        'Experimental validation and performance analysis.',
+      ],
+    },
+    stack: ['Python', 'Traitement du signal', 'Algorithmique'],
+  },
+];
+
 /* ------------------------------------------------------------ projets web */
 export const webProjects: Project[] = [
   {
@@ -254,6 +350,84 @@ export const webProjects: Project[] = [
   },
 ];
 
+/* ------------------------------------------------------------- variantes */
+export const variants: Record<VariantKey, Variant> = {
+  embedded: {
+    role: profile.role,
+    tagline: profile.tagline,
+    available: profile.available,
+    badge: { fr: 'Profil orienté logiciel embarqué', en: 'Embedded software profile' },
+    order: ['experience', 'projects', 'skills', 'contact'],
+    projects: embeddedProjects,
+    projectsTitle: { fr: 'Projets embarqués', en: 'Embedded projects' },
+    projectsSub: {
+      fr: 'Au cœur de mon métier : conception matérielle et logiciel temps réel.',
+      en: 'The core of my craft: hardware design and real-time software.',
+    },
+    projectsLayout: 'cards',
+  },
+  web: {
+    role: { fr: 'Développeur web full-stack', en: 'Full-stack web developer' },
+    tagline: {
+      fr: "Développeur web full-stack issu d'une formation d'ingénieur (TÉLÉCOM Nancy). Je développe et déploie des plateformes web complètes - TypeScript, React/Next.js, Supabase - de l'architecture à la production, pour de vrais clients.",
+      en: 'Full-stack web developer with an engineering background (TÉLÉCOM Nancy). I build and ship complete web platforms - TypeScript, React/Next.js, Supabase - from architecture to production, for real clients.',
+    },
+    available: {
+      fr: 'Disponible - recherche un CDI en développement web',
+      en: 'Available - looking for a permanent web development role',
+    },
+    badge: { fr: 'Profil orienté développement web', en: 'Web development profile' },
+    order: ['experience', 'projects', 'skills', 'contact'],
+    projects: webProjects,
+    projectsTitle: { fr: 'Réalisations web', en: 'Web work' },
+    projectsSub: {
+      fr: 'Des produits réels, livrés de bout en bout pour de vrais clients - la preuve que je sais concevoir, développer et déployer un produit complet, en autonomie.',
+      en: 'Real products, shipped end to end for real clients - proof that I can design, build and deploy a complete product autonomously.',
+    },
+    projectsLayout: 'showcase',
+  },
+  python: {
+    role: { fr: 'Développeur Python / Backend', en: 'Python / Backend developer' },
+    tagline: {
+      fr: "Ingénieur en informatique orienté Python et architecture logicielle (POO, APIs REST, CI/CD). Expérience concrète d'automatisation et d'intégration de services en environnement industriel exigeant.",
+      en: 'Computer engineer focused on Python and software architecture (OOP, REST APIs, CI/CD). Hands-on experience automating and integrating services in demanding industrial environments.',
+    },
+    available: {
+      fr: 'Disponible - recherche un CDI de développeur Python / backend',
+      en: 'Available - looking for a permanent Python / backend developer role',
+    },
+    badge: { fr: 'Profil orienté Python / backend', en: 'Python / backend profile' },
+    order: ['experience', 'skills', 'projects', 'contact'],
+    projects: softwareProjects,
+    projectsTitle: { fr: 'Projets clés', en: 'Key projects' },
+    projectsSub: {
+      fr: "Projets d'algorithmique et de traitement de données en Python.",
+      en: 'Algorithmics and data-processing projects in Python.',
+    },
+    projectsLayout: 'cards',
+  },
+  cicd: {
+    role: { fr: 'Ingénieur logiciel · CI/CD & Automatisation', en: 'Software engineer · CI/CD & Automation' },
+    tagline: {
+      fr: "J'automatise les chaînes d'outils et fiabilise les pipelines CI/CD - Python, Jenkins, APIs REST. La rigueur d'un environnement industriel international, au service de vos migrations de toolchain.",
+      en: 'I automate toolchains and harden CI/CD pipelines - Python, Jenkins, REST APIs - with the rigour of a demanding international industrial environment.',
+    },
+    available: {
+      fr: 'Disponible - recherche un poste en CI/CD & automatisation',
+      en: 'Available - looking for a CI/CD & automation role',
+    },
+    badge: { fr: 'Profil orienté CI/CD & automatisation', en: 'CI/CD & automation profile' },
+    order: ['experience', 'skills', 'projects', 'contact'],
+    projects: softwareProjects,
+    projectsTitle: { fr: 'Projets clés', en: 'Key projects' },
+    projectsSub: {
+      fr: "Projets d'algorithmique et de traitement de données en Python.",
+      en: 'Algorithmics and data-processing projects in Python.',
+    },
+    projectsLayout: 'cards',
+  },
+};
+
 /* ----------------------------------------------------------- compétences */
 export interface SkillGroup {
   label: L;
@@ -310,6 +484,7 @@ export const ui = {
     about: { fr: 'Profil', en: 'About' },
     experience: { fr: 'Expériences', en: 'Experience' },
     embedded: { fr: 'Projets embarqués', en: 'Embedded projects' },
+    software: { fr: 'Projets clés', en: 'Key projects' },
     web: { fr: 'Réalisations web', en: 'Web work' },
     skills: { fr: 'Compétences', en: 'Skills' },
     contact: { fr: 'Contact', en: 'Contact' },
@@ -324,6 +499,11 @@ export const ui = {
     embedded_sub: {
       fr: 'Au cœur de mon métier : conception matérielle et logiciel temps réel.',
       en: 'The core of my craft: hardware design and real-time software.',
+    },
+    software: { fr: 'Projets clés', en: 'Key projects' },
+    software_sub: {
+      fr: "Projets d'algorithmique et de traitement de données en Python.",
+      en: 'Algorithmics and data-processing projects in Python.',
     },
     web: { fr: 'Réalisations web', en: 'Web work' },
     web_sub: {
@@ -350,4 +530,10 @@ export const ui = {
 
 export function path(lang: Lang): string {
   return lang === 'fr' ? '/' : '/en/';
+}
+
+/** URL d'une variante pour une langue donnée (préserve le profil au switch FR/EN). */
+export function variantPath(lang: Lang, variant: VariantKey = 'embedded'): string {
+  if (variant === 'embedded') return lang === 'fr' ? '/' : '/en/';
+  return lang === 'fr' ? `/${variant}` : `/en/${variant}`;
 }

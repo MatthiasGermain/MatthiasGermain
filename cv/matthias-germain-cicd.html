@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CV - Matthias Germain - CI/CD & Automatisation</title>
+    <style>
+      :root {
+        --ink: #1f2933;
+        --muted: #5b6770;
+        --line: #d9dee3;
+        --accent: #0f766e; /* teal sobre */
+        --accent-soft: #e6f2f0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+        color: var(--ink);
+        font-size: 10.5px;
+        line-height: 1.45;
+        background: #f3f5f7;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        background: #fff;
+        padding: 14mm 14mm 12mm;
+      }
+
+      /* ---------- Header ---------- */
+      header {
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 10px;
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-size: 25px;
+        letter-spacing: 1px;
+        margin: 0;
+        text-transform: uppercase;
+      }
+      .role {
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 12.5px;
+        margin-top: 2px;
+        letter-spacing: 0.5px;
+      }
+      .contact {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 16px;
+        color: var(--muted);
+        font-size: 9.8px;
+      }
+      .contact a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      /* ---------- Layout ---------- */
+      .body {
+        display: grid;
+        grid-template-columns: 1fr 62mm;
+        gap: 16px;
+      }
+
+      h2 {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--accent);
+        margin: 0 0 7px;
+        padding-bottom: 3px;
+        border-bottom: 1px solid var(--line);
+      }
+      section {
+        margin-bottom: 14px;
+      }
+
+      .summary {
+        margin: 0 0 14px;
+        font-size: 10.5px;
+      }
+
+      .job {
+        margin-bottom: 11px;
+      }
+      .job-title {
+        font-weight: 700;
+        font-size: 10.8px;
+      }
+      .job-meta {
+        color: var(--muted);
+        font-size: 9.5px;
+        margin: 1px 0 4px;
+      }
+      ul {
+        margin: 4px 0 0;
+        padding-left: 15px;
+      }
+      li {
+        margin-bottom: 3px;
+      }
+      .tech {
+        margin-top: 4px;
+        font-size: 9.2px;
+        color: var(--muted);
+      }
+      .tech b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .skill-group {
+        margin-bottom: 9px;
+      }
+      .skill-group h3 {
+        font-size: 9.8px;
+        margin: 0 0 3px;
+        color: var(--ink);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .chip {
+        background: var(--accent-soft);
+        color: #0c5b54;
+        border-radius: 3px;
+        padding: 2px 6px;
+        font-size: 8.8px;
+        white-space: nowrap;
+      }
+      .chip.learn {
+        background: #fff;
+        border: 1px dashed var(--line);
+        color: var(--muted);
+      }
+      .side-item {
+        margin-bottom: 9px;
+      }
+      .side-item .t {
+        font-weight: 600;
+        font-size: 9.8px;
+      }
+      .side-item .m {
+        color: var(--muted);
+        font-size: 9px;
+      }
+
+      @media print {
+        body {
+          background: #fff;
+          font-size: 10px;
+        }
+        .page {
+          margin: 0;
+          padding: 12mm 12mm 10mm;
+          width: auto;
+          min-height: auto;
+        }
+        a {
+          color: inherit;
+        }
+      }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <h1>Matthias Germain</h1>
+        <div class="role">Ingénieur logiciel · CI/CD &amp; Automatisation</div>
+        <div class="contact">
+          <span>+33 6 02 32 17 20</span>
+          <a href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>
+          <a href="https://github.com/MatthiasGermain">github.com/MatthiasGermain</a>
+          <a href="https://www.linkedin.com/in/matthias-germain-98b3ba2a4/">LinkedIn</a>
+          <a href="https://matthias-germain.vercel.app">matthias-germain.vercel.app</a>
+          <span>Strasbourg · Permis B</span>
+        </div>
+      </header>
+
+      <p class="summary">
+        Ingénieur en informatique formé aux systèmes embarqués, avec une expérience concrète de
+        l'<b>intégration continue</b> et de l'<b>automatisation d'outils</b> : conception d'un outil intégré
+        à un pipeline <b>CI/CD Jenkins</b>, automatisation de chaînes de configuration en Python via des
+        <b>APIs REST</b>, et déploiement continu d'applications web. Habitué à un environnement industriel
+        international exigeant (documentation, validation, travail en équipe), je cherche à mettre cette
+        rigueur au service de missions de <b>CI/CD et de migration de toolchain</b>.
+      </p>
+
+      <div class="body">
+        <!-- ============ MAIN ============ -->
+        <div class="main">
+          <section>
+            <h2>Expériences</h2>
+
+            <div class="job">
+              <div class="job-title">Ingénieur logiciel · Automatisation &amp; CI/CD — Schaeffler Automotive (stage 6 mois)</div>
+              <div class="job-meta">Avril à Septembre 2025 · Bühl-Baden, Allemagne · automobile</div>
+              <ul>
+                <li>
+                  Conception d'un outil Python (POO) de génération de rapports d'erreurs
+                  <b>intégré au pipeline CI/CD Jenkins</b> : temps de traitement réduit de ~18 min à ~1 min.
+                </li>
+                <li>
+                  <b>Automatisation</b> de la validation et de la génération de configurations ECU
+                  (Python, <b>APIs REST</b> Confluence / Windchill PLM) : suppression des erreurs de saisie manuelle.
+                </li>
+                <li>
+                  Production de documentation technique et travail en équipe internationale
+                  (ECU, ETAS, calibration, diagnostics, signaux CAN).
+                </li>
+              </ul>
+              <div class="tech">
+                <b>Tech :</b> Python, CI/CD, Jenkins, APIs REST, Windchill (PLM), Confluence, Git/GitHub, VM, ETAS
+              </div>
+            </div>
+
+            <div class="job">
+              <div class="job-title">Développeur web · conception &amp; mise en production</div>
+              <div class="job-meta">Janvier à Juin 2026 · Strasbourg</div>
+              <ul>
+                <li>
+                  Conception et <b>mise en production</b> de sites et plateformes web pour des clients,
+                  de la maquette au déploiement.
+                </li>
+                <li>
+                  <b>Déploiement continu</b> via Vercel, gestion de version <b>Git / GitHub</b>,
+                  base de données managée <b>Supabase (PostgreSQL)</b>.
+                </li>
+                <li>Livraison de bout en bout en autonomie ; optimisation et SEO.</li>
+              </ul>
+              <div class="tech">
+                <b>Tech :</b> TypeScript, React / Next.js, Astro, Tailwind, Supabase (PostgreSQL), Vercel, Git, SEO
+              </div>
+            </div>
+
+            <div class="job">
+              <div class="job-title">Développeur embarqué temps réel — Maquette Urbanloop (stage 2 mois)</div>
+              <div class="job-meta">Juin à Juillet 2024 · Télécom Nancy</div>
+              <ul>
+                <li>
+                  Refonte de la logique d'aiguillage temps réel (ESP32, FreeRTOS) : suppression d'un délai
+                  d'~2 s et fin des déraillements.
+                </li>
+                <li>
+                  Interface de supervision temps réel (Flask, JavaScript) : suivi de 4 entités,
+                  détection des déconnexions Wi-Fi, modes manuel / auto.
+                </li>
+              </ul>
+              <div class="tech"><b>Tech :</b> C/C++, FreeRTOS, ESP32, UART, IrDA, Flask, JavaScript, PlatformIO, Git</div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Projets clés</h2>
+            <div class="job">
+              <div class="job-title">Processeur RISC-V</div>
+              <ul>
+                <li>
+                  Implémentation complète d'un processeur RISC-V en VHDL, avec interface web de simulation
+                  d'instructions publiée sur GitHub Pages.
+                </li>
+              </ul>
+              <div class="tech"><b>Tech :</b> VHDL, FPGA, Quartus, RISC-V, Python</div>
+            </div>
+            <div class="job">
+              <div class="job-title">Système embarqué sous FreeRTOS (ESP32)</div>
+              <ul>
+                <li>
+                  Mesure CO₂ / température / humidité, tâches concurrentes en modèle producteur-consommateur
+                  sur deux ESP32 communicants.
+                </li>
+              </ul>
+              <div class="tech"><b>Tech :</b> C/C++, FreeRTOS, ESP32, UART</div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ============ SIDEBAR ============ -->
+        <aside class="side">
+          <section>
+            <h2>Compétences</h2>
+
+            <div class="skill-group">
+              <h3>CI/CD &amp; automatisation</h3>
+              <div class="chips">
+                <span class="chip">CI/CD</span>
+                <span class="chip">GitHub Actions</span>
+                <span class="chip">Jenkins</span>
+                <span class="chip">Docker (notions)</span>
+                <span class="chip">Git / GitHub</span>
+                <span class="chip">Déploiement continu (Vercel)</span>
+                <span class="chip">Automatisation Python</span>
+                <span class="chip">APIs REST</span>
+              </div>
+            </div>
+
+            <div class="skill-group">
+              <h3>Langages &amp; scripting</h3>
+              <div class="chips">
+                <span class="chip">Python</span>
+                <span class="chip">C / C++</span>
+                <span class="chip">TypeScript / JS</span>
+                <span class="chip">SQL</span>
+                <span class="chip">VHDL</span>
+              </div>
+            </div>
+
+            <div class="skill-group">
+              <h3>Cloud &amp; données</h3>
+              <div class="chips">
+                <span class="chip">Vercel</span>
+                <span class="chip">Supabase (PostgreSQL)</span>
+                <span class="chip">Linux</span>
+                <span class="chip">VM</span>
+              </div>
+            </div>
+
+            <div class="skill-group">
+              <h3>Qualité &amp; méthode</h3>
+              <div class="chips">
+                <span class="chip">Tests &amp; validation</span>
+                <span class="chip">Documentation technique</span>
+                <span class="chip">Gestion de projet</span>
+                <span class="chip">Transfert de connaissances</span>
+              </div>
+            </div>
+
+            <div class="skill-group">
+              <h3>Axes de montée en compétences</h3>
+              <div class="chips">
+                <span class="chip learn">Terraform (IaC)</span>
+                <span class="chip learn">JFrog Artifactory</span>
+                <span class="chip learn">SonarQube</span>
+                <span class="chip learn">RBAC</span>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Langues</h2>
+            <div class="side-item">
+              <div class="m">Français (natif) · Anglais (courant, B2+)</div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Formation</h2>
+            <div class="side-item">
+              <div class="t">Diplôme d'ingénieur en informatique</div>
+              <div class="m">Systèmes &amp; logiciels embarqués · TÉLÉCOM Nancy · 2022-2025</div>
+            </div>
+            <div class="side-item">
+              <div class="t">Classe préparatoire PC</div>
+              <div class="m">Lycée Victor Hugo, Besançon · 2020-2022</div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Certifications</h2>
+            <div class="side-item">
+              <div class="m">MOOC Gestion de Projet · Centrale Lille</div>
+              <div class="m">BAFA</div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Engagement</h2>
+            <div class="side-item">
+              <div class="m">
+                Vice-président de l'association Fortin (devoir de mémoire, lien intergénérationnel).
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>
