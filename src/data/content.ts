@@ -88,7 +88,7 @@ export const experiences: Experience[] = [
       fr: [
         'Développement et mise en production de sites et plateformes web pour des clients (agence de communication, plateforme de services), de l\'architecture au déploiement.',
         "Développement d'une plateforme multilingue (FR/DE/EN) de mise en relation artisans / particuliers (devis, cashback, parrainage), backend Supabase (base de données, stockage).",
-        "Plateforme SaaS pour églises (Narthex) générant des sites multi-pages avec gestion dynamique de contenu (événements, prédications, communauté).",
+        "Plateforme SaaS pour églises (Narthex) générant des sites multi-pages avec gestion dynamique de contenu (événements, prédications, communauté) ; conteneurisation Docker et déploiement sur une machine virtuelle DigitalOcean.",
       ],
       en: [
         'Development and production deployment of websites and web platforms for clients (communication agency, services platform), from architecture to release.',
@@ -96,7 +96,7 @@ export const experiences: Experience[] = [
         'Data modelling and SQL queries (PostgreSQL via Supabase); continuous deployment (Vercel, Git).',
       ],
     },
-    stack: ['TypeScript', 'React / Next.js', 'Astro', 'Tailwind CSS', 'Supabase (PostgreSQL)', 'Vercel', 'Git', 'SEO'],
+    stack: ['TypeScript', 'React / Next.js', 'Astro', 'Tailwind CSS', 'Supabase (PostgreSQL)', 'Docker', 'DigitalOcean', 'Vercel', 'Git', 'SEO'],
     links: [{ label: 'ChuTTT', url: 'https://chuttt.ch' }],
   },
   {
@@ -286,15 +286,17 @@ export const webProjects: Project[] = [
       fr: [
         'Architecture multi-tenant : un moteur unique, un site dédié par église.',
         'Back-office de gestion paroissiale (cultes, événements, membres).',
+        'Conteneurisation Docker et déploiement sur une machine virtuelle DigitalOcean.',
         'Instance de démonstration en ligne et fonctionnelle (church-test.dev).',
       ],
       en: [
         'Multi-tenant architecture: a single engine, one dedicated site per church.',
         'Parish-management back office (services, events, members).',
+        'Docker containerisation and deployment on a DigitalOcean virtual machine.',
         'Live, working demo instance (church-test.dev).',
       ],
     },
-    stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS'],
+    stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'Docker', 'DigitalOcean'],
     status: { fr: 'En cours', en: 'In progress' },
     url: 'https://narthex.dev',
     demoUrl: 'https://church-test.dev',
@@ -449,7 +451,7 @@ export const skills: SkillGroup[] = [
   },
   {
     label: { fr: 'Outils & méthodes', en: 'Tools & methods' },
-    items: ['Git / GitHub', 'CI/CD (Jenkins)', 'PlatformIO', 'Quartus', 'ETAS', 'Linux', 'LaTeX', 'Gestion de projet'],
+    items: ['Git / GitHub', 'CI/CD (Jenkins)', 'Docker', 'DigitalOcean', 'PlatformIO', 'Quartus', 'ETAS', 'Linux', 'LaTeX', 'Gestion de projet'],
   },
 ];
 
