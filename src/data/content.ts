@@ -31,8 +31,8 @@ export const profile = {
     en: 'I design and harden real-time embedded software - C/C++, FreeRTOS, microcontrollers. And because I can ship a product end to end, I also build web applications for real clients.',
   } as L,
   available: {
-    fr: 'Disponible - recherche un CDI en logiciel embarqué',
-    en: 'Available - looking for a permanent embedded software role',
+    fr: 'Disponible à partir de septembre - recherche un CDI en logiciel embarqué',
+    en: 'Available from September - looking for a permanent embedded software role',
   } as L,
 };
 
@@ -375,8 +375,8 @@ export const variants: Record<VariantKey, Variant> = {
       en: 'Full-stack web developer with an engineering background (TÉLÉCOM Nancy). I build and ship complete web platforms - TypeScript, React/Next.js, Supabase - from architecture to production, for real clients.',
     },
     available: {
-      fr: 'Disponible - recherche un CDI en développement web',
-      en: 'Available - looking for a permanent web development role',
+      fr: 'Disponible à partir de septembre - recherche un CDI en développement web',
+      en: 'Available from September - looking for a permanent web development role',
     },
     badge: { fr: 'Profil orienté développement web', en: 'Web development profile' },
     order: ['experience', 'projects', 'skills', 'contact'],
@@ -395,8 +395,8 @@ export const variants: Record<VariantKey, Variant> = {
       en: 'Computer engineer focused on Python and software architecture (OOP, REST APIs, CI/CD). Hands-on experience automating and integrating services in demanding industrial environments.',
     },
     available: {
-      fr: 'Disponible - recherche un CDI de développeur Python / backend',
-      en: 'Available - looking for a permanent Python / backend developer role',
+      fr: 'Disponible à partir de septembre - recherche un CDI de développeur Python / backend',
+      en: 'Available from September - looking for a permanent Python / backend developer role',
     },
     badge: { fr: 'Profil orienté Python / backend', en: 'Python / backend profile' },
     order: ['experience', 'skills', 'projects', 'contact'],
@@ -415,8 +415,8 @@ export const variants: Record<VariantKey, Variant> = {
       en: 'I automate toolchains and harden CI/CD pipelines - Python, Jenkins, REST APIs - with the rigour of a demanding international industrial environment.',
     },
     available: {
-      fr: 'Disponible - recherche un poste en CI/CD & automatisation',
-      en: 'Available - looking for a CI/CD & automation role',
+      fr: 'Disponible à partir de septembre - recherche un poste en CI/CD & automatisation',
+      en: 'Available from September - looking for a CI/CD & automation role',
     },
     badge: { fr: 'Profil orienté CI/CD & automatisation', en: 'CI/CD & automation profile' },
     order: ['experience', 'skills', 'projects', 'contact'],

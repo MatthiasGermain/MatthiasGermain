@@ -1,0 +1,80 @@
+---
+export const prerender = false;
+
+import Base from '../../layouts/Base.astro';
+import { getScheduleWithStatus } from '../../data/schedule';
+import { getInProgressTasks, type NotionTask } from '../../lib/notion';
+
+const blocks = getScheduleWithStatus();
+
+let tasks: NotionTask[] = [];
+let tasksError: string | null = null;
+try {
+  tasks = await getInProgressTasks();
+} catch (err) {
+  tasksError = err instanceof Error ? err.message : 'Erreur inconnue lors de la lecture Notion.';
+}
+
+function formatMinutes(m: number): string {
+  const h = Math.floor(m / 60) % 24;
+  const min = m % 60;
+  return `${String(h).padStart(2, '0')}h${String(min).padStart(2, '0')}`;
+}
+---
+
+<Base lang="fr" title="Routine" description="Où j'en suis maintenant.">
+  <main class="mx-auto max-w-2xl px-4 py-10 font-sans">
+    <h1 class="mb-8 text-2xl font-semibold">Où j'en suis</h1>
+
+    <section class="mb-10">
+      <h2 class="mb-3 text-sm font-medium uppercase tracking-wide text-gray-500">
+        Planning
+      </h2>
+      <ol class="flex flex-col gap-1">
+        {
+          blocks.map((block) => (
+            <li
+              class:list={[
+                'flex items-center justify-between rounded-md px-3 py-2 text-sm',
+                block.status === 'current' && 'bg-black font-semibold text-white',
+                block.status === 'past' && 'text-gray-400',
+                block.status === 'upcoming' && 'text-gray-800',
+              ]}
+            >
+              <span>{block.label}</span>
+              <span class="font-mono text-xs opacity-80">
+                {formatMinutes(block.start)}
+                {block.start !== block.end && ` – ${formatMinutes(block.end)}`}
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section>
+      <h2 class="mb-3 text-sm font-medium uppercase tracking-wide text-gray-500">
+        Tâches en cours
+      </h2>
+      {
+        tasksError ? (
+          <p class="text-sm text-red-600">
+            Impossible de charger les tâches Notion : {tasksError}
+          </p>
+        ) : tasks.length === 0 ? (
+          <p class="text-sm text-gray-400">Aucune tâche en cours.</p>
+        ) : (
+          <ul class="flex flex-col gap-1">
+            {tasks.map((task) => (
+              <li class="rounded-md border border-gray-200 px-3 py-2 text-sm">
+                <a href={task.url} target="_blank" rel="noopener noreferrer" class="hover:underline">
+                  {task.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </section>
+  </main>
+</Base>

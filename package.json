@@ -9,8 +9,10 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "astro": "^5.7.0",
+    "@astrojs/vercel": "^8.2.11",
+    "@notionhq/client": "^2.3.0",
     "@tailwindcss/vite": "^4.1.0",
+    "astro": "^5.7.0",
     "tailwindcss": "^4.1.0"
   }
 }
