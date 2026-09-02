@@ -14,7 +14,7 @@ function toMinutes(h: number, m: number): number {
   return h * 60 + m;
 }
 
-export const schedule: ScheduleBlock[] = [
+export const weekdaySchedule: ScheduleBlock[] = [
   { start: toMinutes(7, 30), end: toMinutes(7, 35), label: 'Réveil & Déclencheurs' },
   { start: toMinutes(7, 35), end: toMinutes(8, 5), label: 'Petit-déjeuner' },
   { start: toMinutes(8, 5), end: toMinutes(8, 25), label: 'Deprivation' },
@@ -34,6 +34,18 @@ export const schedule: ScheduleBlock[] = [
   { start: toMinutes(24, 0), end: toMinutes(24, 0), label: 'Coucher' },
 ];
 
+/** Planning du week-end (samedi/dimanche) — volontairement vide à part. */
+export const weekendSchedule: ScheduleBlock[] = [{ start: toMinutes(10, 0), end: toMinutes(11, 30), label: 'Rencontre' }];
+
+function isWeekend(day: number): boolean {
+  return day === 0 || day === 6;
+}
+
+/** Le planning applicable pour une date donnée (semaine ou week-end). */
+export function getActiveSchedule(now: Date = new Date()): ScheduleBlock[] {
+  return isWeekend(now.getDay()) ? weekendSchedule : weekdaySchedule;
+}
+
 export type BlockStatus = 'past' | 'current' | 'upcoming';
 
 export interface ScheduleBlockWithStatus extends ScheduleBlock {
@@ -49,7 +61,7 @@ export interface ScheduleBlockWithStatus extends ScheduleBlock {
 export function getScheduleWithStatus(now: Date = new Date()): ScheduleBlockWithStatus[] {
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-  return schedule.map((block) => {
+  return getActiveSchedule(now).map((block) => {
     // Le dernier bloc ("Coucher") est ponctuel (start === end) : on ne peut
     // jamais être "dedans", seulement avant ou après.
     const isPunctual = block.start === block.end;
@@ -69,6 +81,8 @@ export function getScheduleWithStatus(now: Date = new Date()): ScheduleBlockWith
   });
 }
 
-export function getCurrentBlock(now: Date = new Date()): ScheduleBlockWithStatus | null {
-  return getScheduleWithStatus(now).find((b) => b.status === 'current') ?? null;
+export function formatMinutes(m: number): string {
+  const h = Math.floor(m / 60) % 24;
+  const min = m % 60;
+  return `${String(h).padStart(2, '0')}h${String(min).padStart(2, '0')}`;
 }
