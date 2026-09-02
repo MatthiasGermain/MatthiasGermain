@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 import { getScheduleWithStatus, getBlockProgress, formatMinutes } from '../../data/schedule';
 import { getInProgressTasks, getTodoTasks, getDoneTasks, type NotionTask } from '../../lib/notion';
 import { tagColorStyle } from '../../lib/task-colors';
-import { SORT_OPTIONS, parseSortKey, sortTasks } from '../../lib/task-sort';
+import { SORT_OPTIONS, parseSortKey, sortTasks, taskSignature } from '../../lib/task-sort';
 
 const blocks = getScheduleWithStatus();
 
@@ -96,7 +96,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
                     {inProgressTasks.length}
                   </span>
                 </div>
-                <div id="inProgressContent">
+                <div id="inProgressContent" data-signature={taskSignature(sortedInProgress)}>
                   {sortedInProgress.length === 0 ? (
                     <p class="tasks-empty">Aucune tâche en cours.</p>
                   ) : (
@@ -125,7 +125,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
                     {todoTasks.length}
                   </span>
                 </div>
-                <div id="todoContent">
+                <div id="todoContent" data-signature={taskSignature(sortedTodo)}>
                   {sortedTodo.length === 0 ? (
                     <p class="tasks-empty">Rien à faire pour l'instant.</p>
                   ) : (
@@ -160,7 +160,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
             </span>
           )}
         </div>
-        <div id="doneContent">
+        <div id="doneContent" data-signature={taskSignature(doneTasks, true)}>
           {tasksError ? (
             <p class="tasks-empty">—</p>
           ) : doneTasks.length === 0 ? (
@@ -198,6 +198,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
   <script>
     import { getScheduleWithStatus, getBlockProgress } from '../../data/schedule';
     import { tagColorStyle } from '../../lib/task-colors';
+    import { taskSignature } from '../../lib/task-sort';
     import { createGrainient } from '../../lib/grainient';
     import type { NotionTask } from '../../lib/notion';
 
@@ -293,8 +294,13 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
 
     // Empreinte du contenu d'une section : tant qu'elle ne change pas, on ne
     // repeint rien — le rafraîchissement passe inaperçu au lieu de faire
-    // clignoter les listes toutes les 60s.
+    // clignoter les listes toutes les 60s. Amorcée depuis le `data-signature`
+    // posé au rendu serveur, sinon le premier fetch repeindrait pour rien.
     const lastSignatures: Record<string, string> = {};
+    for (const id of ['inProgressContent', 'todoContent', 'doneContent']) {
+      const el = document.getElementById(id);
+      if (el?.dataset.signature) lastSignatures[id] = el.dataset.signature;
+    }
 
     function updateSection(
       contentId: string,
@@ -309,7 +315,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       if (count) count.textContent = String(tasks.length);
       if (!content) return;
 
-      const signature = JSON.stringify(tasks.map((t) => [t.id, t.title, compact ? null : t.space]));
+      const signature = taskSignature(tasks, compact);
       if (lastSignatures[contentId] === signature) return;
       lastSignatures[contentId] = signature;
       renderTaskList(content, tasks, variant, emptyText, compact);

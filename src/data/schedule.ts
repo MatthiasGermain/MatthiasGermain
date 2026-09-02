@@ -14,7 +14,7 @@ function toMinutes(h: number, m: number): number {
   return h * 60 + m;
 }
 
-export const weekdaySchedule: ScheduleBlock[] = [
+const weekdaySchedule: ScheduleBlock[] = [
   { start: toMinutes(7, 30), end: toMinutes(7, 35), label: 'Réveil & Déclencheurs' },
   { start: toMinutes(7, 35), end: toMinutes(8, 5), label: 'Petit-déjeuner' },
   { start: toMinutes(8, 5), end: toMinutes(8, 25), label: 'Deprivation' },
@@ -35,14 +35,14 @@ export const weekdaySchedule: ScheduleBlock[] = [
 ];
 
 /** Planning du week-end (samedi/dimanche) — volontairement vide à part. */
-export const weekendSchedule: ScheduleBlock[] = [{ start: toMinutes(10, 0), end: toMinutes(11, 30), label: 'Rencontre' }];
+const weekendSchedule: ScheduleBlock[] = [{ start: toMinutes(10, 0), end: toMinutes(11, 30), label: 'Rencontre' }];
 
 function isWeekend(day: number): boolean {
   return day === 0 || day === 6;
 }
 
 /** Le planning applicable pour une date donnée (semaine ou week-end). */
-export function getActiveSchedule(now: Date = new Date()): ScheduleBlock[] {
+function getActiveSchedule(now: Date = new Date()): ScheduleBlock[] {
   return isWeekend(now.getDay()) ? weekendSchedule : weekdaySchedule;
 }
 

@@ -18,6 +18,15 @@ export function parseSortKey(value: string | null): SortKey {
   return value === 'alpha' ? 'alpha' : 'priority';
 }
 
+/**
+ * Empreinte du contenu d'une liste. Calculée à l'identique au rendu serveur
+ * (posée en `data-signature`) et au rafraîchissement client : tant qu'elles
+ * coïncident, le client ne repeint rien.
+ */
+export function taskSignature(tasks: NotionTask[], compact = false): string {
+  return JSON.stringify(tasks.map((t) => [t.id, t.title, compact ? null : t.space]));
+}
+
 export function sortTasks(tasks: NotionTask[], sortKey: SortKey): NotionTask[] {
   const compare = (a: NotionTask, b: NotionTask) =>
     sortKey === 'priority' ? (b.priority ?? -1) - (a.priority ?? -1) : a.title.localeCompare(b.title, 'fr');

@@ -11,7 +11,7 @@ export interface TagColor {
   textDark: string;
 }
 
-export const NOTION_TAG_COLORS: Record<string, TagColor> = {
+const NOTION_TAG_COLORS: Record<string, TagColor> = {
   default: { bg: '#f1f1ef', text: '#32302c', bgDark: '#2f2f2f', textDark: '#d4d4d4' },
   gray: { bg: '#e3e2e0', text: '#32302c', bgDark: '#454b4e', textDark: '#c4c4c4' },
   brown: { bg: '#e9e5e3', text: '#442a1e', bgDark: '#4a3228', textDark: '#c9a88c' },

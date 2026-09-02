@@ -33,18 +33,6 @@ function getClient(): Client {
   return client;
 }
 
-/**
- * Récupère le schéma brut de la base (types + noms de propriétés).
- * Usage ponctuel en dev pour découvrir la propriété statut et ses valeurs
- * exactes avant de finaliser STATUS_PROPERTY / IN_PROGRESS_VALUE ci-dessus.
- */
-export async function discoverSchema() {
-  if (!NOTION_TASKS_DB_ID) {
-    throw new Error('NOTION_TASKS_DB_ID manquant (variable d\'environnement).');
-  }
-  return getClient().databases.retrieve({ database_id: NOTION_TASKS_DB_ID });
-}
-
 export interface NotionTask {
   id: string;
   title: string;
