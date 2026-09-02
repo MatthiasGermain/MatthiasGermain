@@ -81,6 +81,19 @@ export function getScheduleWithStatus(now: Date = new Date()): ScheduleBlockWith
   });
 }
 
+/**
+ * Avancement (0-100) dans un bloc pour une heure donnée : 0 au début du
+ * créneau, 100 à sa fin. Sert à la fois à la barre de progression et au
+ * remplissage du fil de la timeline.
+ */
+export function getBlockProgress(block: ScheduleBlock, now: Date = new Date()): number {
+  const duration = block.end - block.start;
+  if (duration <= 0) return 0;
+  const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+  const elapsed = nowMinutes - block.start;
+  return Math.min(100, Math.max(0, (elapsed / duration) * 100));
+}
+
 export function formatMinutes(m: number): string {
   const h = Math.floor(m / 60) % 24;
   const min = m % 60;

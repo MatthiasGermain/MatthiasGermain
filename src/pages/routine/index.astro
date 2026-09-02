@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import Base from '../../layouts/Base.astro';
-import { getScheduleWithStatus, formatMinutes } from '../../data/schedule';
+import { getScheduleWithStatus, getBlockProgress, formatMinutes } from '../../data/schedule';
 import { getInProgressTasks, getTodoTasks, getDoneTasks, type NotionTask } from '../../lib/notion';
 import { tagColorStyle } from '../../lib/task-colors';
 import { SORT_OPTIONS, parseSortKey, sortTasks } from '../../lib/task-sort';
@@ -40,6 +40,8 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     />
   </Fragment>
 
+  <div class="grainient-bg" id="grainientBg" aria-hidden="true"></div>
+
   <div class="routine-page">
     <button class="theme-toggle-btn" id="themeToggleBtn" title="Changer le theme">&#9790;</button>
 
@@ -55,7 +57,10 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
         <div class="schedule-list" id="scheduleList">
           {
             blocks.map((block) => (
-              <div class={`schedule-item ${block.status}`}>
+              <div
+                class={`schedule-item ${block.status}`}
+                style={block.status === 'current' ? `--block-progress:${getBlockProgress(block).toFixed(1)}%` : undefined}
+              >
                 <span class="schedule-time">{formatMinutes(block.start)}</span>
                 <span class="schedule-label">{block.label}</span>
               </div>
@@ -96,8 +101,8 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
                     <p class="tasks-empty">Aucune tâche en cours.</p>
                   ) : (
                     <ul class="task-list">
-                      {sortedInProgress.map((task) => (
-                        <li class="task-item in-progress">
+                      {sortedInProgress.map((task, i) => (
+                        <li class="task-item in-progress" style={`--i:${i}`}>
                           <a href={task.url} target="_blank" rel="noopener noreferrer">
                             <span class="task-title">{task.title}</span>
                             {task.space && (
@@ -125,8 +130,8 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
                     <p class="tasks-empty">Rien à faire pour l'instant.</p>
                   ) : (
                     <ul class="task-list">
-                      {sortedTodo.map((task) => (
-                        <li class="task-item todo">
+                      {sortedTodo.map((task, i) => (
+                        <li class="task-item todo" style={`--i:${i}`}>
                           <a href={task.url} target="_blank" rel="noopener noreferrer">
                             <span class="task-title">{task.title}</span>
                             {task.space && (
@@ -162,8 +167,8 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
             <p class="tasks-empty">Aucune tâche terminée récemment.</p>
           ) : (
             <ul class="task-list">
-              {doneTasks.map((task) => (
-                <li class="task-item done">
+              {doneTasks.map((task, i) => (
+                <li class="task-item done" style={`--i:${i}`}>
                   <a href={task.url} target="_blank" rel="noopener noreferrer">
                     <span class="task-title">{task.title}</span>
                   </a>
@@ -174,11 +179,26 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
         </div>
       </aside>
     </div>
+
+    {/* Gabarits clonés par le rafraîchissement client : rendus par Astro, ils
+        portent l'attribut de scope des styles (contrairement à du HTML
+        construit à la main en JS, qui sortirait sans aucun style). */}
+    <template id="tplTaskList"><ul class="task-list" /></template>
+    <template id="tplTasksEmpty"><p class="tasks-empty" /></template>
+    <template id="tplTaskItem">
+      <li class="task-item">
+        <a target="_blank" rel="noopener noreferrer">
+          <span class="task-title" />
+          <span class="task-badge" />
+        </a>
+      </li>
+    </template>
   </div>
 
   <script>
-    import { getScheduleWithStatus } from '../../data/schedule';
+    import { getScheduleWithStatus, getBlockProgress } from '../../data/schedule';
     import { tagColorStyle } from '../../lib/task-colors';
+    import { createGrainient } from '../../lib/grainient';
     import type { NotionTask } from '../../lib/notion';
 
     function pad(n: number) {
@@ -198,37 +218,101 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     function refreshSchedule() {
       const now = new Date();
       const blocks = getScheduleWithStatus(now);
-      const items = document.querySelectorAll('#scheduleList .schedule-item');
+      const items = document.querySelectorAll<HTMLElement>('#scheduleList .schedule-item');
       items.forEach((el, i) => {
-        const status = blocks[i]?.status;
-        if (status) el.className = `schedule-item ${status}`;
+        const block = blocks[i];
+        if (!block) return;
+        el.className = `schedule-item ${block.status}`;
+        // Avancement dans le créneau : remplit le fil de la timeline et la
+        // barre de progression du bloc courant.
+        if (block.status === 'current') {
+          el.style.setProperty('--block-progress', `${getBlockProgress(block, now).toFixed(1)}%`);
+        } else {
+          el.style.removeProperty('--block-progress');
+        }
       });
     }
     refreshSchedule();
     setInterval(refreshSchedule, 30000);
 
     // ===== TASKS: light refresh via JSON instead of a full page reload. =====
-    function escapeHtml(s: string) {
-      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    function cloneTemplate(id: string): HTMLElement | null {
+      const tpl = document.getElementById(id) as HTMLTemplateElement | null;
+      const node = tpl?.content.firstElementChild?.cloneNode(true);
+      return (node as HTMLElement) ?? null;
     }
 
-    function renderTaskList(tasks: NotionTask[], variant: string, emptyText: string, compact = false): string {
-      if (tasks.length === 0) return `<p class="tasks-empty">${emptyText}</p>`;
-      const items = tasks
-        .map((task) => {
-          const badge =
-            !compact && task.space
-              ? `<span class="task-badge" style="${tagColorStyle(task.spaceColor)}">${escapeHtml(task.space)}</span>`
-              : '';
-          return `<li class="task-item ${variant}">
-            <a href="${task.url}" target="_blank" rel="noopener noreferrer">
-              <span class="task-title">${escapeHtml(task.title)}</span>
-              ${badge}
-            </a>
-          </li>`;
-        })
-        .join('');
-      return `<ul class="task-list">${items}</ul>`;
+    function renderTaskList(
+      container: HTMLElement,
+      tasks: NotionTask[],
+      variant: string,
+      emptyText: string,
+      compact = false,
+    ) {
+      container.replaceChildren();
+
+      if (tasks.length === 0) {
+        const empty = cloneTemplate('tplTasksEmpty');
+        if (empty) {
+          empty.textContent = emptyText;
+          container.append(empty);
+        }
+        return;
+      }
+
+      const list = cloneTemplate('tplTaskList');
+      if (!list) return;
+
+      tasks.forEach((task, i) => {
+        const item = cloneTemplate('tplTaskItem');
+        if (!item) return;
+        item.classList.add(variant);
+        item.style.setProperty('--i', String(i));
+
+        const link = item.querySelector('a');
+        if (link) link.href = task.url;
+
+        const title = item.querySelector('.task-title');
+        if (title) title.textContent = task.title;
+
+        const badge = item.querySelector('.task-badge');
+        if (badge) {
+          if (!compact && task.space) {
+            badge.textContent = task.space;
+            badge.setAttribute('style', tagColorStyle(task.spaceColor));
+          } else {
+            badge.remove();
+          }
+        }
+
+        list.append(item);
+      });
+
+      container.append(list);
+    }
+
+    // Empreinte du contenu d'une section : tant qu'elle ne change pas, on ne
+    // repeint rien — le rafraîchissement passe inaperçu au lieu de faire
+    // clignoter les listes toutes les 60s.
+    const lastSignatures: Record<string, string> = {};
+
+    function updateSection(
+      contentId: string,
+      countId: string,
+      tasks: NotionTask[],
+      variant: string,
+      emptyText: string,
+      compact = false,
+    ) {
+      const content = document.getElementById(contentId);
+      const count = document.getElementById(countId);
+      if (count) count.textContent = String(tasks.length);
+      if (!content) return;
+
+      const signature = JSON.stringify(tasks.map((t) => [t.id, t.title, compact ? null : t.space]));
+      if (lastSignatures[contentId] === signature) return;
+      lastSignatures[contentId] = signature;
+      renderTaskList(content, tasks, variant, emptyText, compact);
     }
 
     async function refreshTasks() {
@@ -237,25 +321,62 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
         const data = await res.json();
         if (data.error) return; // keep last known good state
 
-        const inProgressContent = document.getElementById('inProgressContent');
-        const todoContent = document.getElementById('todoContent');
-        const doneContent = document.getElementById('doneContent');
-        const inProgressCount = document.getElementById('inProgressCount');
-        const todoCount = document.getElementById('todoCount');
-        const doneCount = document.getElementById('doneCount');
-
-        if (inProgressContent) inProgressContent.innerHTML = renderTaskList(data.inProgress, 'in-progress', 'Aucune tâche en cours.');
-        if (todoContent) todoContent.innerHTML = renderTaskList(data.todo, 'todo', "Rien à faire pour l'instant.");
-        if (doneContent)
-          doneContent.innerHTML = renderTaskList(data.done, 'done', 'Aucune tâche terminée récemment.', true);
-        if (inProgressCount) inProgressCount.textContent = String(data.inProgress.length);
-        if (todoCount) todoCount.textContent = String(data.todo.length);
-        if (doneCount) doneCount.textContent = String(data.done.length);
+        updateSection('inProgressContent', 'inProgressCount', data.inProgress, 'in-progress', 'Aucune tâche en cours.');
+        updateSection('todoContent', 'todoCount', data.todo, 'todo', "Rien à faire pour l'instant.");
+        updateSection('doneContent', 'doneCount', data.done, 'done', 'Aucune tâche terminée récemment.', true);
       } catch {
         // Réseau indisponible : on garde le dernier état connu plutôt que de casser l'affichage.
       }
     }
     setInterval(refreshTasks, 60000);
+
+    // ===== BACKGROUND: dégradé grainé animé.
+    // Réglages d'origine du composant (reactbits.dev) : seules les couleurs
+    // sont adaptées à la palette du dashboard.
+    const BG_BASE = {
+      timeSpeed: 0.25,
+      colorBalance: 0.0,
+      warpStrength: 1.0,
+      warpFrequency: 5.0,
+      warpSpeed: 2.0,
+      warpAmplitude: 50.0,
+      blendAngle: 0.0,
+      blendSoftness: 0.05,
+      rotationAmount: 500.0,
+      noiseScale: 2.0,
+      grainAmount: 0.1,
+      grainScale: 2.0,
+      grainAnimated: false,
+      contrast: 1.5,
+      gamma: 1.0,
+      saturation: 1.0,
+      centerX: 0.0,
+      centerY: 0.0,
+      zoom: 0.9,
+    };
+    // Trois teintes distinctes de la palette, sans blanc : le violet éclairci
+    // garde le champ assez clair pour que les cartes blanches ressortent, le
+    // cyan sert de base sourde pour éviter la bouillie mauve.
+    const BG_LIGHT = {
+      color1: '#d3b3e2', // violet éclairci
+      color2: '#8b80f9', // indigo
+      color3: '#628f93', // cyan
+    };
+    // De nuit, on descend d'un cran en luminosité sur les mêmes teintes.
+    const BG_DARK = {
+      color1: '#6f66d6', // indigo assombri
+      color2: '#a67fbd', // violet assombri
+      color3: '#151d3d', // raisin profond
+    };
+
+    const grainient = (() => {
+      const el = document.getElementById('grainientBg');
+      return el ? createGrainient(el, { ...BG_BASE, ...BG_LIGHT }) : null;
+    })();
+
+    function applyBackgroundPalette(theme: 'light' | 'dark') {
+      grainient?.update(theme === 'dark' ? BG_DARK : BG_LIGHT);
+    }
 
     // ===== THEME (auto by time-of-day / light / dark) =====
     const THEME_DAY_START = 7;
@@ -281,8 +402,10 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       btn.classList.toggle('theme-auto', mode === 'auto');
     }
     function applyTheme(mode: 'auto' | 'light' | 'dark') {
-      document.documentElement.setAttribute('data-theme', getEffectiveTheme(mode));
+      const effective = getEffectiveTheme(mode);
+      document.documentElement.setAttribute('data-theme', effective);
       updateThemeButton(mode);
+      applyBackgroundPalette(effective);
     }
 
     document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
@@ -321,7 +444,6 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       --ease-signature: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
       font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--cream);
       color: var(--foreground);
       height: 100vh;
       padding: 20px;
@@ -329,6 +451,25 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      /* Le fond est peint par .grainient-bg, en dessous. */
+      background: transparent;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Fond animé (dégradé grainé WebGL). Le canvas se glisse dedans ; la
+       couleur unie du thème sert de repli si WebGL2 est indisponible. */
+    .grainient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      /* Valeurs en dur : ce bloc est frère de .routine-page, où sont
+         déclarées les variables de palette — il n'en hérite donc pas. */
+      background: #f4f0ec;
+      pointer-events: none;
+    }
+    :global([data-theme='dark']) .grainient-bg {
+      background: #0f1530;
     }
 
     :global(html),
@@ -518,8 +659,14 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     .schedule-item.past .schedule-label {
       color: var(--past-text);
     }
+    /* Le fil se remplit au fil du créneau : la césure passé/à-venir suit
+       l'avancement réel dans le bloc plutôt qu'un 50/50 figé. */
     .schedule-item.current::before {
-      background: linear-gradient(to bottom, var(--past-line) 50%, var(--violet) 50%);
+      background: linear-gradient(
+        to bottom,
+        var(--past-line) var(--block-progress, 50%),
+        var(--violet) var(--block-progress, 50%)
+      );
     }
     .schedule-item.current::after {
       background: var(--sunglow);
@@ -551,6 +698,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       line-height: 1.3;
       white-space: nowrap;
     }
+
 
     /* Sort controls */
     .sort-bar {
@@ -630,6 +778,30 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       flex-direction: column;
       gap: 6px;
     }
+    /* Entrée en cascade : au chargement, et à chaque fois qu'une liste change
+       réellement lors du rafraîchissement (sinon rien n'est repeint).
+       `backwards` (et non `both`) pour que le hover reprenne la main une fois
+       l'animation terminée. */
+    @keyframes taskIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    @keyframes taskInDone {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 0.65;
+        transform: none;
+      }
+    }
     .task-item {
       background: linear-gradient(165deg, var(--polaroid-light), var(--polaroid-mid));
       border: 1px solid var(--isabelline);
@@ -639,6 +811,8 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       transition:
         transform 0.2s var(--ease-signature),
         box-shadow 0.2s var(--ease-signature);
+      animation: taskIn 0.28s var(--ease-signature) backwards;
+      animation-delay: calc(var(--i, 0) * 30ms);
     }
     .task-item:hover {
       transform: translateY(-2px);
@@ -647,6 +821,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     @media (prefers-reduced-motion: reduce) {
       .task-item {
         transition: box-shadow 0.2s var(--ease-signature);
+        animation: none;
       }
       .task-item:hover {
         transform: none;
@@ -661,6 +836,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     .task-item.done {
       border-left-color: var(--violet);
       opacity: 0.65;
+      animation-name: taskInDone;
     }
     .task-item a {
       display: flex;

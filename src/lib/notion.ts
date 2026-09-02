@@ -21,17 +21,6 @@ const IN_PROGRESS_VALUE = import.meta.env.NOTION_STATUS_IN_PROGRESS_VALUE ?? 'En
 const TODO_VALUE = import.meta.env.NOTION_STATUS_TODO_VALUE ?? 'Pas commencé';
 const DONE_VALUE = import.meta.env.NOTION_STATUS_DONE_VALUE ?? 'Terminé';
 
-// Page + vue Notion (Kanban "Suivi des tâches") depuis laquelle tu ouvres tes
-// tâches normalement — utilisées pour que les liens ouvrent chaque tâche en
-// "side-peek" dans le contexte de cette vue plutôt que la page brute isolée.
-const NOTION_VIEW_PAGE_ID = import.meta.env.NOTION_VIEW_PAGE_ID ?? '0a2b272152698377b9c7813d7f7ea7ae';
-const NOTION_VIEW_ID = import.meta.env.NOTION_VIEW_ID ?? '376b27215269832bb78a0845448b8124';
-
-function taskViewUrl(taskId: string): string {
-  const flatId = taskId.replace(/-/g, '');
-  return `https://app.notion.com/p/${NOTION_VIEW_PAGE_ID}?v=${NOTION_VIEW_ID}&p=${flatId}&pm=s`;
-}
-
 let client: Client | null = null;
 
 function getClient(): Client {
@@ -120,7 +109,7 @@ async function queryTasksByStatus(
     return {
       id: page.id,
       title,
-      url: taskViewUrl(page.id),
+      url: page.url ?? '',
       space: spaceProp?.select?.name ?? null,
       spaceColor: spaceProp?.select?.color ?? null,
       priority: priorityProp?.select?.name ? Number(priorityProp.select.name) || null : null,
