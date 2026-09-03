@@ -23,8 +23,9 @@ export function parseSortKey(value: string | null): SortKey {
  * (posée en `data-signature`) et au rafraîchissement client : tant qu'elles
  * coïncident, le client ne repeint rien.
  */
-export function taskSignature(tasks: NotionTask[], compact = false): string {
-  return JSON.stringify(tasks.map((t) => [t.id, t.title, compact ? null : t.space]));
+export function taskSignature(tasks: NotionTask[]): string {
+  // L'empreinte couvre exactement ce qui est affiché.
+  return JSON.stringify(tasks.map((t) => [t.id, t.title, t.space]));
 }
 
 export function sortTasks(tasks: NotionTask[], sortKey: SortKey): NotionTask[] {

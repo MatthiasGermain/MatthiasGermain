@@ -19,7 +19,6 @@ const NOTION_TASKS_DB_ID = import.meta.env.NOTION_TASKS_DB_ID;
 const STATUS_PROPERTY = import.meta.env.NOTION_STATUS_PROPERTY ?? 'État';
 const IN_PROGRESS_VALUE = import.meta.env.NOTION_STATUS_IN_PROGRESS_VALUE ?? 'En cours';
 const TODO_VALUE = import.meta.env.NOTION_STATUS_TODO_VALUE ?? 'Pas commencé';
-const DONE_VALUE = import.meta.env.NOTION_STATUS_DONE_VALUE ?? 'Terminé';
 
 let client: Client | null = null;
 
@@ -66,24 +65,14 @@ function findProp(properties: Record<string, any>, name: string): any {
   return undefined;
 }
 
-async function queryTasksByStatus(
-  statusValue: string,
-  opts: { sortByRecentEdit?: boolean; pageSize?: number } = {},
-): Promise<NotionTask[]> {
+async function queryTasksByStatus(statusValue: string): Promise<NotionTask[]> {
   if (!NOTION_TASKS_DB_ID) {
     throw new Error('NOTION_TASKS_DB_ID manquant (variable d\'environnement).');
   }
 
   const response = await getClient().databases.query({
     database_id: NOTION_TASKS_DB_ID,
-    filter: {
-      property: STATUS_PROPERTY,
-      status: { equals: statusValue },
-    },
-    ...(opts.sortByRecentEdit && {
-      sorts: [{ timestamp: 'last_edited_time', direction: 'descending' }],
-    }),
-    ...(opts.pageSize && { page_size: opts.pageSize }),
+    filter: { property: STATUS_PROPERTY, status: { equals: statusValue } },
   });
 
   return response.results.map((page: any) => {
@@ -112,9 +101,4 @@ export function getInProgressTasks(): Promise<NotionTask[]> {
 
 export function getTodoTasks(): Promise<NotionTask[]> {
   return queryTasksByStatus(TODO_VALUE);
-}
-
-/** Les tâches terminées les plus récentes, pour un panneau "historique". */
-export function getDoneTasks(limit = 12): Promise<NotionTask[]> {
-  return queryTasksByStatus(DONE_VALUE, { sortByRecentEdit: true, pageSize: limit });
 }

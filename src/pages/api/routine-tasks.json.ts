@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
-import { getInProgressTasks, getTodoTasks, getDoneTasks } from '../../lib/notion';
+import { getInProgressTasks, getTodoTasks } from '../../lib/notion';
 import { parseSortKey, sortTasks } from '../../lib/task-sort';
 
 /**
@@ -13,13 +13,12 @@ export const GET: APIRoute = async ({ url }) => {
   const sortKey = parseSortKey(url.searchParams.get('sort'));
 
   try {
-    const [inProgress, todo, done] = await Promise.all([getInProgressTasks(), getTodoTasks(), getDoneTasks()]);
+    const [inProgress, todo] = await Promise.all([getInProgressTasks(), getTodoTasks()]);
 
     return new Response(
       JSON.stringify({
         inProgress: sortTasks(inProgress, sortKey),
         todo: sortTasks(todo, sortKey),
-        done,
       }),
       { headers: { 'Content-Type': 'application/json' } },
     );

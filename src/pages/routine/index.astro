@@ -3,7 +3,7 @@ export const prerender = false;
 
 import Base from '../../layouts/Base.astro';
 import { getScheduleWithStatus, getBlockProgress, formatMinutes } from '../../data/schedule';
-import { getInProgressTasks, getTodoTasks, getDoneTasks, type NotionTask } from '../../lib/notion';
+import { getInProgressTasks, getTodoTasks, type NotionTask } from '../../lib/notion';
 import { tagColorStyle } from '../../lib/task-colors';
 import { SORT_OPTIONS, parseSortKey, sortTasks, taskSignature } from '../../lib/task-sort';
 
@@ -11,14 +11,9 @@ const blocks = getScheduleWithStatus();
 
 let inProgressTasks: NotionTask[] = [];
 let todoTasks: NotionTask[] = [];
-let doneTasks: NotionTask[] = [];
 let tasksError: string | null = null;
 try {
-  [inProgressTasks, todoTasks, doneTasks] = await Promise.all([
-    getInProgressTasks(),
-    getTodoTasks(),
-    getDoneTasks(),
-  ]);
+  [inProgressTasks, todoTasks] = await Promise.all([getInProgressTasks(), getTodoTasks()]);
 } catch (err) {
   tasksError = err instanceof Error ? err.message : 'Erreur inconnue lors de la lecture Notion.';
 }
@@ -151,33 +146,6 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
         }
       </main>
 
-      <aside class="card history-card">
-        <div class="tasks-header">
-          <span class="tasks-title">Historique</span>
-          {!tasksError && (
-            <span class="tasks-count" id="doneCount">
-              {doneTasks.length}
-            </span>
-          )}
-        </div>
-        <div id="doneContent" data-signature={taskSignature(doneTasks, true)}>
-          {tasksError ? (
-            <p class="tasks-empty">—</p>
-          ) : doneTasks.length === 0 ? (
-            <p class="tasks-empty">Aucune tâche terminée récemment.</p>
-          ) : (
-            <ul class="task-list">
-              {doneTasks.map((task, i) => (
-                <li class="task-item done" style={`--i:${i}`}>
-                  <a href={task.url} target="_blank" rel="noopener noreferrer">
-                    <span class="task-title">{task.title}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </aside>
     </div>
 
     {/* Gabarits clonés par le rafraîchissement client : rendus par Astro, ils
@@ -243,13 +211,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       return (node as HTMLElement) ?? null;
     }
 
-    function renderTaskList(
-      container: HTMLElement,
-      tasks: NotionTask[],
-      variant: string,
-      emptyText: string,
-      compact = false,
-    ) {
+    function renderTaskList(container: HTMLElement, tasks: NotionTask[], variant: string, emptyText: string) {
       container.replaceChildren();
 
       if (tasks.length === 0) {
@@ -278,7 +240,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
 
         const badge = item.querySelector('.task-badge');
         if (badge) {
-          if (!compact && task.space) {
+          if (task.space) {
             badge.textContent = task.space;
             badge.setAttribute('style', tagColorStyle(task.spaceColor));
           } else {
@@ -297,7 +259,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     // clignoter les listes toutes les 60s. Amorcée depuis le `data-signature`
     // posé au rendu serveur, sinon le premier fetch repeindrait pour rien.
     const lastSignatures: Record<string, string> = {};
-    for (const id of ['inProgressContent', 'todoContent', 'doneContent']) {
+    for (const id of ['inProgressContent', 'todoContent']) {
       const el = document.getElementById(id);
       if (el?.dataset.signature) lastSignatures[id] = el.dataset.signature;
     }
@@ -308,17 +270,16 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       tasks: NotionTask[],
       variant: string,
       emptyText: string,
-      compact = false,
     ) {
       const content = document.getElementById(contentId);
       const count = document.getElementById(countId);
       if (count) count.textContent = String(tasks.length);
       if (!content) return;
 
-      const signature = taskSignature(tasks, compact);
+      const signature = taskSignature(tasks);
       if (lastSignatures[contentId] === signature) return;
       lastSignatures[contentId] = signature;
-      renderTaskList(content, tasks, variant, emptyText, compact);
+      renderTaskList(content, tasks, variant, emptyText);
     }
 
     async function refreshTasks() {
@@ -329,7 +290,6 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
 
         updateSection('inProgressContent', 'inProgressCount', data.inProgress, 'in-progress', 'Aucune tâche en cours.');
         updateSection('todoContent', 'todoCount', data.todo, 'todo', "Rien à faire pour l'instant.");
-        updateSection('doneContent', 'doneCount', data.done, 'done', 'Aucune tâche terminée récemment.', true);
       } catch {
         // Réseau indisponible : on garde le dernier état connu plutôt que de casser l'affichage.
       }
@@ -552,19 +512,6 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       flex-direction: column;
       gap: 22px;
     }
-    .history-card {
-      width: 260px;
-      flex-shrink: 0;
-      height: 100%;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-    @media (max-width: 1024px) {
-      .history-card {
-        width: 220px;
-      }
-    }
     @media (max-width: 768px) {
       :global(html),
       :global(body) {
@@ -579,8 +526,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
         flex-direction: column;
       }
       .schedule-card,
-      .tasks-card,
-      .history-card {
+      .tasks-card {
         width: auto;
         height: auto;
         overflow: visible;
@@ -831,16 +777,6 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
         transform: none;
       }
     }
-    @keyframes taskInDone {
-      from {
-        opacity: 0;
-        transform: translateY(4px);
-      }
-      to {
-        opacity: 0.65;
-        transform: none;
-      }
-    }
     .task-item {
       /* Pas de backdrop-filter ici : la carte parente floute déjà le fond,
          un second flou serait sans effet visible et coûteux. */
@@ -874,11 +810,6 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     .task-item.todo {
       border-left-color: var(--cyan);
     }
-    .task-item.done {
-      border-left-color: var(--violet);
-      opacity: 0.65;
-      animation-name: taskInDone;
-    }
     .task-item a {
       display: flex;
       align-items: center;
@@ -910,13 +841,6 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     :global([data-theme='dark']) .task-badge {
       color: var(--badge-text-dark);
       background: var(--badge-bg-dark);
-    }
-    .history-card .task-item .task-title {
-      font-size: 0.85em;
-    }
-    .history-card .task-item.done .task-title {
-      text-decoration: line-through;
-      text-decoration-color: var(--past-line);
     }
     .tasks-empty {
       text-align: center;

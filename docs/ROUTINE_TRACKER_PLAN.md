@@ -11,7 +11,7 @@ Un simple coup d'œil "où j'en suis maintenant" : le bloc de ton planning-type 
 - Un seul déploiement Vercel : route intégrée au repo `portfolio` (Astro), pas de nouveau projet.
 - Route `/routine` cachée, non listée dans la nav.
 - **Aucune base Notion à créer.** Ta base de tâches existante (globale, avec vues + statut à faire/en cours/fait) est lue telle quelle, en lecture seule.
-- **Aucune écriture.** Le dashboard n'enregistre rien : il ne fait que lire Notion. Le panneau "Historique" affiche les tâches déjà passées au statut "Terminé" dans Notion — c'est une lecture, pas un journal tenu par le dashboard.
+- **Aucune écriture, aucun historique.** Le dashboard ne fait que lire Notion et n'affiche que l'état courant. Les tâches terminées ne sont pas affichées du tout : suivre ce qui a été fait est explicitement hors périmètre.
 
 ## 3. Pourquoi c'est plus simple que prévu initialement
 
@@ -53,10 +53,9 @@ Pas de schéma à créer : on lit ta base telle qu'elle existe. La structure exa
 - Bloc horaire actuel mis en avant (à venir / en cours / passé, purement visuel, aucun état à cocher).
 - Liste des tâches Notion au statut "en cours" (ou équivalent, à confirmer selon le schéma découvert).
 - Liste des tâches au statut "Pas commencé" (panneau "À faire").
-- Panneau "Historique" : les 12 dernières tâches "Terminé", triées par date de modification.
 - Tri des listes par priorité ou alphabétique, via `?sort=` (persisté au rafraîchissement).
 - Catégorie ("Espace") affichée en badge, aux couleurs définies dans Notion.
-- Toujours exclu : aucune case à cocher, aucune écriture, aucun suivi de complétion jour après jour.
+- Toujours exclu : aucune case à cocher, aucune écriture, aucun affichage des tâches terminées, aucun suivi de complétion jour après jour.
 
 ## 7. À préparer côté Notion
 
@@ -74,7 +73,7 @@ Aucune nouvelle base à créer — juste partager l'existante avec l'intégratio
 - `src/lib/task-sort.ts`, `src/lib/task-colors.ts` : modules purs (tri, empreinte de liste, couleurs des tags), partagés serveur et client.
 - `src/pages/api/routine-tasks.json.ts` : endpoint JSON pour le rafraîchissement client (évite un rechargement complet toutes les 60 s).
 - `src/lib/grainient.ts` : fond animé WebGL (portage vanilla du composant React de reactbits.dev, dépendance `ogl`).
-- `src/pages/routine/index.astro` : `export const prerender = false`, dashboard plein écran non scrollable (Programme à gauche, tâches au centre, historique à droite).
+- `src/pages/routine/index.astro` : `export const prerender = false`, dashboard plein écran non scrollable (Programme à gauche, tâches à droite).
 - Variables d'env Vercel : `NOTION_TOKEN`, `NOTION_TASKS_DB_ID`.
 - Aucun lien dans la nav du portfolio.
 
