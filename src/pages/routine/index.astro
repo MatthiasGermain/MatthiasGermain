@@ -174,10 +174,17 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       return String(n).padStart(2, '0');
     }
 
+    // L'horloge n'affiche que HH:MM : on n'écrit que quand la minute change.
+    // Réécrire le même texte chaque seconde invaliderait la peinture 60 fois
+    // par minute, et donc le `backdrop-filter` des panneaux avec.
+    let lastClock = '';
     function tickClock() {
       const now = new Date();
+      const label = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      if (label === lastClock) return;
+      lastClock = label;
       const el = document.getElementById('clock');
-      if (el) el.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      if (el) el.textContent = label;
     }
     tickClock();
     setInterval(tickClock, 1000);
@@ -191,12 +198,20 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       items.forEach((el, i) => {
         const block = blocks[i];
         if (!block) return;
-        el.className = `schedule-item ${block.status}`;
-        // Avancement dans le créneau : remplit le fil de la timeline et la
-        // barre de progression du bloc courant.
+
+        // On n'écrit que si la valeur change réellement : une réassignation
+        // identique invalide quand même le style, et fait recalculer le flou
+        // des panneaux au compositeur.
+        const className = `schedule-item ${block.status}`;
+        if (el.className !== className) el.className = className;
+
+        // Avancement dans le créneau : remplit le fil de la timeline.
         if (block.status === 'current') {
-          el.style.setProperty('--block-progress', `${getBlockProgress(block, now).toFixed(1)}%`);
-        } else {
+          const progress = `${getBlockProgress(block, now).toFixed(1)}%`;
+          if (el.style.getPropertyValue('--block-progress') !== progress) {
+            el.style.setProperty('--block-progress', progress);
+          }
+        } else if (el.style.getPropertyValue('--block-progress')) {
           el.style.removeProperty('--block-progress');
         }
       });
@@ -310,7 +325,11 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       blendSoftness: 0.05,
       rotationAmount: 500.0,
       noiseScale: 2.0,
-      grainAmount: 0.1,
+      // Grain désactivé côté shader : il est rendu en calque CSS fixe
+      // au-dessus du canvas (voir `.grainient-bg::after`). Dans le shader il
+      // était écrêté par le `clamp` dans les zones claires, ce qui le faisait
+      // paraître se déplacer avec le dégradé.
+      grainAmount: 0,
       grainScale: 2.0,
       grainAnimated: false,
       contrast: 1.5,
@@ -450,6 +469,25 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     }
     :global([data-theme='dark']) .grainient-bg {
       background: #0f1530;
+    }
+
+    /* Grain : calque fixe posé au-dessus du canvas, et non plus calculé dans
+       le shader. Dans le shader il était ajouté avant `contrast` et `clamp`,
+       donc écrêté (invisible) dans les zones claires du dégradé : le motif
+       était figé, mais son masque se déplaçait avec le dégradé, ce qui donnait
+       l'illusion d'un grain qui rampe. Ici il est composé une seule fois,
+       strictement immobile, et ne coûte rien par frame.
+       `overlay` laisse le gris moyen neutre : seules les déviations du bruit
+       ressortent, ce qui est exactement le comportement d'un grain argentique. */
+    .grainient-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      opacity: 0.55;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
     }
 
     :global(html),
