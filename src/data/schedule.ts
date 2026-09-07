@@ -81,6 +81,11 @@ export function getScheduleWithStatus(now: Date = new Date()): ScheduleBlockWith
   });
 }
 
+/** Le libellé du bloc en cours, ou null hors planning. */
+export function getCurrentBlockLabel(now: Date = new Date()): string | null {
+  return getScheduleWithStatus(now).find((b) => b.status === 'current')?.label ?? null;
+}
+
 /**
  * Avancement (0-100) dans un bloc pour une heure donnée : 0 au début du
  * créneau, 100 à sa fin. Sert à la fois à la barre de progression et au

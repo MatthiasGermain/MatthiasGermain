@@ -3,11 +3,21 @@ export const prerender = false;
 
 import Base from '../../layouts/Base.astro';
 import { getScheduleWithStatus, getBlockProgress, formatMinutes } from '../../data/schedule';
+import {
+  DOMAIN_LABELS,
+  WEEKDAY_LABELS,
+  weekPlan,
+  getCurrentSlot,
+  prioritizeForDomain,
+  isTaskInDomain,
+} from '../../data/week-plan';
 import { getInProgressTasks, getTodoTasks, type NotionTask } from '../../lib/notion';
 import { tagColorStyle } from '../../lib/task-colors';
 import { SORT_OPTIONS, parseSortKey, sortTasks, taskSignature } from '../../lib/task-sort';
 
 const blocks = getScheduleWithStatus();
+const slot = getCurrentSlot();
+const domain = slot?.domain ?? null;
 
 let inProgressTasks: NotionTask[] = [];
 let todoTasks: NotionTask[] = [];
@@ -23,8 +33,10 @@ function sortUrl(key: string): string {
   return `${Astro.url.pathname}?sort=${key}`;
 }
 
-const sortedInProgress = sortTasks(inProgressTasks, sortKey);
-const sortedTodo = sortTasks(todoTasks, sortKey);
+// Tri choisi par l'utilisateur, puis remontée des tâches du domaine du créneau
+// en cours : rien n'est masqué, seul l'ordre change.
+const sortedInProgress = prioritizeForDomain(sortTasks(inProgressTasks, sortKey), domain);
+const sortedTodo = prioritizeForDomain(sortTasks(todoTasks, sortKey), domain);
 ---
 
 <Base lang="fr" title="Routine" description="Où j'en suis maintenant." favicon="/favicon-routine.svg">
@@ -61,6 +73,42 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
               </div>
             ))
           }
+        </div>
+
+        <div class="week-plan">
+          <div class="week-header">
+            <span class="week-title">Semaine</span>
+            <span class="week-note">Flow 3 indicatif</span>
+          </div>
+
+          <div class="week-grid" id="weekGrid">
+            <span class="week-corner"></span>
+            {WEEKDAY_LABELS.map((d, i) => <span class={`week-day ${slot?.dayIndex === i ? 'today' : ''}`}>{d}</span>)}
+            {
+              [0, 1, 2].map((flowIndex) => (
+                <>
+                  <span class="week-flow">F{flowIndex + 1}</span>
+                  {weekPlan.map((day, dayIndex) => (
+                    <span
+                      class:list={[
+                        'week-cell',
+                        `d-${day[flowIndex]}`,
+                        slot?.dayIndex === dayIndex && slot?.flowIndex === flowIndex && 'now',
+                      ]}
+                      title={`${DOMAIN_LABELS[day[flowIndex]]} — Flow ${flowIndex + 1}`}
+                    />
+                  ))}
+                </>
+              ))
+            }
+          </div>
+
+          <div class="week-legend">
+            <span class="legend-item"><span class="legend-dot d-pro"></span>Pro</span>
+            <span class="legend-item"><span class="legend-dot d-asso"></span>Asso</span>
+            <span class="legend-item"><span class="legend-dot d-perso"></span>Perso</span>
+            <span class="legend-item"><span class="legend-dot d-tampon"></span>Tampon</span>
+          </div>
         </div>
       </aside>
 
@@ -165,6 +213,7 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
 
   <script>
     import { getScheduleWithStatus, getBlockProgress } from '../../data/schedule';
+    import { getCurrentSlot, prioritizeForDomain } from '../../data/week-plan';
     import { tagColorStyle } from '../../lib/task-colors';
     import { taskSignature } from '../../lib/task-sort';
     import { createGrainient } from '../../lib/grainient';
@@ -214,6 +263,25 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
         } else if (el.style.getPropertyValue('--block-progress')) {
           el.style.removeProperty('--block-progress');
         }
+      });
+
+      refreshWeekGrid(now);
+    }
+
+    // La case en cours de la semaine type suit le changement de créneau, sans
+    // aller-retour réseau : le plan est statique, seule l'heure varie.
+    function refreshWeekGrid(now: Date) {
+      const grid = document.getElementById('weekGrid');
+      if (!grid) return;
+      const slot = getCurrentSlot(now);
+
+      grid.querySelectorAll<HTMLElement>('.week-day').forEach((el, i) => {
+        el.classList.toggle('today', slot?.dayIndex === i);
+      });
+      grid.querySelectorAll<HTMLElement>('.week-cell').forEach((el, i) => {
+        // Les cellules sont rendues ligne par ligne : index = flow × 5 + jour.
+        const isNow = slot !== null && Math.floor(i / 5) === slot.flowIndex && i % 5 === slot.dayIndex;
+        el.classList.toggle('now', isNow);
       });
     }
     refreshSchedule();
@@ -303,8 +371,15 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
         const data = await res.json();
         if (data.error) return; // keep last known good state
 
-        updateSection('inProgressContent', 'inProgressCount', data.inProgress, 'in-progress', 'Aucune tâche en cours.');
-        updateSection('todoContent', 'todoCount', data.todo, 'todo', "Rien à faire pour l'instant.");
+        // Même priorisation qu'au rendu serveur. Recalculée ici parce que le
+        // domaine change au fil des créneaux : l'ordre suivra donc au plus
+        // tard au prochain cycle de 60 s après un changement de flow.
+        const domain = getCurrentSlot()?.domain ?? null;
+        const inProgress = prioritizeForDomain(data.inProgress as NotionTask[], domain);
+        const todo = prioritizeForDomain(data.todo as NotionTask[], domain);
+
+        updateSection('inProgressContent', 'inProgressCount', inProgress, 'in-progress', 'Aucune tâche en cours.');
+        updateSection('todoContent', 'todoCount', todo, 'todo', "Rien à faire pour l'instant.");
       } catch {
         // Réseau indisponible : on garde le dernier état connu plutôt que de casser l'affichage.
       }
@@ -533,11 +608,14 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       width: 100%;
       margin: 0 auto;
     }
+    /* Ce panneau ne défile jamais : les blocs se partagent la hauteur
+       disponible (voir `.schedule-item { flex: 1 }`). Seule la colonne des
+       tâches, de longueur imprévisible, garde un défilement. */
     .schedule-card {
       width: 340px;
       flex-shrink: 0;
       height: 100%;
-      overflow-y: auto;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
@@ -641,13 +719,21 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
     }
 
     .schedule-list {
+      flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
     }
+    /* `flex: 1` sur chaque bloc : ils s'étirent quand il y a de la place et se
+       compriment quand il en manque, ce qui évite tout défilement. Le padding
+       reste faible pour que la compression ait de la marge avant de toucher au
+       texte ; `min-height` empêche l'écrasement complet. */
     .schedule-item {
+      flex: 1;
+      min-height: 24px;
       display: flex;
       gap: 10px;
-      padding: 9px 0 9px 28px;
+      padding: 4px 0 4px 28px;
       position: relative;
       align-items: center;
     }
@@ -722,6 +808,123 @@ const sortedTodo = sortTasks(todoTasks, sortKey);
       white-space: nowrap;
     }
 
+
+    /* Semaine type, sous le planning du jour */
+    .week-plan {
+      flex-shrink: 0;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--glass-border);
+    }
+    .week-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+    .week-title {
+      font-size: 0.8em;
+      font-weight: 700;
+      color: var(--raisin);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .week-note {
+      font-size: 0.66em;
+      color: var(--cyan);
+      font-style: italic;
+    }
+    .week-grid {
+      display: grid;
+      grid-template-columns: 22px repeat(5, 1fr);
+      gap: 5px;
+      align-items: center;
+      justify-items: center;
+    }
+    .week-day,
+    .week-flow {
+      font-size: 0.66em;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 0.04em;
+    }
+    .week-day.today {
+      color: var(--current-text);
+    }
+    .week-flow {
+      justify-self: start;
+    }
+    .week-cell {
+      width: 100%;
+      height: 12px;
+      border-radius: 4px;
+      background: var(--past-line);
+    }
+    /* Le créneau en cours : même code visuel que la pastille du planning. */
+    .week-cell.now {
+      box-shadow: 0 0 0 2px var(--sunglow);
+    }
+    .d-pro {
+      background: var(--indigo);
+    }
+    .d-asso {
+      background: var(--violet);
+    }
+    .d-perso {
+      background: var(--cyan);
+    }
+    .d-tampon {
+      background: var(--past-line);
+    }
+    .week-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      margin-top: 10px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.64em;
+      font-weight: 600;
+      color: var(--cyan);
+    }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+    }
+
+    /* Écrans courts : on resserre plutôt que de laisser la compression des
+       blocs écraser le texte, et le panneau tient toujours sans défiler. */
+    @media (min-width: 769px) and (max-height: 800px) {
+      h1 {
+        font-size: 1.3em;
+        margin-bottom: 12px;
+      }
+      .card {
+        padding: 18px;
+      }
+      .schedule-item {
+        min-height: 20px;
+        padding: 2px 0 2px 26px;
+      }
+      .schedule-label {
+        font-size: 0.88em;
+      }
+      .schedule-time {
+        font-size: 0.82em;
+        min-width: 46px;
+      }
+      .week-plan {
+        margin-top: 12px;
+        padding-top: 10px;
+      }
+      .week-legend {
+        margin-top: 7px;
+      }
+    }
 
     /* Sort controls */
     .sort-bar {
