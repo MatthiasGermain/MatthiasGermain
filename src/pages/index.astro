@@ -1,13 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
-import Page from '../components/Page.astro';
-import { profile } from '../data/content';
 ---
 
 <Base
   lang="fr"
-  title={`${profile.name} - ${profile.role.fr}`}
-  description={profile.tagline.fr}
+  title="Matthias Germain - Ingénieur logiciel"
+  description="Ingénieur logiciel embarqué et web, basé à Strasbourg. Portfolio en cours de refonte."
 >
-  <Page lang="fr" />
+  <main class="min-h-screen flex items-center justify-center px-4">
+    <div class="max-w-xl">
+      <h1 class="text-3xl font-semibold">Matthias Germain</h1>
+      <p class="mt-2 opacity-80">Ingénieur logiciel, embarqué et web · Strasbourg</p>
+      <p class="mt-6">Le portfolio est en cours de refonte. En attendant, mes projets sont sur GitHub.</p>
+      <p class="mt-1 opacity-80" lang="en">Portfolio being rebuilt. In the meantime, my projects are on GitHub.</p>
+      <p class="mt-6 flex gap-4">
+        <a class="underline" href="https://github.com/MatthiasGermain">GitHub</a>
+        <a class="underline" href="https://www.linkedin.com/in/matthias-germain-98b3ba2a4/">LinkedIn</a>
+      </p>
+    </div>
+  </main>
 </Base>

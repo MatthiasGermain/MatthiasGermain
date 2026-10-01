@@ -11,6 +11,17 @@ export default defineConfig({
   // seules les pages avec `export const prerender = false` (ex. /routine)
   // sont rendues côté serveur grâce à l'adaptateur Vercel ci-dessous.
   output: 'static',
+  // Anciennes URL du portfolio (liens présents dans les CV) : renvoyées vers l'accueil
+  // le temps de la refonte.
+  redirects: {
+    '/web': '/',
+    '/python': '/',
+    '/cicd': '/',
+    '/en': '/',
+    '/en/web': '/',
+    '/en/python': '/',
+    '/en/cicd': '/',
+  },
   adapter: vercel(),
   vite: {
     plugins: [tailwindcss()],

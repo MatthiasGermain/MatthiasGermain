@@ -1,7 +1,6 @@
 # Portfolio - développement
 
-Portfolio bilingue (FR/EN) construit avec **Astro + Tailwind CSS v4**.
-Positionnement : ingénieur logiciel embarqué, avec les réalisations web comme preuve de polyvalence.
+Site Astro + Tailwind CSS v4 déployé sur Vercel. Le portfolio est en cours de refonte : pour l'instant le site contient une page d'accueil provisoire et la route `/routine` (planning + tâches Notion).
 
 ## Commandes
 
@@ -20,13 +19,12 @@ npm run preview  # prévisualiser le build de production
 
 ```
 src/
-  data/content.ts        ← TOUT le contenu (FR + EN). C'est ici qu'on édite.
-  layouts/Base.astro     ← <head>, polices, SEO
-  components/Page.astro  ← mise en page (sections), rendue en FR et EN
-  pages/index.astro      ← route FR  (/)
-  pages/en/index.astro   ← route EN  (/en/)
-  styles/global.css      ← thème (couleurs, polices)
-public/favicon.svg
+  pages/index.astro             <- accueil provisoire
+  pages/routine/index.astro     <- page /routine (rendue côté serveur)
+  pages/api/routine-tasks.json.ts
+  data/schedule.ts, week-plan.ts <- planning-type
+  lib/notion.ts                 <- lecture de la base Notion
+  layouts/Base.astro, styles/global.css
 ```
 
 ## Déploiement
