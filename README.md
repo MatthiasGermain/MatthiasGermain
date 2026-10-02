@@ -16,7 +16,7 @@ En recherche d'un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg, 
 |---|---|
 | Embarqué | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), RISC-V |
 | Web | TypeScript, React, Next.js, Astro, Tailwind CSS, Payload CMS, Supabase |
-| Data / Python | Python, Pandas, NumPy, SQL, Flask, OpenCV |
+| Data / Python | Python, Pandas, NumPy, SQL, Flask |
 | Outils | Git, GitHub Actions, Docker, Vercel, DigitalOcean, Linux |
 
 ### Projets
@@ -24,10 +24,11 @@ En recherche d'un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg, 
 | Projet | En une ligne |
 |---|---|
 | [routine-station](https://github.com/MatthiasGermain/routine-station) | Station de supervision connectée : ESP32, capteurs, moteur pas-à-pas, MQTT et page web de contrôle. En cours, construite étape par étape. |
+| [narthex](https://github.com/MatthiasGermain/narthex) | Plateforme multi-tenant pour les églises : un site public par église et un espace de gestion (membres, événements, cultes). Next.js, Payload CMS, PostgreSQL, déploiement Docker par GitHub Actions. |
 | [RISC-V-Processor](https://github.com/MatthiasGermain/RISC-V-Processor) | Processeur RISC-V en VHDL (instructions R, I, L), avec un script Python de vérification et un [simulateur web](https://matthiasgermain.github.io/RISC-V-Processor/). |
 | [IRDA_FOR_BELOOP](https://github.com/MatthiasGermain/IRDA_FOR_BELOOP) | Firmware C++ (ESP32) de communication infrarouge, réalisé en bureau d'études UrbanLoop en 3e année : signalisation, gestion vitesse et arrêt, affichage OLED. |
-| [spotify_report](https://github.com/MatthiasGermain/spotify_report) | Rapport quotidien d'écoute Spotify en Python, envoyé par e-mail, lancé via GitHub Actions. |
-| [N26csvToFinance](https://github.com/MatthiasGermain/N26csvToFinance) | Application Flask + SQLite pour analyser ses exports bancaires CSV : catégories, bilans mensuels et annuels. |
+| [spotweb](https://github.com/MatthiasGermain/spotweb) | Site de l'association Spotlight, dont je suis responsable web bénévole : Next.js, Tailwind CSS, formulaire de contact et newsletter (Resend). |
+| [spotify_report](https://github.com/MatthiasGermain/spotify_report) | Rapport d'écoute Spotify en Python : historique en CSV, statistiques du jour, envoi par e-mail, lancé par un workflow GitHub Actions sur un runner auto-hébergé. |
 
 ### Sites réalisés
 
@@ -55,7 +56,7 @@ Looking for a software engineering role, embedded or web, in Strasbourg, Nancy o
 |---|---|
 | Embedded | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), RISC-V |
 | Web | TypeScript, React, Next.js, Astro, Tailwind CSS, Payload CMS, Supabase |
-| Data / Python | Python, Pandas, NumPy, SQL, Flask, OpenCV |
+| Data / Python | Python, Pandas, NumPy, SQL, Flask |
 | Tooling | Git, GitHub Actions, Docker, Vercel, DigitalOcean, Linux |
 
 ### Projects
@@ -63,10 +64,11 @@ Looking for a software engineering role, embedded or web, in Strasbourg, Nancy o
 | Project | In one line |
 |---|---|
 | [routine-station](https://github.com/MatthiasGermain/routine-station) | Connected monitoring station: ESP32, sensors, stepper motor, MQTT and a web control page. In progress, built step by step. |
+| [narthex](https://github.com/MatthiasGermain/narthex) | Multi-tenant platform for churches: a public website per church and a management area (members, events, services). Next.js, Payload CMS, PostgreSQL, Docker deployment through GitHub Actions. |
 | [RISC-V-Processor](https://github.com/MatthiasGermain/RISC-V-Processor) | RISC-V processor in VHDL (R, I, L instructions), with a Python checking script and a [web simulator](https://matthiasgermain.github.io/RISC-V-Processor/). |
 | [IRDA_FOR_BELOOP](https://github.com/MatthiasGermain/IRDA_FOR_BELOOP) | C++ (ESP32) infrared communication firmware, built during a 3rd-year UrbanLoop engineering project: signalling, speed and stop handling, OLED display. |
-| [spotify_report](https://github.com/MatthiasGermain/spotify_report) | Daily Spotify listening report in Python, sent by email, run through GitHub Actions. |
-| [N26csvToFinance](https://github.com/MatthiasGermain/N26csvToFinance) | Flask + SQLite app to analyse bank CSV exports: categories, monthly and yearly summaries. |
+| [spotweb](https://github.com/MatthiasGermain/spotweb) | Website of the Spotlight association, where I am the volunteer web lead: Next.js, Tailwind CSS, contact form and newsletter (Resend). |
+| [spotify_report](https://github.com/MatthiasGermain/spotify_report) | Spotify listening report in Python: history stored as CSV, daily stats, sent by email, run by a GitHub Actions workflow on a self-hosted runner. |
 
 ### Websites
 
