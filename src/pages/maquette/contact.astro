@@ -10,13 +10,140 @@ import Signature from '../../components/Signature.astro';
       <p class="contact-sub">
         Je cherche un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg ou à Nancy.
       </p>
-      <a class="mail" href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>
-      <div class="contact-links">
-        <a class="pill pill-light" href="https://www.linkedin.com/in/matthias-germain-98b3ba2a4/">LinkedIn ↗</a>
-        <a class="pill pill-light" href="https://github.com/MatthiasGermain">GitHub ↗</a>
-        <a class="pill pill-sun" href="/cv" data-flash>CV ↗</a>
+
+      <div class="contact-grid">
+        <!-- TX / RX : le formulaire émet, l'accusé de réception répond. Sans JavaScript, le formulaire
+             est envoyé normalement et la route renvoie ici, sur l'ancre du résultat. -->
+        <form class="contact-form" id="ecrire" method="post" action="/api/contact">
+          <div class="field">
+            <label for="cf-name">Nom</label>
+            <input id="cf-name" name="name" type="text" autocomplete="name" maxlength="100" required />
+          </div>
+          <div class="field">
+            <label for="cf-email">Email</label>
+            <input id="cf-email" name="email" type="email" autocomplete="email" maxlength="200" required />
+          </div>
+          <div class="field">
+            <label for="cf-message">Message</label>
+            <textarea id="cf-message" name="message" rows="6" minlength="10" maxlength="5000" required></textarea>
+          </div>
+          <!-- Champ piège : invisible pour les visiteurs, rempli par les robots -->
+          <div class="field-trap" aria-hidden="true">
+            <label for="cf-site">Site</label>
+            <input id="cf-site" name="site" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="form-foot">
+            <button class="pill pill-sun form-send" type="submit">
+              <span class="pin-name">TX</span>
+              <span class="form-send-label">Envoyer</span>
+            </button>
+            <div class="form-notes" aria-live="polite">
+              <p class="form-note form-note-rx" id="message-envoye">
+                <span class="pin-name">RX</span>
+                <span class="form-note-text">Message bien reçu. Je vous réponds rapidement.</span>
+              </p>
+              <p class="form-note is-error" id="message-erreur">
+                <span class="form-error-text">Le message n'est pas parti.</span>
+                Réessayez, ou écrivez-moi directement par email.
+              </p>
+            </div>
+          </div>
+        </form>
+
+        <div class="contact-direct">
+          <p class="contact-or">Ou directement</p>
+          <a class="mail" href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>
+          <div class="contact-links">
+            <a class="pill pill-light" href="https://www.linkedin.com/in/matthias-germain-98b3ba2a4/">LinkedIn ↗</a>
+            <a class="pill pill-light" href="https://github.com/MatthiasGermain">GitHub ↗</a>
+            <a class="pill pill-sun" href="/cv" data-flash>CV ↗</a>
+          </div>
+        </div>
       </div>
+
       <div class="signature"><Signature label="Signature de Matthias" /></div>
     </div>
   </section>
 </MaquettePage>
+
+<script>
+  // Envoi en arrière-plan : on reste sur la page. Comme sur un convertisseur USB-série, la LED TX
+  // du bouton clignote pendant l'émission ; à la réponse, une impulsion file jusqu'à la broche RX de
+  // l'accusé de réception, qui clignote à son tour pendant que le texte apparaît.
+  const form = document.querySelector<HTMLFormElement>('.contact-form');
+  if (form) {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const button = form.querySelector<HTMLButtonElement>('.form-send')!;
+    const label = form.querySelector<HTMLElement>('.form-send-label')!;
+    const foot = form.querySelector<HTMLElement>('.form-foot')!;
+    const sent = form.querySelector<HTMLElement>('#message-envoye')!;
+    const failed = form.querySelector<HTMLElement>('#message-erreur')!;
+    const errorText = failed.querySelector<HTMLElement>('.form-error-text')!;
+    const txLed = button.querySelector<HTMLElement>('.pin-name')!;
+    const rxLed = sent.querySelector<HTMLElement>('.pin-name')!;
+    const show = (note: HTMLElement | null) => {
+      for (const n of [sent, failed]) n.classList.toggle('is-shown', n === note);
+    };
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    // Impulsion en ligne droite jusqu'au centre de RX. Elle sort du bouton par le bord le plus proche
+    // (à droite si RX est à côté, en bas sous TX quand RX passe à la ligne sur mobile), sans
+    // traverser le libellé.
+    const travel = async () => {
+      const f = foot.getBoundingClientRect();
+      const b = button.getBoundingClientRect();
+      const tx = txLed.getBoundingClientRect();
+      const rx = rxLed.getBoundingClientRect();
+      const at = (x: number, y: number) => `translate(${x - f.left}px, ${y - f.top}px)`;
+      const from = rx.left >= b.right ? at(b.right, b.top + b.height / 2) : at(tx.left + tx.width / 2, b.bottom);
+      const pulse = document.createElement('span');
+      pulse.className = 'form-pulse';
+      foot.append(pulse);
+      await pulse.animate([{ transform: from }, { transform: at(rx.left + rx.width / 2, rx.top + rx.height / 2) }], {
+        duration: 360,
+        easing: 'ease-in-out',
+      }).finished;
+      pulse.remove();
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (button.disabled) return;
+      button.disabled = true;
+      button.classList.add('is-sending');
+      label.textContent = 'Envoi…';
+      show(null);
+      const started = performance.now();
+      let data: { ok?: boolean; error?: string; field?: string } = {};
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        data = await res.json().catch(() => ({}));
+        if (!res.ok) data.ok = false;
+      } catch {
+        data = {};
+      }
+      // La LED TX clignote au moins un instant, même si le serveur répond très vite
+      if (!reduced) await wait(700 - (performance.now() - started));
+      button.classList.remove('is-sending');
+
+      if (data.ok) {
+        form.reset();
+        sent.classList.add('is-arriving');
+        show(sent);
+        if (!reduced) await travel().catch(() => {});
+        sent.classList.remove('is-arriving');
+      } else {
+        errorText.textContent = data.error ?? "Le message n'est pas parti.";
+        show(failed);
+        if (data.field) form.querySelector<HTMLElement>(`[name="${data.field}"]`)?.focus();
+      }
+      button.disabled = false;
+      label.textContent = 'Envoyer';
+    });
+  }
+</script>
