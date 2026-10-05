@@ -1,0 +1,57 @@
+---
+import MaquettePage from '../../layouts/MaquettePage.astro';
+import ProjectCard from '../../components/maquette/ProjectCard.astro';
+import { filters, projects } from '../../data/maquette';
+
+// Les études de cas ont leur propre page
+const list = projects.filter((p) => !p.caseStudy);
+const defaultFilter = filters.findIndex((f) => f.id === 'tout');
+---
+
+<MaquettePage current="projets">
+  <section class="wrap">
+    <div class="projets-head">
+      <p class="lead">
+        Firmware pour microcontrôleurs, outillage Python et CI/CD, interfaces web mises en
+        production : toute la chaîne d'un système connecté.
+      </p>
+      <div class="filter">
+        <span class="filter-label">Filtre</span>
+        <div class="switch" role="radiogroup" aria-label="Filtrer les projets" style={`--i: ${defaultFilter}; --n: ${filters.length}`}>
+          <span class="switch-knob" aria-hidden="true"></span>
+          {
+            filters.map((f) => (
+              <button type="button" role="radio" aria-checked={String(f.id === 'tout')} data-filter={f.id}>
+                {f.label}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="projects">
+      {list.map((p, i) => <ProjectCard project={p} flip={i % 2 === 1} />)}
+    </div>
+  </section>
+
+  <script>
+    // Interrupteur Embarqué / Tout / Web (un projet peut être dans plusieurs catégories)
+    const sw = document.querySelector<HTMLElement>('.switch');
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.proj'));
+    const buttons = Array.from(sw?.querySelectorAll<HTMLButtonElement>('button') ?? []);
+    buttons.forEach((btn, index) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter ?? 'tout';
+        sw?.style.setProperty('--i', String(index));
+        buttons.forEach((b) => b.setAttribute('aria-checked', String(b === btn)));
+        let visible = 0;
+        cards.forEach((card) => {
+          const show = filter === 'tout' || (card.dataset.cats ?? '').split(' ').includes(filter);
+          card.hidden = !show;
+          if (show) card.classList.toggle('flip', visible++ % 2 === 1);
+        });
+      });
+    });
+  </script>
+</MaquettePage>

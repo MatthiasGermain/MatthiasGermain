@@ -1,0 +1,30 @@
+---
+import MaquettePage from '../../layouts/MaquettePage.astro';
+import { steps } from '../../data/maquette';
+---
+
+<MaquettePage current="parcours">
+  <section class="wrap parcours">
+    <div class="parcours-grid">
+      <div class="parcours-intro">
+        <p class="lead small">
+          De l'embarqué automobile au web en production, en passant par les capsules UrbanLoop.
+        </p>
+        <a class="pill pill-solid" href="/cv" data-flash>Voir le CV</a>
+      </div>
+      <ol class="timeline">
+        {
+          steps.map((s) => (
+            <li class:list={['tl-item', { 'is-current': s.current }]}>
+              <span class="tl-pad" aria-hidden="true" />
+              <p class="tl-when">{s.when}</p>
+              <h2 class="tl-title">{s.title}</h2>
+              <p class="tl-where">{s.where}</p>
+              <p class="tl-line">{s.line}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+</MaquettePage>

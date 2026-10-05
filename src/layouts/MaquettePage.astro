@@ -1,0 +1,102 @@
+---
+/* Gabarit des pages de section de la maquette (Projets, Études, Parcours, Contact).
+ * En-tête : la signature (retour à la carte), la barrette de broches pour passer d'une page à
+ * l'autre sans repasser par l'ESP32, et BOOT (mode recruteur). */
+import '../styles/maquette.css';
+import Signature from '../components/Signature.astro';
+import { BASE, buttons, sections, type SectionId } from '../data/maquette';
+
+interface Props {
+  current: SectionId;
+}
+
+const { current } = Astro.props;
+const section = sections.find((s) => s.id === current)!;
+// Ordre de la barrette : EN (retour à la carte) puis les sections
+const strip = [
+  { id: 'carte', label: 'Carte', pinLabel: 'EN', href: BASE },
+  ...sections.map((s) => ({ id: s.id, label: s.label, pinLabel: s.pinLabel, href: s.href })),
+];
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{section.label} - Matthias Germain</title>
+  </head>
+  <body>
+    <header class="page-top">
+      <div class="wrap page-top-row">
+        <a class="logo" href={BASE} aria-label="Matthias Germain, retour à la carte">
+          <span class="logo-sign" aria-hidden="true"><Signature /></span>
+          <span class="logo-bold">GERMAIN</span>
+        </a>
+        <nav class="strip" aria-label="Sections">
+          {
+            strip.map((s) => (
+              <a class="strip-pin" href={s.href} aria-current={s.id === current ? 'page' : undefined}>
+                <span class="pad" aria-hidden="true" />
+                <span class="pin-name">{s.pinLabel}</span>
+                <span class="strip-label">{s.label}</span>
+              </a>
+            ))
+          }
+        </nav>
+        <a class="pill pill-outline boot-link" href={buttons.boot.href} data-flash>
+          <span class="pin-name">{buttons.boot.pinLabel}</span>
+          {buttons.boot.label}
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <div class="wrap page-head">
+        <p class="page-pin">Broche <span class="pin-name">{section.pinLabel}</span></p>
+        <h1 class="page-title">{section.label}</h1>
+        <p class="page-why">{section.why}</p>
+      </div>
+      <slot />
+    </main>
+
+    <footer class="wrap page-foot">
+      <span>© 2026 Matthias Germain · Strasbourg</span>
+      <span>Maquette : textes et visuels provisoires</span>
+    </footer>
+
+    <script>
+      import { bindFlashLinks } from '../lib/maquette-flash';
+
+      bindFlashLinks();
+
+      // Barrette : une impulsion court de la broche actuelle vers celle visée, puis on change de page
+      const strip = document.querySelector<HTMLElement>('.strip');
+      const pins = Array.from(document.querySelectorAll<HTMLAnchorElement>('.strip-pin'));
+      const current = pins.find((p) => p.getAttribute('aria-current') === 'page');
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const centerOf = (el: HTMLElement) => {
+        const pad = el.querySelector<HTMLElement>('.pad')!;
+        const s = strip!.getBoundingClientRect();
+        const r = pad.getBoundingClientRect();
+        return r.left + r.width / 2 - s.left;
+      };
+      for (const pin of pins) {
+        pin.addEventListener('click', (e) => {
+          if (!strip || !current || pin === current || reduced || e.metaKey || e.ctrlKey) return;
+          e.preventDefault();
+          const pulse = document.createElement('span');
+          pulse.className = 'strip-pulse';
+          pulse.style.left = `${centerOf(current)}px`;
+          strip.append(pulse);
+          requestAnimationFrame(() => requestAnimationFrame(() => (pulse.style.left = `${centerOf(pin)}px`)));
+          setTimeout(() => (location.href = pin.href), 360);
+        });
+      }
+      // Retour arrière : on retire l'impulsion restée affichée
+      window.addEventListener('pageshow', () => document.querySelectorAll('.strip-pulse').forEach((p) => p.remove()));
+    </script>
+  </body>
+</html>

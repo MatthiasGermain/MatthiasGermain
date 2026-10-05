@@ -1,0 +1,65 @@
+---
+// Fiche projet, présentée comme une fiche technique (référence, rôle, contexte, stack, liens).
+import ProjectVisual from './ProjectVisual.astro';
+import { catLabel, refOf, type Project } from '../../data/maquette';
+
+interface Props {
+  project: Project;
+  flip?: boolean;
+}
+
+const { project: p, flip = false } = Astro.props;
+---
+
+<article class:list={['proj', { flip, 'is-case': p.caseStudy }]} data-cats={p.cats.join(' ')}>
+  <div class="proj-visual">
+    <ProjectVisual visual={p.visual} />
+    <span class="ph-tag">{p.visual === 'narthex' || p.visual === 'spotweb' ? 'Capture à venir' : 'Schéma à venir'}</span>
+  </div>
+
+  <div class="proj-sheet">
+    <p class="proj-ref">
+      {p.caseStudy && <span class="case-tag">Étude de cas</span>}
+      <span>{refOf(p)}</span>
+      <span class="sep">·</span>
+      <span>{p.cats.map((c) => catLabel[c]).join(' · ')}</span>
+      {p.status && <span class="status-tag">{p.status}</span>}
+    </p>
+    <h2 class="proj-title">{p.title}</h2>
+    <p class="proj-pitch">{p.pitch}</p>
+    <dl class="spec">
+      <div>
+        <dt>Rôle</dt>
+        <dd>{p.role}</dd>
+      </div>
+      <div>
+        <dt>Contexte</dt>
+        <dd>{p.context}</dd>
+      </div>
+      <div>
+        <dt>Stack</dt>
+        <dd>
+          <ul class="chips">{p.stack.map((s) => <li>{s}</li>)}</ul>
+        </dd>
+      </div>
+    </dl>
+    <p class="proj-links">
+      {
+        p.repo ? (
+          <a class="pill pill-outline pill-sm" href={p.repo}>
+            Code ↗
+          </a>
+        ) : (
+          <span class="proj-note">Code propriétaire : pas de dépôt public</span>
+        )
+      }
+      {
+        p.site && (
+          <a class="pill pill-outline pill-sm" href={p.site.url}>
+            {p.site.label} ↗
+          </a>
+        )
+      }
+    </p>
+  </div>
+</article>

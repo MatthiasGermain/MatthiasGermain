@@ -1,0 +1,22 @@
+---
+import MaquettePage from '../../layouts/MaquettePage.astro';
+import Signature from '../../components/Signature.astro';
+---
+
+<MaquettePage current="contact">
+  <section class="contact">
+    <div class="wrap">
+      <h2 class="display h2 on-dark"><span class="light">On en</span> <span class="strong">PARLE ?</span></h2>
+      <p class="contact-sub">
+        Je cherche un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg ou à Nancy.
+      </p>
+      <a class="mail" href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>
+      <div class="contact-links">
+        <a class="pill pill-light" href="https://www.linkedin.com/in/matthias-germain-98b3ba2a4/">LinkedIn ↗</a>
+        <a class="pill pill-light" href="https://github.com/MatthiasGermain">GitHub ↗</a>
+        <a class="pill pill-sun" href="/cv" data-flash>CV ↗</a>
+      </div>
+      <div class="signature"><Signature label="Signature de Matthias" /></div>
+    </div>
+  </section>
+</MaquettePage>

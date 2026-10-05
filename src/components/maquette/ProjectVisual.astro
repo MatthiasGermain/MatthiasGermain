@@ -1,0 +1,224 @@
+---
+// Visuel d'une fiche projet : schéma SVG (embarqué, outillage) ou faux navigateur (web), en attendant
+// les vrais schémas et captures de Matthias.
+import type { Visual } from '../../data/maquette';
+
+interface Props {
+  visual: Visual;
+}
+
+const { visual } = Astro.props;
+---
+
+  {visual === 'routine' && (
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Schéma de routine-station">
+      <g class="s">
+        <rect x="24" y="48" width="84" height="32" rx="4" class="paper" />
+        <rect x="24" y="109" width="84" height="32" rx="4" class="paper" />
+        <rect x="24" y="170" width="84" height="32" rx="4" class="paper" />
+        <path d="M108 64 H128 V105 H150 M108 125 H150 M108 186 H128 V145 H150" />
+        <rect x="150" y="85" width="100" height="80" rx="6" class="paper" />
+        <path d="M200 165 V197" />
+        <circle cx="200" cy="215" r="18" class="paper" />
+        <path d="M250 110 H312 V90" class="dash" />
+        <rect x="290" y="40" width="90" height="50" rx="25" class="paper" />
+        <path d="M358 90 V150" class="dash" />
+        <rect x="290" y="150" width="90" height="70" rx="6" class="paper" />
+        <line x1="290" y1="166" x2="380" y2="166" />
+      </g>
+      <circle cx="238" cy="97" r="5" class="sun" />
+      <text x="66" y="68" class="t" text-anchor="middle">TEMP.</text>
+      <text x="66" y="129" class="t" text-anchor="middle">LUMIÈRE</text>
+      <text x="66" y="190" class="t" text-anchor="middle">FLAMME</text>
+      <text x="200" y="131" class="tb" text-anchor="middle">ESP32</text>
+      <text x="200" y="220" class="tb" text-anchor="middle">M</text>
+      <text x="335" y="69" class="t" text-anchor="middle">MQTT</text>
+      <text x="335" y="197" class="t" text-anchor="middle">PAGE WEB</text>
+    </svg>
+  )}
+  {visual === 'risc' && (
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Schéma du processeur RISC-V">
+      <defs>
+        <marker id="arr-risc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+        </marker>
+      </defs>
+      <g class="s">
+        <rect x="16" y="105" width="46" height="40" rx="4" class="paper" />
+        <rect x="84" y="95" width="66" height="60" rx="4" class="paper" />
+        <rect x="176" y="28" width="60" height="34" rx="4" class="paper" />
+        <rect x="176" y="100" width="60" height="50" rx="4" class="paper" />
+        <rect x="176" y="182" width="60" height="34" rx="4" class="paper" />
+        <path d="M262 92 L302 112 L302 140 L262 160 L262 136 L272 126 L262 116 Z" class="sun" />
+        <rect x="322" y="96" width="62" height="60" rx="4" class="paper" />
+        <path d="M62 125 H82" marker-end="url(#arr-risc)" />
+        <path d="M150 125 H174" marker-end="url(#arr-risc)" />
+        <path d="M164 125 V45 H174" marker-end="url(#arr-risc)" />
+        <path d="M164 125 V199 H174" marker-end="url(#arr-risc)" />
+        <path d="M236 112 H250 V104 H260" marker-end="url(#arr-risc)" />
+        <path d="M236 138 H250 V148 H260" marker-end="url(#arr-risc)" />
+        <path d="M236 199 H250 V148" />
+        <path d="M302 126 H320" marker-end="url(#arr-risc)" />
+        <path d="M353 96 V78 H206 V98" marker-end="url(#arr-risc)" />
+        <path d="M236 45 H282 V100" class="dash" />
+      </g>
+      <circle cx="164" cy="125" r="3" class="dot" />
+      <circle cx="250" cy="148" r="3" class="dot" />
+      <text x="39" y="129" class="t" text-anchor="middle">PC</text>
+      <text x="117" y="129" class="t" text-anchor="middle">IMEM</text>
+      <text x="206" y="49" class="t" text-anchor="middle">DÉC.</text>
+      <text x="206" y="129" class="t" text-anchor="middle">REG</text>
+      <text x="206" y="203" class="t" text-anchor="middle">IMM</text>
+      <text x="283" y="130" class="t" text-anchor="middle">ALU</text>
+      <text x="353" y="130" class="t" text-anchor="middle">MÉM</text>
+    </svg>
+  )}
+  {visual === 'irda' && (
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Schéma des deux ESP32 reliés par infrarouge">
+      <defs>
+        <marker id="arr-irda" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+        </marker>
+      </defs>
+      <g class="s">
+        <rect x="24" y="78" width="120" height="96" rx="6" class="paper" />
+        <rect x="40" y="94" width="88" height="34" rx="2" class="ink" />
+        <path d="M150 112 A14 14 0 0 1 150 140 M158 102 A24 24 0 0 1 158 150 M166 92 A34 34 0 0 1 166 160" />
+        <path d="M184 126 H252" class="dash" marker-end="url(#arr-irda)" />
+        <rect x="256" y="78" width="120" height="96" rx="6" class="paper" />
+        <path d="M316 34 V76" marker-end="url(#arr-irda)" />
+        <path d="M316 174 V198" />
+        <circle cx="316" cy="210" r="11" class="sun" />
+      </g>
+      <text x="84" y="117" class="tb cream" text-anchor="middle">GO</text>
+      <text x="84" y="156" class="t" text-anchor="middle">ESP32 · RADAR</text>
+      <text x="218" y="114" class="t" text-anchor="middle">IrDA</text>
+      <text x="316" y="124" class="tb" text-anchor="middle">ESP32</text>
+      <text x="316" y="144" class="t" text-anchor="middle">CAPSULE</text>
+      <text x="306" y="50" class="t" text-anchor="end">GO · SLOW · STOP</text>
+      <text x="334" y="214" class="t">LED 0-5 V</text>
+    </svg>
+  )}
+  {visual === 'schaeffler' && (
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Schéma de l'outillage Python chez Schaeffler">
+      <defs>
+        <marker id="arr-schaeffler" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+        </marker>
+      </defs>
+      <g class="s">
+        <rect x="14" y="30" width="262" height="62" rx="8" class="dash" />
+        <rect x="26" y="44" width="92" height="36" rx="4" class="paper" />
+        <path d="M118 62 H150" marker-end="url(#arr-schaeffler)" />
+        <rect x="152" y="42" width="112" height="40" rx="4" class="sun" />
+        <path d="M264 62 H306" marker-end="url(#arr-schaeffler)" />
+        <path d="M308 40 H356 L370 54 V86 H308 Z" class="paper" />
+        <path d="M356 40 V54 H370 M318 62 H360 M318 72 H360" />
+        <rect x="20" y="144" width="104" height="34" rx="4" class="paper" />
+        <rect x="20" y="194" width="104" height="34" rx="4" class="paper" />
+        <path d="M124 161 H144 V176 H164" marker-end="url(#arr-schaeffler)" />
+        <path d="M124 211 H144 V196 H164" marker-end="url(#arr-schaeffler)" />
+        <rect x="166" y="160" width="104" height="52" rx="4" class="paper" />
+        <path d="M270 186 H302" marker-end="url(#arr-schaeffler)" />
+        <rect x="304" y="160" width="72" height="52" rx="3" class="ink" />
+        <path d="M316 152 V160 M330 152 V160 M344 152 V160 M358 152 V160 M316 212 V220 M330 212 V220 M344 212 V220 M358 212 V220" />
+      </g>
+      <text x="20" y="22" class="t">PIPELINE JENKINS</text>
+      <text x="72" y="66" class="t" text-anchor="middle">ÉTAPES CI</text>
+      <text x="208" y="66" class="t" text-anchor="middle">OUTIL PYTHON</text>
+      <text x="339" y="102" class="t" text-anchor="middle">RAPPORT</text>
+      <text x="20" y="134" class="t">CONFIGURATION ECU</text>
+      <text x="72" y="159" class="t" text-anchor="middle">CONFLUENCE</text>
+      <text x="72" y="171" class="t muted" text-anchor="middle">API REST</text>
+      <text x="72" y="215" class="t" text-anchor="middle">WINDCHILL</text>
+      <text x="218" y="183" class="t" text-anchor="middle">SCRIPT PYTHON</text>
+      <text x="218" y="198" class="t muted" text-anchor="middle">VALIDATION</text>
+      <text x="340" y="191" class="tb cream" text-anchor="middle">ECU</text>
+    </svg>
+  )}
+  {visual === 'spotify' && (
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Schéma du rapport Spotify">
+      <defs>
+        <marker id="arr-spotify" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+        </marker>
+      </defs>
+      <g class="s">
+        <circle cx="58" cy="125" r="32" class="paper" />
+        <path d="M120 98 H172 L186 112 V152 H120 Z" class="paper" />
+        <path d="M172 98 V112 H186 M130 122 H174 M130 132 H174 M130 142 H162" />
+        <rect x="222" y="98" width="74" height="54" rx="4" class="paper" />
+        <rect x="326" y="104" width="58" height="42" rx="3" class="paper" />
+        <path d="M326 106 L355 128 L384 106" />
+        <path d="M90 125 H116" marker-end="url(#arr-spotify)" />
+        <path d="M188 125 H218" marker-end="url(#arr-spotify)" />
+        <path d="M296 125 H322" marker-end="url(#arr-spotify)" />
+        <circle cx="259" cy="58" r="14" class="paper" />
+        <path d="M259 50 V58 H266" />
+      </g>
+      <rect x="234" y="128" width="8" height="16" class="sun" />
+      <rect x="248" y="118" width="8" height="26" class="sun" />
+      <rect x="262" y="124" width="8" height="20" class="sun" />
+      <rect x="276" y="112" width="8" height="32" class="sun" />
+      <text x="58" y="123" class="tb" text-anchor="middle">API</text>
+      <text x="58" y="139" class="t" text-anchor="middle">SPOTIFY</text>
+      <text x="153" y="172" class="t" text-anchor="middle">CSV / JOUR</text>
+      <text x="259" y="172" class="t" text-anchor="middle">RAPPORT</text>
+      <text x="355" y="172" class="t" text-anchor="middle">E-MAIL</text>
+      <text x="280" y="62" class="t">CHAQUE JOUR</text>
+    </svg>
+  )}
+  {visual === 'narthex' && (
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Aperçu du tableau de bord de narthex">
+      <g class="s">
+        <rect x="20" y="18" width="360" height="214" rx="10" class="paper" />
+        <line x1="20" y1="44" x2="380" y2="44" />
+        <rect x="130" y="25" width="180" height="12" rx="6" />
+        <line x1="96" y1="44" x2="96" y2="232" />
+        <rect x="108" y="86" width="80" height="54" rx="4" />
+        <rect x="198" y="86" width="80" height="54" rx="4" />
+        <rect x="288" y="86" width="80" height="54" rx="4" />
+        <rect x="108" y="152" width="260" height="68" rx="4" />
+      </g>
+      <circle cx="36" cy="31" r="3.5" class="dot" />
+      <circle cx="48" cy="31" r="3.5" class="dot" />
+      <circle cx="60" cy="31" r="3.5" class="dot" />
+      <text x="220" y="34" class="t url" text-anchor="middle">narthex.dev</text>
+      <rect x="28" y="58" width="60" height="14" rx="3" class="sun" />
+      <rect x="34" y="62" width="40" height="6" rx="3" class="ink-soft" />
+      <rect x="34" y="82" width="44" height="6" rx="3" class="ink-soft" />
+      <rect x="34" y="98" width="36" height="6" rx="3" class="ink-soft" />
+      <rect x="34" y="114" width="42" height="6" rx="3" class="ink-soft" />
+      <text x="108" y="72" class="t">TABLEAU DE BORD</text>
+      <rect x="118" y="112" width="24" height="16" rx="2" class="sun" />
+      <rect x="118" y="100" width="40" height="5" rx="2.5" class="ink-soft" />
+      <rect x="208" y="100" width="44" height="5" rx="2.5" class="ink-soft" />
+      <rect x="298" y="100" width="36" height="5" rx="2.5" class="ink-soft" />
+      <rect x="208" y="112" width="30" height="16" rx="2" class="violet" />
+      <rect x="298" y="112" width="50" height="16" rx="2" class="indigo-fill" />
+      <rect x="120" y="166" width="200" height="6" rx="3" class="ink-soft" />
+      <rect x="120" y="182" width="170" height="6" rx="3" class="ink-soft" />
+      <rect x="120" y="198" width="186" height="6" rx="3" class="ink-soft" />
+    </svg>
+  )}
+  {visual === 'spotweb' && (
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Aperçu du site spotlightcrea.fr">
+      <g class="s">
+        <rect x="20" y="18" width="360" height="214" rx="10" class="paper" />
+        <line x1="20" y1="44" x2="380" y2="44" />
+        <rect x="130" y="25" width="180" height="12" rx="6" />
+      </g>
+      <circle cx="36" cy="31" r="3.5" class="dot" />
+      <circle cx="48" cy="31" r="3.5" class="dot" />
+      <circle cx="60" cy="31" r="3.5" class="dot" />
+      <text x="220" y="34" class="t url" text-anchor="middle">spotlightcrea.fr</text>
+      <rect x="44" y="70" width="110" height="14" rx="2" class="violet" />
+      <rect x="44" y="104" width="190" height="10" class="sun" />
+      <rect x="44" y="92" width="180" height="18" rx="2" class="ink" />
+      <rect x="44" y="132" width="210" height="10" class="sun" />
+      <rect x="44" y="120" width="150" height="18" rx="2" class="ink" />
+      <rect x="21" y="164" width="358" height="34" class="ink" />
+      <rect x="70" y="177" width="260" height="6" rx="3" class="cream-fill" />
+      <path d="M21 198 H379 V222 a10 10 0 0 1 -10 10 H31 a10 10 0 0 1 -10 -10 Z" class="violet" />
+    </svg>
+  )}

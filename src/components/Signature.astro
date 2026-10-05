@@ -1,0 +1,16 @@
+---
+// Signature manuscrite de Matthias (couleur héritée via currentColor).
+import { SIGNATURE_PATH, SIGNATURE_VIEWBOX } from '../data/signature';
+
+interface Props {
+  class?: string;
+  label?: string;
+}
+
+const { class: className, label = 'Matthias' } = Astro.props;
+const viewBox = `0 0 ${SIGNATURE_VIEWBOX[0]} ${SIGNATURE_VIEWBOX[1]}`;
+---
+
+<svg class={className} viewBox={viewBox} role="img" aria-label={label} xmlns="http://www.w3.org/2000/svg">
+  <path fill="currentColor" fill-rule="evenodd" d={SIGNATURE_PATH} />
+</svg>
