@@ -17,9 +17,9 @@ En recherche d'un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg o
 | Domaine | Outils |
 |---|---|
 | Embarqué | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), RISC-V |
-| Outillage Python | Python, Flask, Jinja2, API REST, Jenkins |
+| Outillage Python | Python, Flask, Jinja2, API REST |
 | Web | TypeScript, React, Next.js, Astro, Tailwind CSS, Payload CMS, Supabase |
-| Outils | Git, GitHub Actions, Docker, Vercel, DigitalOcean, Linux |
+| Outils | Git, GitHub Actions, Jenkins, Docker, Vercel, DigitalOcean, Linux |
 
 ### Projets
 
