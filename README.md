@@ -59,9 +59,9 @@ Looking for a software engineering role, embedded or web, in Strasbourg or Nancy
 | Area | Tools |
 |---|---|
 | Embedded | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), RISC-V |
-| Python tooling | Python, Flask, Jinja2, REST APIs, Jenkins |
+| Python tooling | Python, Flask, Jinja2, REST APIs |
 | Web | TypeScript, React, Next.js, Astro, Tailwind CSS, Payload CMS, Supabase |
-| Tooling | Git, GitHub Actions, Docker, Vercel, DigitalOcean, Linux |
+| Tooling | Git, GitHub Actions, Jenkins, Docker, Vercel, DigitalOcean, Linux |
 
 ### Projects
 
