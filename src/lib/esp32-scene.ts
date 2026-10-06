@@ -375,13 +375,13 @@ function drawMarking(w: number, h: number, opts: MarkingOptions): HTMLCanvasElem
   // Nom, calé sur la même largeur
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#c9a0dc';
-  fit('GERMAIN', 900, 'Avenir, system-ui, sans-serif', w * 0.2);
+  fit('GERMAIN', 900, "'Figtree Variable', system-ui, sans-serif", w * 0.2);
   const nameSize = parseFloat(ctx.font.split(' ')[1]);
   ctx.fillText('GERMAIN', pad, sigBottom + nameSize * 0.78);
 
   // Une seule ligne, assez grande pour rester lisible à l'échelle du hero
   ctx.fillStyle = ink;
-  fit('EMBARQUÉ & IoT', 700, 'Montserrat, system-ui, sans-serif', w * 0.085);
+  fit('EMBARQUÉ & IoT', 700, "'Montserrat Variable', system-ui, sans-serif", w * 0.085);
   ctx.fillText('EMBARQUÉ & IoT', pad, h - pad * 0.95);
   return c;
 }

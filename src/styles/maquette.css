@@ -1,14 +1,9 @@
 /* Maquette du portfolio : DA Spotlight + motif « schéma ». Partagée par toutes les pages de /maquette. */
 
-@font-face { font-family: 'Avenir'; src: url('/fonts/AvenirLTStd-Light.otf') format('opentype'); font-weight: 300; font-display: swap; }
-@font-face { font-family: 'Avenir'; src: url('/fonts/AvenirLTStd-Book.otf') format('opentype'); font-weight: 400; font-display: swap; }
-@font-face { font-family: 'Avenir'; src: url('/fonts/AvenirLTStd-Medium.otf') format('opentype'); font-weight: 500; font-display: swap; }
-@font-face { font-family: 'Avenir'; src: url('/fonts/AvenirLTStd-Heavy.otf') format('opentype'); font-weight: 800; font-display: swap; }
-@font-face { font-family: 'Avenir'; src: url('/fonts/AvenirLTStd-Black.otf') format('opentype'); font-weight: 900; font-display: swap; }
-@font-face { font-family: 'Montserrat'; src: url('/fonts/Montserrat-Regular.otf') format('opentype'); font-weight: 400; font-display: swap; }
-@font-face { font-family: 'Montserrat'; src: url('/fonts/Montserrat-Medium.otf') format('opentype'); font-weight: 500; font-display: swap; }
-@font-face { font-family: 'Montserrat'; src: url('/fonts/Montserrat-SemiBold.otf') format('opentype'); font-weight: 600; font-display: swap; }
-@font-face { font-family: 'Montserrat'; src: url('/fonts/Montserrat-Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
+/* Polices libres (OFL), intégrées au site par Fontsource en versions variables : Figtree pour les
+   titres (proche d'Avenir, qui demandait une licence web), Montserrat pour le texte. */
+@import '@fontsource-variable/figtree';
+@import '@fontsource-variable/montserrat';
 
 :root {
   --cream: #f4f0ec;
@@ -19,8 +14,8 @@
   --violet: #c9a0dc;
   --indigo: #8b80f9;
   --sun: #fcca46;
-  --font-display: 'Avenir', 'Avenir Next', system-ui, sans-serif;
-  --font-body: 'Montserrat', system-ui, sans-serif;
+  --font-display: 'Figtree Variable', system-ui, sans-serif;
+  --font-body: 'Montserrat Variable', system-ui, sans-serif;
   --maxw: 1240px;
   --gutter: clamp(16px, 4vw, 56px);
 }

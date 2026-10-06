@@ -136,7 +136,7 @@ const links = [
 
       if (hasWebGL2 && mode !== 'flat') {
         const start = () =>
-          Promise.all([loadEsp32('/models/esp32.bin'), document.fonts.load('900 40px Avenir'), document.fonts.load('600 20px Montserrat')])
+          Promise.all([loadEsp32('/models/esp32.bin'), document.fonts.load("900 40px 'Figtree Variable'"), document.fonts.load("700 20px 'Montserrat Variable'")])
             .then(([model]) => initStage(model))
             .catch((err) => console.warn('ESP32 3D indisponible, accueil sans 3D', err));
         if (document.readyState === 'complete') start();
