@@ -5,7 +5,7 @@ import { Renderer, Camera, Transform, Geometry, Program, Mesh, Texture, Plane, V
  * ----------------------------------------------------------------------------
  *  Le modèle vient de `public/models/esp32.bin`, produit par
  *  `tools/esp32-model/build_model.py` à partir de « ESP32 Wroom » de TER1Z
- *  (Sketchfab, CC BY) :
+ *  (Sketchfab, CC BY 4.0, https://sketchfab.com/3d-models/esp32-wroom-fd714190aacc4e3f9c26b8d7e27807fc) :
  *    u32 longueur de l'en-tête JSON | en-tête JSON
  *    | faces papier : positions Uint16 quantifiées, indices Uint16
  *    | faces encre (sérigraphie) : positions Uint16 quantifiées, indices Uint16

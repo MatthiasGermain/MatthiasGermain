@@ -1,0 +1,256 @@
+---
+/* Présentation détaillée du stage de fin d'études chez Schaeffler.
+ * Ne jamais nommer : le client constructeur, des personnes, des numéros internes (pièces, change
+ * orders, pages), la bibliothèque interne d'accès à Windchill. Aucun gain chiffré : rien n'a été
+ * mesuré avant et après. */
+import MaquettePage from '../../layouts/MaquettePage.astro';
+---
+
+<MaquettePage
+  current="experiences"
+  title="Schaeffler"
+  subtitle="Stage de fin d'études : automatiser la chaîne qui génère la documentation technique des calculateurs de la transmission hybride DHT."
+  description="Stage de fin d'études de Matthias Germain chez Schaeffler : rapports d'erreurs par équipe et configuration des livraisons automatisée pour la documentation technique (ETAS eHandbook) des calculateurs de la DHT."
+>
+  <div class="wrap case">
+    <dl class="case-facts">
+      <div><dt>Entreprise</dt><dd>Schaeffler, division E-Mobility</dd></div>
+      <div><dt>Équipe</dt><dd>Tools/Script Developers, une dizaine de personnes</dd></div>
+      <div><dt>Rôle</dt><dd>Ingénieur logiciel, automatisation (stage de fin d'études)</dd></div>
+      <div><dt>Période</dt><dd>Mars - sept. 2025</dd></div>
+      <div><dt>Lieu</dt><dd>Bühl (Allemagne), en hybride</dd></div>
+      <div><dt>Langue</dt><dd>Anglais, au quotidien</dd></div>
+      <div><dt>Stack</dt><dd>Python, Jenkins, Windchill, Confluence (API REST), ETAS eHandbook, Excel, PowerShell</dd></div>
+      <div><dt>Code</dt><dd>Interne, non publié</dd></div>
+    </dl>
+
+    <div class="case-body">
+      <section>
+        <h2><span class="pin-name">01</span> Le contexte</h2>
+        <p>
+          L'équipe Tools/Script Developers ne développe pas le produit. Elle maintient les scripts et la
+          chaîne d'outils qui génèrent la documentation technique du logiciel des calculateurs de la DHT,
+          une transmission conçue pour les véhicules hybrides.
+        </p>
+        <p>
+          Cette documentation est produite avec ETAS eHandbook : une documentation interactive du logiciel
+          d'un calculateur, générée à partir de ses modèles et de son code. Son contenu appartient à
+          d'autres équipes (diagnostic, interfaces…). Notre rôle, c'est la chaîne qui la fabrique.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">02</span> Le problème</h2>
+        <p>Deux étapes de cette chaîne coûtaient cher aux équipes.</p>
+        <h3>Des logs illisibles</h3>
+        <p>
+          Chaque build produisait un log de souvent plus de 10 000 entrées, dont la grande majorité
+          concernait le diagnostic et les interfaces. Les équipes qui fournissent ces données devaient
+          l'interpréter elles-mêmes, avec pour seule aide une vue HTML filtrable. Et les erreurs
+          n'apparaissaient qu'en fin de build : un filtre erroné pouvait vider un ensemble de documents et
+          faire échouer un build après plusieurs heures de calcul.
+        </p>
+        <h3>Une configuration recopiée à la main</h3>
+        <p>
+          À chaque livraison, les paramètres du build (identifiants de documents, labels, filtres, données
+          de la page de titre) étaient saisis sur une page Confluence, vérifiés à la main, puis recopiés à
+          la main dans les fichiers de configuration. Seuls l'import et l'upload dans Windchill étaient
+          automatisés. D'où des erreurs de recopie, des erreurs de format JSON, et aucune vérification
+          automatique.
+        </p>
+        <p>
+          Mes deux objectifs : <b>valider les données en amont</b>, avec un retour rapide aux équipes, et
+          <b>automatiser la définition, la validation et la génération des configurations</b>.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">03</span> Des rapports d'erreurs par équipe</h2>
+        <figure class="case-figure">
+          <svg viewBox="0 0 710 226" role="img" aria-label="Chaîne des rapports : le build eHandbook produit un log CSV, que mon générateur enrichit avec Windchill pour produire un classeur Excel par catégorie">
+            <defs>
+              <marker id="arr-sch-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="280" y="14" width="200" height="44" rx="6" class="paper dash" />
+              <path d="M380 58 V96" marker-end="url(#arr-sch-a)" />
+              <rect x="10" y="100" width="140" height="60" rx="6" class="paper dash" />
+              <path d="M150 130 H174" marker-end="url(#arr-sch-a)" />
+              <rect x="176" y="100" width="114" height="60" rx="6" class="paper" />
+              <path d="M290 130 H308" marker-end="url(#arr-sch-a)" />
+              <rect x="310" y="100" width="140" height="60" rx="6" class="sun" />
+              <path d="M450 130 H488" marker-end="url(#arr-sch-a)" />
+              <rect x="490" y="100" width="210" height="60" rx="6" class="paper" />
+            </g>
+            <text x="380" y="33" class="t" text-anchor="middle">WINDCHILL</text>
+            <text x="380" y="48" class="t muted" text-anchor="middle">DONNÉES DES DOCUMENTS</text>
+            <text x="390" y="82" class="t muted">APPELS PARALLÈLES</text>
+            <text x="80" y="126" class="t" text-anchor="middle">BUILD EHANDBOOK</text>
+            <text x="80" y="142" class="t muted" text-anchor="middle">JENKINS · EXISTANT</text>
+            <text x="233" y="126" class="t" text-anchor="middle">LOG CSV</text>
+            <text x="233" y="142" class="t muted" text-anchor="middle">10 000+ LIGNES</text>
+            <text x="380" y="122" class="t" text-anchor="middle">GÉNÉRATEUR</text>
+            <text x="380" y="136" class="t" text-anchor="middle">DE RAPPORTS</text>
+            <text x="380" y="150" class="t muted" text-anchor="middle">PYTHON</text>
+            <text x="595" y="120" class="t" text-anchor="middle">CLASSEURS EXCEL</text>
+            <text x="595" y="135" class="t muted" text-anchor="middle">UN PAR CATÉGORIE</text>
+            <text x="595" y="149" class="t muted" text-anchor="middle">4 TABLEAUX CROISÉS</text>
+            <text x="595" y="182" class="t muted" text-anchor="middle">ÉQUIPES DIAGNOSTIC ET INTERFACES</text>
+            <text x="10" y="216" class="t muted">EN JAUNE : MON DÉVELOPPEMENT · POINTILLÉS : EXISTANT OU EXTERNE</text>
+          </svg>
+          <figcaption>Le générateur tourne à la fin de chaque génération eHandbook.</figcaption>
+        </figure>
+        <p>
+          J'ai écrit un générateur de rapports en Python, lancé par Jenkins à la fin de chaque génération
+          eHandbook. Il lit le log CSV, l'analyse par expressions régulières et le trie par catégorie
+          (diagnostic, interfaces). Il enrichit ensuite chaque entrée avec des données de Windchill
+          (responsable, état, fonction, change orders), par des appels parallèles.
+        </p>
+        <p>Il produit un classeur Excel par catégorie, déposé à côté des fichiers eHandbook :</p>
+        <ul>
+          <li>une table de données (20 champs pour le diagnostic, 12 pour les interfaces) ;</li>
+          <li>
+            quatre tableaux croisés générés automatiquement, par exemple par responsable ou par fonction,
+            pour que chaque équipe voie d'un coup d'œil les corrections qui la concernent ;
+          </li>
+          <li>un onglet de journal, pour suivre l'exécution.</li>
+        </ul>
+        <p>
+          Pourquoi Excel ? Parce que les équipes l'utilisaient déjà : un rapport qu'on ouvre sans
+          formation est un rapport qu'on lit. J'ai aussi ajouté des colonnes à la vue HTML existante, en
+          Jinja2.
+        </p>
+        <p>
+          Côté code, une classe abstraite gère l'écriture Excel, et chaque catégorie en est une
+          sous-classe. Les champs et les tableaux croisés sont décrits à part de la logique : ajouter une
+          catégorie revient à écrire une sous-classe.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">04</span> La configuration des livraisons</h2>
+        <figure class="case-figure">
+          <svg viewBox="0 0 736 248" role="img" aria-label="Chaîne de configuration : l'outil lit la page de livraison et les règles dans Confluence, contrôle les données dans Windchill, réécrit les statuts dans Confluence et génère les fichiers, relus avant l'upload">
+            <defs>
+              <marker id="arr-sch-b" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="230" y="12" width="180" height="42" rx="6" class="paper dash" />
+              <path d="M320 54 V94" marker-end="url(#arr-sch-b)" />
+              <rect x="10" y="96" width="160" height="60" rx="6" class="paper dash" />
+              <path d="M170 116 H228" marker-end="url(#arr-sch-b)" />
+              <path d="M230 138 H172" marker-end="url(#arr-sch-b)" />
+              <rect x="230" y="96" width="180" height="60" rx="6" class="sun" />
+              <path d="M320 158 V194" marker-start="url(#arr-sch-b)" marker-end="url(#arr-sch-b)" />
+              <rect x="230" y="196" width="180" height="42" rx="6" class="paper dash" />
+              <path d="M410 126 H462" marker-end="url(#arr-sch-b)" />
+              <rect x="464" y="96" width="126" height="60" rx="6" class="paper" />
+              <path d="M590 126 H610" marker-end="url(#arr-sch-b)" />
+              <rect x="612" y="96" width="116" height="60" rx="6" class="paper dash" />
+            </g>
+            <text x="320" y="30" class="t" text-anchor="middle">RÈGLES DE CONTRÔLE</text>
+            <text x="320" y="45" class="t muted" text-anchor="middle">PAGE CONFLUENCE</text>
+            <text x="90" y="122" class="t" text-anchor="middle">PAGE DE LIVRAISON</text>
+            <text x="90" y="138" class="t muted" text-anchor="middle">CONFLUENCE · ÉQUIPES</text>
+            <text x="200" y="108" class="t muted" text-anchor="middle">SAISIES</text>
+            <text x="200" y="152" class="t muted" text-anchor="middle">STATUTS</text>
+            <text x="320" y="122" class="t" text-anchor="middle">OUTIL DE CONFIGURATION</text>
+            <text x="320" y="138" class="t muted" text-anchor="middle">PYTHON · JENKINS</text>
+            <text x="320" y="214" class="t" text-anchor="middle">WINDCHILL</text>
+            <text x="320" y="229" class="t muted" text-anchor="middle">5 CONTRÔLES</text>
+            <text x="527" y="122" class="t" text-anchor="middle">FICHIERS</text>
+            <text x="527" y="138" class="t muted" text-anchor="middle">JSON, PROPERTIES</text>
+            <text x="670" y="122" class="t" text-anchor="middle">REVUE HUMAINE</text>
+            <text x="670" y="138" class="t muted" text-anchor="middle">PUIS UPLOAD</text>
+            <text x="464" y="214" class="t muted">EN JAUNE : MON DÉVELOPPEMENT</text>
+            <text x="464" y="229" class="t muted">POINTILLÉS : EXISTANT OU EXTERNE</text>
+          </svg>
+          <figcaption>L'outil remplace la vérification et la recopie manuelles ; la revue humaine est gardée volontairement.</figcaption>
+        </figure>
+        <p>
+          Deuxième outil : une application Python, lancée depuis Jenkins. Elle lit trois sources : la page
+          Confluence de livraison, où les équipes saisissent leurs valeurs ; une page Confluence de
+          paramétrage, qui décrit les règles de correspondance, de format et de contrôle, modifiables sans
+          toucher au code ; et les fichiers de configuration existants, rangés dans Windchill.
+        </p>
+        <p>Avant de générer quoi que ce soit, elle vérifie chaque ligne dans Windchill :</p>
+        <ol>
+          <li>le document existe ;</li>
+          <li>le label existe, avec sa date ;</li>
+          <li>le filtre renvoie bien des documents, et combien ;</li>
+          <li>les parenthèses du filtre sont équilibrées ;</li>
+          <li>la révision logicielle existe.</li>
+        </ol>
+        <p>Elle repère aussi les champs vides ou marqués « TBD ».</p>
+        <p>
+          Le résultat de chaque contrôle est réécrit directement dans le tableau Confluence, avec un statut
+          et un message : chaque équipe voit son erreur là où elle l'a saisie. En cas d'erreur, aucun
+          fichier n'est généré, sauf en mode « force write », prévu pour les urgences. Tout est journalisé,
+          et le job Jenkins ne plante pas.
+        </p>
+        <p>
+          Si tout est bon, l'outil génère les deux fichiers de configuration du build, un JSON et un
+          fichier de propriétés. Il produit aussi les variantes interne et externe des filtres, pour
+          qu'une livraison externe n'embarque aucun document interne. Les fichiers passent ensuite par une
+          revue humaine avant l'upload dans Windchill.
+        </p>
+        <p>
+          Le code suit quatre couches : import, traitement et validation, génération, intégration. Le plus
+          délicat a été d'extraire de façon fiable les tableaux Confluence (cellules fusionnées, espaces
+          insécables, artefacts d'encodage) : j'ai écrit un analyseur dédié et des règles de normalisation.
+          Le format du tableau a été conçu avec le chef de projet.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">05</span> La chaîne au quotidien</h2>
+        <p>
+          En parallèle, j'ai traité une dizaine de demandes de support sur la chaîne de build, suivies en
+          change orders dans Windchill, avec revue : installation d'outils sur un agent Jenkins, migration
+          d'un script vers la nouvelle bibliothèque interne d'accès à Windchill, ajout d'un cache,
+          correction d'une exception de l'outil ETAS, correctif de compilateur sur les machines de build,
+          convention de nommage des fichiers.
+        </p>
+        <p>
+          L'environnement est sous Windows : scripts batch et PowerShell, automatisation d'Excel par COM,
+          agents Jenkins dédiés et plusieurs modes d'authentification à gérer.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">06</span> Résultats et limites</h2>
+        <ul>
+          <li>À la fin du stage, les rapports Excel étaient intégrés au pipeline Jenkins et livrés à chaque build.</li>
+          <li>L'outil de configuration était accessible aux utilisateurs autorisés, depuis Jenkins.</li>
+          <li>Les deux outils ont été validés par le chef d'équipe.</li>
+        </ul>
+        <p>Je n'ai pas de gain chiffré à présenter : il n'y a pas eu de mesure avant et après.</p>
+        <p>
+          Restent à faire, et proposés comme suites : lancer l'outil depuis un bouton dans Confluence, sans
+          passer par Jenkins ; déclencher automatiquement le build eHandbook quand tous les contrôles
+          passent ; étendre les rapports à d'autres catégories.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">07</span> Ce que j'en retire</h2>
+        <p>
+          Techniquement : Python orienté objet, expressions régulières, automatisation d'Excel, API REST
+          et analyse HTML, appels parallèles, intégration Jenkins (Groovy, batch, PowerShell), et un outil
+          de gestion du cycle de vie produit, Windchill, avec sa gestion des changements.
+        </p>
+        <p>
+          Surtout, j'ai appris à outiller des équipes sans toucher à leur contenu : faire remonter l'erreur
+          au bon endroit, au bon moment, dans un outil qu'elles connaissent déjà. Le tout en anglais, au
+          quotidien.
+        </p>
+      </section>
+
+      <p class="case-back"><a class="pill pill-outline pill-sm" href="/experiences">← Toutes les expériences</a></p>
+    </div>
+  </div>
+</MaquettePage>

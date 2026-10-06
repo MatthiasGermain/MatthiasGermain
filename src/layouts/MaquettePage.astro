@@ -1,20 +1,29 @@
 ---
-/* Gabarit des pages de section de la maquette (Projets, Études, Parcours, Contact).
+/* Gabarit des pages du site hors accueil : les sections (Projets, Expériences, Parcours, Contact) et
+ * les pages annexes (mentions légales).
  * En-tête : la signature (retour à la carte), la barrette de broches pour passer d'une page à
  * l'autre sans repasser par l'ESP32, et BOOT (mode recruteur). */
 import '../styles/maquette.css';
 import Signature from '../components/Signature.astro';
-import { BASE, buttons, sections, type SectionId } from '../data/maquette';
+import SeoHead from '../components/SeoHead.astro';
+import { HOME, buttons, sections, type SectionId } from '../data/maquette';
 
 interface Props {
-  current: SectionId;
+  /** Section affichée (allume sa broche dans la barrette) ; absente pour une page annexe */
+  current?: SectionId;
+  /** Titre et description d'une page annexe, ou d'une page de détail dans une section */
+  title?: string;
+  description?: string;
+  /** Sous-titre sous le titre (par défaut, le « pourquoi » de la broche de la section) */
+  subtitle?: string;
 }
 
-const { current } = Astro.props;
-const section = sections.find((s) => s.id === current)!;
+const { current, title, description, subtitle } = Astro.props;
+const section = sections.find((s) => s.id === current);
+const pageTitle = title ?? section?.label ?? '';
 // Ordre de la barrette : EN (retour à la carte) puis les sections
 const strip = [
-  { id: 'carte', label: 'Carte', pinLabel: 'EN', href: BASE },
+  { id: 'carte', label: 'Carte', pinLabel: 'EN', href: HOME },
   ...sections.map((s) => ({ id: s.id, label: s.label, pinLabel: s.pinLabel, href: s.href })),
 ];
 ---
@@ -22,16 +31,12 @@ const strip = [
 <!doctype html>
 <html lang="fr">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="robots" content="noindex" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{section.label} - Matthias Germain</title>
+    <SeoHead title={`${pageTitle} - Matthias Germain`} description={description ?? section?.meta ?? ''} />
   </head>
   <body>
     <header class="page-top">
       <div class="wrap page-top-row">
-        <a class="logo" href={BASE} aria-label="Matthias Germain, retour à la carte">
+        <a class="logo" href={HOME} aria-label="Matthias Germain, retour à la carte">
           <span class="logo-sign" aria-hidden="true"><Signature /></span>
           <span class="logo-bold">GERMAIN</span>
         </a>
@@ -55,16 +60,23 @@ const strip = [
 
     <main>
       <div class="wrap page-head">
-        <p class="page-pin">Broche <span class="pin-name">{section.pinLabel}</span></p>
-        <h1 class="page-title">{section.label}</h1>
-        <p class="page-why">{section.why}</p>
+        {
+          section && (
+            <p class="page-pin">
+              Broche <span class="pin-name">{section.pinLabel}</span>
+              {title && <a href={section.href}>{section.label}</a>}
+            </p>
+          )
+        }
+        <h1 class="page-title">{pageTitle}</h1>
+        {(subtitle ?? section?.why) && <p class="page-why">{subtitle ?? section?.why}</p>}
       </div>
       <slot />
     </main>
 
     <footer class="wrap page-foot">
       <span>© 2026 Matthias Germain · Strasbourg</span>
-      <span>Maquette : textes et visuels provisoires</span>
+      <a href="/mentions-legales">Mentions légales et confidentialité</a>
     </footer>
 
     <script>

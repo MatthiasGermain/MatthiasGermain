@@ -1,0 +1,178 @@
+---
+/* Présentation détaillée du stage de 2e année sur la maquette UrbanLoop de TÉLÉCOM Nancy.
+ * Stage en binôme : ne pas nommer la binôme sans son accord ; distinguer ce que Matthias a fait seul,
+ * à deux, et ce qui existait déjà. Rien n'a été mesuré : pas de délai ni de « fin des déraillements ».
+ * Les photos de la maquette appartiennent à l'école (accord avant publication). */
+import MaquettePage from '../../layouts/MaquettePage.astro';
+import ProjectVisual from '../../components/maquette/ProjectVisual.astro';
+---
+
+<MaquettePage
+  current="experiences"
+  title="Maquette UrbanLoop"
+  subtitle="Stage de 2e année : la logique d'aiguillage et la supervision de la maquette UrbanLoop de TÉLÉCOM Nancy."
+  description="Stage de Matthias Germain sur la maquette UrbanLoop de TÉLÉCOM Nancy : logique d'aiguillage sur ESP32 sous FreeRTOS et supervision en temps réel en Flask."
+>
+  <div class="wrap case">
+    <dl class="case-facts">
+      <div><dt>Lieu</dt><dd>TÉLÉCOM Nancy, sur site</dd></div>
+      <div><dt>Rôle</dt><dd>Stagiaire ingénieur systèmes embarqués, en binôme</dd></div>
+      <div><dt>Période</dt><dd>Juin - juil. 2024, 8 semaines</dd></div>
+      <div><dt>Maquette</dt><dd>2 capsules, 2 aiguillages à moteur pas à pas</dd></div>
+      <div><dt>Stack</dt><dd>ESP32, C / C++, FreeRTOS, PlatformIO, IrDA, Python (Flask), JavaScript</dd></div>
+      <div><dt>Code</dt><dd>GitLab interne de l'école, non public</dd></div>
+    </dl>
+
+    <div class="case-body">
+      <section>
+        <h2><span class="pin-name">01</span> Le contexte</h2>
+        <p>
+          UrbanLoop est un projet de transport par capsules autonomes qui circulent sur des boucles.
+          TÉLÉCOM Nancy en possède une maquette à échelle réduite, qui sert de démonstrateur et de support
+          de TP en systèmes embarqués. Ses rails et ses capsules avaient été refaits en 2023 : il fallait
+          rendre cette nouvelle version exploitable.
+        </p>
+        <p>
+          Le stage, en binôme avec une autre stagiaire : reprendre les fonctions de l'ancienne version,
+          améliorer la supervision et programmer la logique des aiguillages.
+        </p>
+        <figure class="case-figure">
+          <ProjectVisual visual="urbanloop" />
+          <figcaption>
+            Le site envoie ses commandes au serveur Hermes, qui les relaie en Wi-Fi aux ESP32. Capsules et
+            aiguillages échangent par infrarouge ; deux aiguillages face à face, par liaison série.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">02</span> Le problème</h2>
+        <p>
+          Chaque aiguillage est piloté par un ESP32. Mais sa décision reposait sur une variable « boucle
+          actuelle » codée en dur dans chaque capsule, avec une règle « premier arrivé, premier servi ».
+        </p>
+        <ul>
+          <li>Dès qu'on déplaçait une capsule à la main, cette variable devenait fausse, et l'aiguillage se trompait.</li>
+          <li>Un aiguillage resté ouvert pouvait renvoyer une capsule dans sa boucle de départ.</li>
+          <li>Quand deux capsules arrivaient rapprochées, la règle créait des attentes inutiles, voire des conflits.</li>
+        </ul>
+        <p>
+          Côté supervision, aucune page ne permettait de commander les aiguillages, et rien ne signalait
+          une entité déconnectée.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">03</span> Une nouvelle logique d'aiguillage</h2>
+        <table class="case-table">
+          <thead>
+            <tr><th scope="col"></th><th scope="col">Avant</th><th scope="col">Après</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Décision</th><td>D'après la « boucle actuelle », codée en dur dans la capsule</td><td class="after">D'après la seule boucle de destination, transmise par la capsule</td></tr>
+            <tr><th scope="row">Priorité</th><td>Premier arrivé, premier servi</td><td class="after">La capsule qui sort de sa boucle passe en premier</td></tr>
+            <tr><th scope="row">Aiguillage inactif</th><td>Pouvait rester ouvert</td><td class="after">Refermé systématiquement</td></tr>
+            <tr><th scope="row">Capteurs</th><td>Un capteur infrarouge par aiguillage</td><td class="after">Deux, pour suivre la capsule jusqu'à la sortie</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Chaque aiguillage est affecté à une boucle, et décide uniquement d'après la destination que la
+          capsule lui transmet par infrarouge. Plus d'état codé en dur, donc plus d'erreur quand on déplace
+          une capsule à la main.
+        </p>
+        <p>
+          À la détection d'une capsule, une tâche FreeRTOS se déclenche. Elle demande à la capsule de
+          ralentir si besoin, vérifie si l'insertion dans la boucle est possible, puis ouvre l'aiguillage ou
+          le laisse fermé. L'aiguillage d'en face est prévenu par liaison série. Un second capteur
+          infrarouge, que j'ai câblé sur chaque aiguillage, suit la capsule jusqu'à la sortie ; deux listes
+          d'attente séparent les capsules qui sortent de celles qui restent. L'aiguillage, actionné par un
+          moteur pas à pas, est ensuite refermé.
+        </p>
+        <p>
+          Refermer systématiquement l'aiguillage inactif a supprimé une cause identifiée de déraillement et
+          de retour en boucle.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">04</span> La supervision, en temps réel</h2>
+        <p>Sur le site Flask existant, j'ai ajouté :</p>
+        <ul>
+          <li>une barre latérale, présente sur toutes les pages, qui interroge chaque entité et passe en rouge celles qui sont déconnectées du Wi-Fi ;</li>
+          <li>une page de commande des aiguillages, pour les ouvrir et les fermer.</li>
+        </ul>
+        <p>
+          En binôme, nous avons ajouté les modes manuel et automatique, verrouillés entre eux : chaque mode
+          bloque l'accès aux pages de l'autre, pour éviter les ordres contradictoires, et le changement de
+          mode est diffusé à toutes les capsules. Nous avons aussi écrit le rappel des capsules en station,
+          dont le message traverse quatre langages.
+        </p>
+        <figure class="case-figure">
+          <svg viewBox="0 0 700 112" role="img" aria-label="Chemin du rappel des capsules : page web en JavaScript, site Flask en Python, serveur Hermes en C#, puis Wi-Fi jusqu'à l'ESP32 de la capsule en C++">
+            <defs>
+              <marker id="arr-ul-chain" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="10" y="30" width="140" height="56" rx="6" class="paper" />
+              <path d="M150 58 H188" marker-end="url(#arr-ul-chain)" />
+              <rect x="190" y="30" width="140" height="56" rx="6" class="paper" />
+              <path d="M330 58 H368" marker-end="url(#arr-ul-chain)" />
+              <rect x="370" y="30" width="140" height="56" rx="6" class="paper dash" />
+              <path d="M510 58 H548" marker-end="url(#arr-ul-chain)" />
+              <rect x="550" y="30" width="140" height="56" rx="6" class="paper" />
+            </g>
+            <text x="80" y="55" class="t" text-anchor="middle">PAGE WEB</text>
+            <text x="80" y="71" class="t muted" text-anchor="middle">JAVASCRIPT</text>
+            <text x="260" y="55" class="t" text-anchor="middle">SITE FLASK</text>
+            <text x="260" y="71" class="t muted" text-anchor="middle">PYTHON</text>
+            <text x="440" y="55" class="t" text-anchor="middle">SERVEUR HERMES</text>
+            <text x="440" y="71" class="t muted" text-anchor="middle">C# · EXISTANT</text>
+            <text x="529" y="22" class="t muted" text-anchor="middle">WI-FI</text>
+            <text x="620" y="55" class="t" text-anchor="middle">ESP32 DE LA CAPSULE</text>
+            <text x="620" y="71" class="t muted" text-anchor="middle">C++</text>
+          </svg>
+          <figcaption>Le rappel d'une capsule, du clic sur la page jusqu'au microcontrôleur.</figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">05</span> Les difficultés</h2>
+        <ul>
+          <li>Des liaisons infrarouges parfois instables.</li>
+          <li>Des déconnexions Wi-Fi fréquentes, atténuées sans être réglées définitivement.</li>
+          <li>Des erreurs de compilation dues à la configuration des cartes, réglées en revoyant les environnements de compilation.</li>
+          <li>La reprise d'un code existant complexe, en C, C++, Python et JavaScript.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">06</span> Résultats et limites</h2>
+        <p>
+          À la fin du stage, la maquette disposait d'une supervision en temps réel avec détection des
+          déconnexions, de l'insertion de capsules dans une boucle active avec gestion des priorités, de
+          modes manuel et automatique verrouillés, et de la nouvelle logique d'aiguillage. Rien n'a été
+          mesuré.
+        </p>
+        <p>
+          Faute de temps, certains points sont restés en suspens. Pistes laissées à l'équipe suivante :
+          fiabiliser le Wi-Fi, ajouter des capsules pour tester la maquette en charge, installer une caméra
+          pour suivre les capsules.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">07</span> Ce que j'en retire</h2>
+        <p>
+          Un système embarqué distribué, de bout en bout : des microcontrôleurs qui se parlent par
+          infrarouge, par liaison série et en Wi-Fi, des tâches FreeRTOS, du câblage et de la soudure sur la
+          maquette. J'y ai aussi appris à reprendre un code que je n'avais pas écrit, et à faire traverser
+          un message par quatre langages.
+        </p>
+      </section>
+
+      <p class="case-back"><a class="pill pill-outline pill-sm" href="/experiences">← Toutes les expériences</a></p>
+    </div>
+  </div>
+</MaquettePage>

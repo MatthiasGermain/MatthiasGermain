@@ -21,6 +21,14 @@ export default defineConfig({
     '/en/web': '/',
     '/en/python': '/',
     '/en/cicd': '/',
+    // Adresses de la maquette, avant le passage du site à la racine
+    '/maquette': '/',
+    '/maquette/projets': '/projets',
+    '/maquette/etudes': '/experiences',
+    // Ancien nom de la section Expériences
+    '/etudes': '/experiences',
+    '/maquette/parcours': '/parcours',
+    '/maquette/contact': '/contact',
   },
   adapter: vercel(),
   vite: {

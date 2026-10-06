@@ -269,6 +269,8 @@ svg text { stroke: none; }
   font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-70);
 }
 .stage-hint .credit { font-weight: 500; letter-spacing: 0.02em; text-transform: none; }
+.stage-hint a { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
+.stage-hint a:hover { color: var(--ink); text-decoration-color: var(--sun); }
 .stage:not(.has-3d) .stage-hint { display: none; }
 
 /* Arrivée dans une section depuis une broche : sa piste s'allume */
@@ -337,6 +339,60 @@ svg text { stroke: none; }
   margin-top: clamp(64px, 8vw, 112px); padding-block: 22px 28px; border-top: 1px solid var(--line);
   font-size: 13px; color: var(--ink-70);
 }
+.page-foot a { color: inherit; text-underline-offset: 3px; }
+.page-foot a:hover { color: var(--ink); text-decoration-color: var(--sun); }
+
+/* Présentation détaillée d'un stage : fiche à gauche (collante), récit à droite */
+.page-pin a { margin-left: 6px; color: inherit; text-decoration-color: var(--sun); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.case { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.3fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
+.case-facts {
+  position: sticky; top: 112px; padding: 6px 20px 14px;
+  border: 2px solid var(--ink); border-radius: 12px; background: var(--paper);
+}
+.case-facts > div { display: grid; gap: 3px; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+.case-facts > div:last-child { border-bottom: 0; }
+.case-facts dt { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-70); }
+.case-facts dd { font-size: 14px; font-weight: 600; line-height: 1.45; }
+.case-body { display: grid; gap: clamp(44px, 5vw, 64px); min-width: 0; }
+.case-body section > * + * { margin-top: 14px; }
+.case-body h2 {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-display); font-weight: 900; font-size: clamp(24px, 2.6vw, 32px); line-height: 1.1; text-transform: uppercase;
+}
+.case-body h2 .pin-name { font-size: 12px; }
+.case-body h3 { margin-top: 26px !important; font-size: 17px; font-weight: 700; }
+.case-body p, .case-body li { max-width: 44em; font-size: 16px; line-height: 1.7; }
+.case-body ul, .case-body ol { display: grid; gap: 6px; padding-left: 1.3em; }
+.case-body b { font-weight: 700; }
+.case-figure {
+  margin-block: 26px !important; padding: 18px; border: 2px solid var(--ink); border-radius: 12px;
+  background-color: var(--paper); background-image: radial-gradient(var(--line) 1.1px, transparent 1.3px); background-size: 16px 16px;
+}
+.case-figure svg { display: block; width: 100%; height: auto; }
+.case-figure figcaption { margin-top: 10px; font-size: 13px; color: var(--ink-70); }
+.case-table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; }
+.case-table th, .case-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.case-table thead th { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-70); border-bottom: 2px solid var(--ink); }
+.case-table tbody th { font-weight: 700; white-space: nowrap; }
+.case-table td.after { background: rgba(252, 202, 70, 0.22); }
+.case-back { margin-top: clamp(48px, 6vw, 80px); }
+@media (max-width: 900px) {
+  .case { grid-template-columns: 1fr; }
+  .case-facts { position: static; }
+  .case-table { font-size: 14px; }
+  .case-table tbody th { white-space: normal; }
+}
+
+/* Mentions légales et confidentialité : texte courant, lisible */
+.legal { display: grid; gap: 40px; font-size: 16px; line-height: 1.65; }
+.legal > * { max-width: 46em; }
+.legal h2 { font-family: var(--font-display); font-weight: 900; font-size: 24px; text-transform: uppercase; margin-bottom: 12px; }
+.legal h3 { font-size: 15px; font-weight: 700; margin: 20px 0 8px; }
+.legal ul { display: grid; gap: 8px; padding-left: 1.2em; }
+.legal a { color: inherit; text-decoration-color: var(--sun); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.legal a:hover { background: rgba(252, 202, 70, 0.35); }
+.legal .todo { margin-top: 10px; padding: 8px 12px; border: 2px dashed var(--ink); border-radius: 6px; background: rgba(252, 202, 70, 0.45); font-weight: 600; }
+.legal-date { font-size: 13px; color: var(--ink-70); }
 
 /* Transitions entre pages (navigateurs qui gèrent les View Transitions entre documents ;
    les autres changent de page normalement) */
@@ -513,6 +569,8 @@ svg text { stroke: none; }
   .form-send.is-sending .pin-name, .form-note .pin-name, .form-note.is-error.is-shown { animation: none; }
   .form-note-text { transition: none; }
 }
+.form-privacy { margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: rgba(244, 240, 236, 0.65); }
+.form-privacy a { color: inherit; text-decoration-color: var(--sun); text-underline-offset: 2px; }
 .contact-or { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(244, 240, 236, 0.75); }
 .contact-direct .mail { margin-top: 12px; font-size: clamp(20px, 2.2vw, 30px); }
 .signature { width: clamp(200px, 30vw, 380px); margin: 24px 0 0 auto; color: var(--cream); }

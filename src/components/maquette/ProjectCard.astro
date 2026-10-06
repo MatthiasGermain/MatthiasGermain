@@ -11,15 +11,15 @@ interface Props {
 const { project: p, flip = false } = Astro.props;
 ---
 
-<article class:list={['proj', { flip, 'is-case': p.caseStudy }]} data-cats={p.cats.join(' ')}>
+<article class:list={['proj', { flip, 'is-case': p.experience }]} data-cats={p.cats.join(' ')}>
   <div class="proj-visual">
     <ProjectVisual visual={p.visual} />
-    <span class="ph-tag">{p.visual === 'narthex' || p.visual === 'spotweb' ? 'Capture à venir' : 'Schéma à venir'}</span>
+    {p.visualNote && <span class="ph-tag">{p.visualNote}</span>}
   </div>
 
   <div class="proj-sheet">
     <p class="proj-ref">
-      {p.caseStudy && <span class="case-tag">Étude de cas</span>}
+      {p.experience && <span class="case-tag">{p.experience}</span>}
       <span>{refOf(p)}</span>
       <span class="sep">·</span>
       <span>{p.cats.map((c) => catLabel[c]).join(' · ')}</span>
@@ -45,12 +45,19 @@ const { project: p, flip = false } = Astro.props;
     </dl>
     <p class="proj-links">
       {
+        p.caseHref && (
+          <a class="pill pill-solid pill-sm" href={p.caseHref}>
+            Lire la présentation détaillée →
+          </a>
+        )
+      }
+      {
         p.repo ? (
           <a class="pill pill-outline pill-sm" href={p.repo}>
             Code ↗
           </a>
         ) : (
-          <span class="proj-note">Code propriétaire : pas de dépôt public</span>
+          <span class="proj-note">{p.codeNote ?? "Code propriétaire : pas de dépôt public"}</span>
         )
       }
       {

@@ -1,7 +1,8 @@
 """Convertit le modèle 3D de l'ESP32 (GLB) en binaire compact pour le hero du portfolio.
 
-Modèle source : « ESP32 Wroom » par TER1Z, Sketchfab, licence CC BY (auteur à créditer,
-modifications à signaler). Fichier d'origine : ESP32Wroom.glb (non versionné).
+Modèle source : « ESP32 Wroom » par TER1Z, Sketchfab, licence CC BY 4.0 (auteur à créditer,
+modifications à signaler) : https://sketchfab.com/3d-models/esp32-wroom-fd714190aacc4e3f9c26b8d7e27807fc
+Fichier d'origine : ESP32Wroom.glb (non versionné).
 
 Étapes :
   1. lecture du GLB (sans bibliothèque glTF) : une primitive par matériau ;

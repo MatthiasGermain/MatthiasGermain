@@ -1,10 +1,10 @@
 ---
-import MaquettePage from '../../layouts/MaquettePage.astro';
-import ProjectCard from '../../components/maquette/ProjectCard.astro';
-import { filters, projects } from '../../data/maquette';
+import MaquettePage from '../layouts/MaquettePage.astro';
+import ProjectCard from '../components/maquette/ProjectCard.astro';
+import { filters, projects } from '../data/maquette';
 
 // Les études de cas ont leur propre page
-const list = projects.filter((p) => !p.caseStudy);
+const list = projects.filter((p) => !p.experience);
 const defaultFilter = filters.findIndex((f) => f.id === 'tout');
 ---
 
