@@ -192,20 +192,31 @@ svg text { stroke: none; }
 /* ---------- Accueil : ESP32 plein écran, sans en-tête, sections au bout des broches */
 .stage { position: relative; display: flex; flex-direction: column; min-height: 100svh; }
 .stage-title { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 40px var(--gutter) 0; font-size: clamp(46px, 9vw, 120px); font-weight: 900; }
-.stage.has-3d .stage-title {
+.stage.has-3d .stage-title, .stage.no-3d .stage-title {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
+/* Rendu fixe de la carte, quand la page renonce à la 3D : le nom y est gravé, comme en 3D */
+.stage-poster { display: none; }
+.stage.no-3d .stage-poster, .stage-poster-static {
+  display: block; width: auto; height: auto; margin: 0 auto;
+  max-width: min(720px, calc(100% - 2 * var(--gutter))); max-height: 46svh;
+}
+.stage.no-3d .pin-links { justify-content: center; }
+@media (scripting: none) {
+  .stage-title { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .pin-links { justify-content: center; }
+}
 .stage-board { position: relative; flex: 1; }
-/* Sans 3D : pas de carte, le contenu se resserre et se centre verticalement */
-.stage:not(.has-3d) { justify-content: center; gap: 28px; }
+/* Sans 3D : pas de carte, le contenu se resserre et se centre verticalement (sans déborder par le
+   haut quand il est plus grand que l'écran) */
+.stage:not(.has-3d) { justify-content: center; justify-content: safe center; gap: 28px; }
+.stage.no-3d { padding-block: 24px; }
 .stage:not(.has-3d) .stage-board { flex: 0 0 auto; }
 .stage.has-3d .stage-board { min-height: 480px; }
 .stage .esp32-3d { display: none; }
 /* Carte au centre ; colonnes symétriques pour les étiquettes : boutons à gauche, Contact à droite */
 .stage.has-3d .esp32-3d { display: block; position: absolute; inset: 0 clamp(220px, 19vw, 280px); width: auto; aspect-ratio: auto; }
-.stage .stage-fallback { width: min(560px, calc(100% - 2 * var(--gutter))); margin: 24px auto 48px; }
-.stage.has-3d .stage-fallback { display: none; }
 
 .pinout { display: none; }
 .stage.has-3d .pinout {
@@ -271,7 +282,6 @@ svg text { stroke: none; }
 .stage-hint .credit { font-weight: 500; letter-spacing: 0.02em; text-transform: none; }
 .stage-hint a { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
 .stage-hint a:hover { color: var(--ink); text-decoration-color: var(--sun); }
-.stage:not(.has-3d) .stage-hint { display: none; }
 
 /* Arrivée dans une section depuis une broche : sa piste s'allume */
 .sec-head.is-incoming .sec-rule::before {

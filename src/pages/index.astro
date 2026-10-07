@@ -13,6 +13,13 @@ const bandOf = (id: string) => {
   }
 };
 
+// Date de la ligne « Disponible » : celle du build, remplacée par celle du jour par le script
+const built = new Date();
+const builtLabel = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+  .format(built)
+  .replace('.', '')
+  .toUpperCase();
+
 const links = [
   ...sections.map((s) => ({ ...s, action: undefined as 'boot' | 'en' | undefined })),
   { ...buttons.boot, id: 'boot', action: 'boot' as const, led: false },
@@ -32,6 +39,30 @@ const links = [
       <h1 class="stage-title display">Matthias <span class="hl">GERMAIN</span></h1>
 
       <div class="stage-board">
+        <!-- Sans 3D (pas de WebGL2, téléphone couché, modèle indisponible) : un rendu fixe de la
+             carte, gravure comprise. Le script ne lui donne son adresse qu'en renonçant à la 3D, pour
+             ne pas la télécharger sinon ; sans JavaScript, c'est la copie du <noscript>. -->
+        <img
+          class="stage-poster"
+          data-src="/images/esp32-board-800.webp"
+          data-srcset="/images/esp32-board-800.webp 800w, /images/esp32-board.webp 1536w"
+          sizes="(min-width: 900px) 720px, 100vw"
+          width="1536"
+          height="710"
+          alt=""
+          decoding="async"
+        />
+        <noscript>
+          <img
+            class="stage-poster-static"
+            src="/images/esp32-board-800.webp"
+            srcset="/images/esp32-board-800.webp 800w, /images/esp32-board.webp 1536w"
+            sizes="(min-width: 900px) 720px, 100vw"
+            width="1536"
+            height="710"
+            alt=""
+          />
+        </noscript>
         <div class="esp32-3d" aria-hidden="true"></div>
         <svg class="pinout" aria-hidden="true"></svg>
         <nav class="pin-links" aria-label="Sections, par broche de l'ESP32">
@@ -78,7 +109,7 @@ const links = [
           </span>
           <span>Diplômé de TÉLÉCOM Nancy · basé à Strasbourg</span>
           <span class="availability">
-            <b>Disponible</b> · <time id="today">05 OCT 2026</time>
+            <b>Disponible</b> · <time id="today" datetime={built.toISOString().slice(0, 10)}>{builtLabel}</time>
             <span class="sub">poste embarqué ou web, Strasbourg ou Nancy</span>
           </span>
         </p>
@@ -136,13 +167,28 @@ const links = [
       // Changement de mode (rotation du téléphone, fenêtre redimensionnée) : on recharge la page
       for (const q of [wideQuery, portraitQuery]) q.addEventListener('change', () => modeOf() !== mode && location.reload());
 
+      // Sans 3D : rendu fixe de la carte à la place (voir .stage-poster)
+      const withoutThreeD = () => {
+        const poster = stage.querySelector<HTMLImageElement>('.stage-poster');
+        if (poster?.dataset.src) {
+          poster.srcset = poster.dataset.srcset ?? '';
+          poster.src = poster.dataset.src;
+        }
+        stage.classList.remove('has-3d', 'is-portrait');
+        stage.classList.add('no-3d');
+      };
       if (hasWebGL2 && mode !== 'flat') {
         const start = () =>
           Promise.all([loadEsp32('/models/esp32.bin'), document.fonts.load("900 40px 'Figtree Variable'"), document.fonts.load("700 20px 'Montserrat Variable'")])
             .then(([model]) => initStage(model))
-            .catch((err) => console.warn('ESP32 3D indisponible, accueil sans 3D', err));
+            .catch((err) => {
+              console.warn('ESP32 3D indisponible, accueil avec le rendu fixe', err);
+              withoutThreeD();
+            });
         if (document.readyState === 'complete') start();
         else window.addEventListener('load', start, { once: true });
+      } else {
+        withoutThreeD();
       }
 
       function initStage(model: Esp32Model) {

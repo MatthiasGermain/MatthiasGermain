@@ -55,47 +55,60 @@ const { visual } = Astro.props;
     </svg>
   )}
   {visual === 'risc' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Chemin de données du processeur RISC-V, sans pipeline">
+    // Chemin de données simplifié, d'après RISC_V_Processor.vhd : pas de pipeline, une instruction par
+    // cycle d'horloge. Pas de mux de branchement devant le PC : les sauts ne sont pas câblés.
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Chemin de données simplifié du processeur RISC-V : PC, mémoire d'instructions, registres, ALU et mémoire de données, avec les cinq étapes d'une instruction dans un seul cycle d'horloge">
       <defs>
-        <marker id="arr-risc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <marker id="arr-risc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M0 0 L8 4 L0 8 Z" class="ink" />
         </marker>
       </defs>
       <g class="s">
-        <rect x="16" y="105" width="46" height="40" rx="4" class="paper" />
-        <rect x="84" y="95" width="66" height="60" rx="4" class="paper" />
-        <rect x="176" y="28" width="60" height="34" rx="4" class="paper" />
-        <rect x="176" y="100" width="60" height="50" rx="4" class="paper" />
-        <rect x="176" y="182" width="60" height="34" rx="4" class="paper" />
-        <path d="M246 134 L256 140 L256 156 L246 162 Z" class="paper" />
-        <path d="M262 92 L302 112 L302 140 L262 160 L262 136 L272 126 L262 116 Z" class="sun" />
-        <rect x="322" y="104" width="62" height="44" rx="4" class="paper" />
-        <path d="M304 56 L304 84 L288 76 L288 64 Z" class="paper" />
-        <path d="M62 125 H82" marker-end="url(#arr-risc)" />
-        <path d="M150 125 H174" marker-end="url(#arr-risc)" />
-        <path d="M164 125 V45 H174" marker-end="url(#arr-risc)" />
-        <path d="M164 125 V199 H174" marker-end="url(#arr-risc)" />
-        <path d="M236 112 H250 V104 H260" marker-end="url(#arr-risc)" />
-        <path d="M236 140 H244" marker-end="url(#arr-risc)" />
-        <path d="M236 199 H240 V156 H244" marker-end="url(#arr-risc)" />
-        <path d="M256 148 H260" />
-        <path d="M302 126 H320" marker-end="url(#arr-risc)" />
-        <path d="M312 126 V76 H306" marker-end="url(#arr-risc)" />
-        <path d="M353 104 V64 H306" marker-end="url(#arr-risc)" />
-        <path d="M288 70 H206 V98" marker-end="url(#arr-risc)" />
-        <path d="M236 45 H282 V100" class="dash" />
+        <rect x="16" y="60" width="26" height="54" rx="4" class="paper" />
+        <rect x="40" y="124" width="28" height="22" rx="11" class="paper" />
+        <rect x="84" y="50" width="42" height="90" rx="4" class="paper" />
+        <rect x="158" y="56" width="38" height="66" rx="4" class="paper" />
+        <path d="M210 100 L220 106 L220 128 L210 134 Z" class="paper" />
+        <path d="M232 52 L272 72 L272 112 L232 132 L232 102 L242 92 L232 82 Z" class="sun" />
+        <rect x="300" y="52" width="44" height="80" rx="4" class="paper" />
+        <path d="M42 87 H82" marker-end="url(#arr-risc)" />
+        <path d="M54 87 V122" marker-end="url(#arr-risc)" />
+        <path d="M40 135 H8 V87 H14" marker-end="url(#arr-risc)" />
+        <path d="M126 70 H156" marker-end="url(#arr-risc)" />
+        <path d="M126 88 H156" marker-end="url(#arr-risc)" />
+        <path d="M126 106 H156" marker-end="url(#arr-risc)" />
+        <path d="M126 126 H208" marker-end="url(#arr-risc)" />
+        <path d="M196 67 H230" marker-end="url(#arr-risc)" />
+        <path d="M196 108 H208" marker-end="url(#arr-risc)" />
+        <path d="M220 117 H230" marker-end="url(#arr-risc)" />
+        <path d="M272 92 H298" marker-end="url(#arr-risc)" />
+        <path d="M344 92 H362 V34 H177 V54" marker-end="url(#arr-risc)" />
+        <path d="M40 180 H390" marker-end="url(#arr-risc)" />
+        <path d="M28 212 H40 V196 H216 V212 H390 V196 H396" />
       </g>
-      <circle cx="164" cy="125" r="3" class="dot" />
-      <circle cx="312" cy="126" r="3" class="dot" />
-      <text x="39" y="129" class="t" text-anchor="middle">PC</text>
-      <text x="117" y="129" class="t" text-anchor="middle">IMEM</text>
-      <text x="206" y="49" class="t" text-anchor="middle">DÉC.</text>
-      <text x="206" y="129" class="t" text-anchor="middle">REG</text>
-      <text x="206" y="203" class="t" text-anchor="middle">IMM</text>
-      <text x="283" y="130" class="t" text-anchor="middle">ALU</text>
-      <text x="353" y="124" class="t" text-anchor="middle">MÉM</text>
-      <text x="353" y="138" class="t muted" text-anchor="middle">+ LOAD</text>
-      <text x="16" y="236" class="t muted">SANS PIPELINE · 1 INSTRUCTION PAR PASSAGE</text>
+      <circle cx="54" cy="87" r="2.5" class="dot" />
+      <g stroke="var(--ink)" stroke-width="1.5" class="sun">
+        <circle cx="40" cy="180" r="3.5" />
+        <circle cx="104" cy="180" r="3.5" />
+        <circle cx="175" cy="180" r="3.5" />
+        <circle cx="253" cy="180" r="3.5" />
+        <circle cx="317" cy="180" r="3.5" />
+      </g>
+      <text x="29" y="91" class="t" text-anchor="middle">PC</text>
+      <text x="54" y="139" class="t" text-anchor="middle">+4</text>
+      <text x="105" y="99" class="t" text-anchor="middle">IMEM</text>
+      <text x="177" y="93" class="t" text-anchor="middle">REG</text>
+      <text x="254" y="96" class="t" text-anchor="middle">ALU</text>
+      <text x="322" y="96" class="t" text-anchor="middle">DMEM</text>
+      <g class="t" style="font-size: 9px">
+        <text x="45" y="173">LECTURE</text>
+        <text x="109" y="173">DÉCODAGE</text>
+        <text x="180" y="173">EXÉCUTION</text>
+        <text x="258" y="173">MÉMOIRE</text>
+        <text x="322" y="173">ÉCRITURE</text>
+      </g>
+      <text x="4" y="209" class="t muted">CLK</text>
+      <text x="200" y="240" class="t muted" text-anchor="middle">UNE INSTRUCTION PAR CYCLE · SANS PIPELINE</text>
     </svg>
   )}
   {visual === 'irda' && (

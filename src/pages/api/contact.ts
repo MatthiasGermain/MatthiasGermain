@@ -25,6 +25,11 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Result = { ok: true } | { ok: false; error: string; field?: 'name' | 'email' | 'message' };
 
+// Visite directe de l'adresse (lien, robot) : retour au formulaire. Sans ce cas, Vercel tente
+// d'afficher la page 404, prérendue donc absente de la fonction, et répond par une erreur 500.
+export const GET: APIRoute = () =>
+  new Response(null, { status: 303, headers: { Location: `${BASE}/contact` } });
+
 export const POST: APIRoute = async ({ request }) => {
   const wantsJson = request.headers.get('accept')?.includes('application/json') ?? false;
   const reply = (result: Result, status: number) =>
