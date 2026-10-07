@@ -1,5 +1,6 @@
 ---
 import MaquettePage from '../layouts/MaquettePage.astro';
+import Chronogram from '../components/maquette/Chronogram.astro';
 import { steps } from '../data/maquette';
 ---
 
@@ -10,12 +11,13 @@ import { steps } from '../data/maquette';
         <p class="lead small">
           De l'embarqué automobile au web en production, en passant par les capsules UrbanLoop.
         </p>
+        <Chronogram steps={steps} />
         <a class="pill pill-solid" href="/cv" data-flash>Voir le CV</a>
       </div>
       <ol class="timeline">
         {
-          steps.map((s) => (
-            <li class:list={['tl-item', { 'is-current': s.current }]}>
+          steps.map((s, i) => (
+            <li id={`etape-${i + 1}`} class:list={['tl-item', { 'is-current': s.current }]} data-step={i}>
               <span class="tl-pad" aria-hidden="true" />
               <p class="tl-when">{s.when}</p>
               <h2 class="tl-title">{s.title}</h2>
@@ -28,3 +30,109 @@ import { steps } from '../data/maquette';
     </div>
   </section>
 </MaquettePage>
+
+<script>
+  // Lecture de la frise : l'étape lue s'allume (pastille et impulsion) et les curseurs A et B du
+  // chronogramme viennent encadrer sa période. L'étape lue est la dernière dont le haut a passé la
+  // ligne de lecture, à 30 % de la hauteur de l'écran ; sur le dernier écran de défilement, cette
+  // ligne descend jusqu'à 90 %, pour que les dernières étapes (qui ne peuvent pas remonter jusqu'à
+  // 30 %) s'allument chacune à leur tour. Les curseurs glissent vers l'étape suivante pendant la
+  // fin de la lecture de la précédente.
+  const chrono = document.querySelector<SVGSVGElement>('.chrono');
+  const items = [...document.querySelectorAll<HTMLElement>('.tl-item')];
+  const segs = [...document.querySelectorAll<SVGElement>('.chrono-seg')];
+  const segOf = (n: number) => segs.find((s) => s.dataset.step === String(n));
+  const span = chrono?.querySelector<SVGElement>('.chrono-span');
+  const curA = chrono?.querySelector<SVGElement>('.chrono-cur-a');
+  const curB = chrono?.querySelector<SVGElement>('.chrono-cur-b');
+  const label = chrono?.querySelector<SVGTextElement>('.chrono-delta');
+  const X0 = Number(chrono?.dataset.x0 ?? 0);
+  const X1 = Number(chrono?.dataset.x1 ?? 0);
+
+  let lit = -1;
+  const light = (n: number) => {
+    if (n === lit) return;
+    lit = n;
+    for (const el of [...items, ...segs]) el.classList.toggle('is-on', el.dataset.step === String(n));
+    if (label) label.textContent = segOf(n)?.dataset.delta ?? '';
+  };
+  const bounds = (n: number) => {
+    const seg = segOf(n);
+    return [Number(seg?.dataset.a ?? X0), Number(seg?.dataset.b ?? X0)];
+  };
+  const place = (a: number, b: number) => {
+    if (!span || !curA || !curB || !label) return;
+    span.style.transform = `translate(${a}px, 0) scale(${Math.max(b - a, 0.5)}, 1)`;
+    curA.style.transform = `translate(${a}px, 0)`;
+    curB.style.transform = `translate(${b}px, 0)`;
+    const half = (label.textContent ?? '').length * 3.3;
+    const mid = Math.min(Math.max((a + b) / 2, X0 + half), X1 - half);
+    label.style.transform = `translate(${mid}px, 0)`;
+  };
+  const ease = (f: number) => f * f * (3 - 2 * f);
+
+  // Après un clic sur une impulsion, l'étape choisie reste en place jusqu'au prochain geste de
+  // défilement de la personne (en bas de page, le défilement automatique n'y arrive pas toujours)
+  let pinned: number | undefined;
+  let queued = false;
+  const update = () => {
+    queued = false;
+    if (pinned !== undefined) {
+      light(pinned);
+      place(...(bounds(pinned) as [number, number]));
+      return;
+    }
+    const first = Math.max(innerHeight * 0.3, 180);
+    const last = innerHeight * 0.9;
+    const reach = innerHeight * 0.6;
+    const rest = document.documentElement.scrollHeight - innerHeight - scrollY;
+    const line = first + (last - first) * Math.min(Math.max(1 - rest / reach, 0), 1);
+    const tops = items.map((el) => el.getBoundingClientRect().top);
+    const k = Math.max(tops.findLastIndex((t) => t <= line), 0);
+    // Glissement vers l'étape suivante sur le dernier tiers de la lecture de l'étape k
+    let f = 0;
+    if (k < items.length - 1 && tops[k] <= line) {
+      const progress = (line - tops[k]) / (tops[k + 1] - tops[k]);
+      f = ease(Math.min(Math.max((progress - 0.65) / 0.35, 0), 1));
+    }
+    light(f > 0.5 ? k + 1 : k);
+    const [a0, b0] = bounds(k);
+    const [a1, b1] = f > 0 ? bounds(k + 1) : [a0, b0];
+    place(a0 + (a1 - a0) * f, b0 + (b1 - b0) * f);
+  };
+  const schedule = () => {
+    if (!queued) (queued = true), requestAnimationFrame(update);
+  };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  segs.forEach((seg) =>
+    seg.addEventListener('click', () => {
+      pinned = Number(seg.dataset.step);
+      schedule();
+    }),
+  );
+  for (const type of ['wheel', 'touchstart', 'keydown']) {
+    addEventListener(type, () => (pinned = undefined), { passive: true });
+  }
+  update();
+
+  // Entrée du chronogramme : tracé des signaux quand il arrive à l'écran, une seule fois
+  if (chrono) {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const start = () => {
+      chrono.classList.add('is-live');
+      if (reduced) return;
+      chrono.classList.add('is-drawing');
+      setTimeout(() => chrono.classList.remove('is-drawing'), 1800);
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        start();
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(chrono);
+  }
+</script>

@@ -1,0 +1,162 @@
+---
+/* Chronogramme du parcours, façon analyseur logique : une ligne par type d'activité, une impulsion
+ * par étape. Les durées et les chevauchements s'y lisent d'un coup d'œil (les stages pendant
+ * l'école, le freelance et le bénévolat en parallèle). Chaque impulsion mène à son étape dans la
+ * frise ; le script de la page allume celle qui est à l'écran et y amène deux curseurs (A et B,
+ * comme sur un analyseur) qui encadrent sa période et affichent sa durée. La date du jour est celle
+ * du build. */
+import { lanes, type Step } from '../../data/maquette';
+
+interface Props {
+  steps: Step[];
+}
+const { steps } = Astro.props;
+
+// Temps en années décimales ; une période couvre ses mois de début et de fin en entier
+const at = (ym: string) => {
+  const [y, m] = ym.split('-').map(Number);
+  return y + (m - 1) / 12;
+};
+const today = new Date();
+const now = today.getFullYear() + (today.getMonth() + today.getDate() / 31) / 12;
+const items = steps.map((s, i) => ({
+  i,
+  step: s,
+  lane: s.chrono.lane,
+  t0: at(s.chrono.from),
+  t1: s.chrono.to ? at(s.chrono.to) + 1 / 12 : now,
+  open: !s.chrono.to,
+}));
+const start = Math.min(...items.map((p) => p.t0)) - 0.2;
+const end = now + 0.25;
+
+// Géométrie (unités du viewBox)
+const W = 350;
+const X0 = 76;
+const X1 = W - 6;
+const GAP = 36;
+// En tête : la durée affichée entre les curseurs et leurs poignées
+const HEAD = 22;
+const TOP = 40 + HEAD;
+const HIGH = 16;
+const x = (t: number) => X0 + ((t - start) / (end - start)) * (X1 - X0);
+const base = (k: number) => TOP + k * GAP;
+const BOTTOM = base(lanes.length - 1) + 6;
+const H = BOTTOM + 26;
+const years: number[] = [];
+for (let y = Math.ceil(start); y <= now; y++) years.push(y);
+const r = (n: number) => Math.round(n * 10) / 10;
+// Durée affichée entre les curseurs : en mois, puis en années arrondies
+const delta = (t0: number, t1: number) => {
+  const m = Math.max(1, Math.round((t1 - t0) * 12));
+  if (m < 12) return `Δ ${m} MOIS`;
+  const y = Math.round(m / 12);
+  return `Δ ${y} AN${y > 1 ? 'S' : ''}`;
+};
+
+// Étiquettes des impulsions : centrées, gardées dans le tracé ; deux voisines qui se gênent
+// s'écartent (la première se cale à gauche de sa fin, la seconde part de son début).
+const CHAR = 6.6;
+const rows = lanes.map((lane, k) => {
+  const pulses = items.filter((p) => p.lane === lane.id).sort((a, b) => a.t0 - b.t0);
+  const tags = pulses
+    .filter((p) => p.step.chrono.label)
+    .map((p) => {
+      const text = p.step.chrono.label!.toUpperCase();
+      const w = text.length * CHAR;
+      const mid = (x(p.t0) + x(p.t1)) / 2;
+      // Une impulsion en cours finit sur la LED : l'étiquette s'arrête avant
+      const right = p.open ? x(p.t1) - 7 : X1;
+      let left = Math.min(Math.max(mid - w / 2, X0), right - w);
+      return { p, text, w, left };
+    });
+  for (let n = 1; n < tags.length; n++) {
+    const a = tags[n - 1];
+    const b = tags[n];
+    if (a.left + a.w + 6 > b.left) {
+      a.left = Math.max(x(a.p.t1) - a.w, X0);
+      b.left = Math.min(x(b.p.t0), X1 - b.w);
+    }
+  }
+  // Le signal : bas, puis une montée par impulsion ; une impulsion en cours reste haute jusqu'à
+  // aujourd'hui, puis continue en pointillé.
+  const y0 = base(k);
+  const y1 = y0 - HIGH;
+  let d = `M${X0} ${y0}`;
+  let tail = '';
+  for (const p of pulses) {
+    d += ` H${r(x(p.t0))} V${y1} H${r(x(p.t1))}`;
+    if (p.open) {
+      tail = `M${r(x(p.t1))} ${y1} H${X1}`;
+      break;
+    }
+    d += ` V${y0}`;
+  }
+  if (!tail) d += ` H${X1}`;
+  return { lane, y0, y1, pulses, tags, d, tail };
+});
+---
+
+<svg class="chrono" viewBox={`0 0 ${W} ${H}`} data-x0={X0} data-x1={X1} role="group" aria-label="Chronogramme du parcours, de 2020 à aujourd'hui">
+  <g class="chrono-grid" aria-hidden="true">
+    {years.map((y) => <path d={`M${r(x(y))} ${HEAD + 2} V${BOTTOM}`} />)}
+  </g>
+  <!-- Fenêtre entre les curseurs, sous les signaux ; placée par le script de la page -->
+  <rect class="chrono-span" x="0" y={HEAD} width="1" height={BOTTOM - HEAD} aria-hidden="true" />
+  <!-- Curseurs A et B et durée entre eux, sous les signaux et les étiquettes -->
+  <g aria-hidden="true">
+    {['a', 'b'].map((c) => (
+      <g class={`chrono-cur chrono-cur-${c}`}>
+        <path d={`M0 ${HEAD - 2} V${BOTTOM}`} />
+        <path class="chrono-handle" d={`M-4.5 ${HEAD - 9} H4.5 L0 ${HEAD - 2} Z`} />
+      </g>
+    ))}
+    <text class="t chrono-delta" x="0" y={HEAD - 13} text-anchor="middle" />
+  </g>
+  {
+    rows.map((row) => (
+      <g>
+        <text class="t chrono-lane" x="0" y={row.y0 - 4} aria-hidden="true">
+          {row.lane.label.toUpperCase()}
+        </text>
+        {row.pulses.map((p) => (
+          <a
+            class="chrono-seg"
+            href={`#etape-${p.i + 1}`}
+            data-step={p.i}
+            data-a={r(x(p.t0))}
+            data-b={r(x(p.t1))}
+            data-delta={delta(p.t0, p.t1)}
+            aria-label={`${p.step.title}, ${p.step.when}`}
+          >
+            <title>{`${p.step.title} · ${p.step.when}`}</title>
+            <rect class="chrono-hit" x={r(x(p.t0) - 4)} y={row.y1 - 4} width={r(x(p.t1) - x(p.t0) + 8)} height={HIGH + 8} />
+            <rect class="chrono-fill" x={r(x(p.t0))} y={row.y1} width={r(x(p.t1) - x(p.t0))} height={HIGH} />
+          </a>
+        ))}
+        <path class="chrono-wave chrono-trace" d={row.d} pathLength="1" aria-hidden="true" />
+        {row.tail && <path class="chrono-wave chrono-tail" d={row.tail} aria-hidden="true" />}
+        {row.pulses
+          .filter((p) => p.open)
+          .map((p) => (
+            <g class="chrono-led" aria-hidden="true">
+              <circle class="chrono-halo" cx={r(x(p.t1))} cy={row.y1} r="8" />
+              <circle cx={r(x(p.t1))} cy={row.y1} r="4" />
+            </g>
+          ))}
+        {row.tags.map((tag) => (
+          <text class="t chrono-tag" x={r(tag.left)} y={row.y1 - 5} aria-hidden="true">
+            {tag.text}
+          </text>
+        ))}
+      </g>
+    ))
+  }
+  <g class="chrono-axis" aria-hidden="true">
+    {years.map((y) => (
+      <text class="t chrono-year" x={r(x(y))} y={H - 6} text-anchor="middle">
+        {y}
+      </text>
+    ))}
+  </g>
+</svg>

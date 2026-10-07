@@ -2,6 +2,9 @@
 import MaquettePage from '../layouts/MaquettePage.astro';
 import Signature from '../components/Signature.astro';
 import { links } from '../data/maquette';
+
+// Coupure possible avant le @ plutôt qu'au milieu du domaine
+const [mailUser, mailDomain] = links.email.split('@');
 ---
 
 <MaquettePage current="contact">
@@ -58,17 +61,16 @@ import { links } from '../data/maquette';
 
         <div class="contact-direct">
           <p class="contact-or">Ou directement</p>
-          <a class="mail" href={`mailto:${links.email}`}>{links.email}</a>
+          <a class="mail" href={`mailto:${links.email}`}>{mailUser}<wbr />@{mailDomain}</a>
           <a class="tel" href={`tel:${links.phone.tel}`}>{links.phone.display}</a>
           <div class="contact-links">
             <a class="pill pill-light" href={links.linkedin}>LinkedIn ↗</a>
             <a class="pill pill-light" href={links.github}>GitHub ↗</a>
             <a class="pill pill-sun" href="/cv" data-flash>CV ↗</a>
           </div>
+          <div class="signature"><Signature label="Signature de Matthias" /></div>
         </div>
       </div>
-
-      <div class="signature"><Signature label="Signature de Matthias" /></div>
     </div>
   </section>
 </MaquettePage>

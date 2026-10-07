@@ -522,14 +522,66 @@ svg text { stroke: none; }
 .tl-pad { position: absolute; left: -43px; top: 4px; width: 16px; height: 16px; border: 2px solid var(--ink); background: var(--cream); border-radius: 2px; }
 .tl-item::before { content: ''; position: absolute; left: -27px; top: 11px; width: 18px; height: 2px; background: var(--ink); }
 .tl-item.is-current .tl-pad { background: var(--sun); box-shadow: 0 0 0 5px rgba(252, 202, 70, 0.35); }
+.tl-item.is-on .tl-pad { background: var(--sun); animation: pad-pop 0.4s ease-out; }
+.tl-pad { transition: background-color 0.25s; }
+@keyframes pad-pop { 40% { transform: scale(1.3); } }
+
+/* Chronogramme (colonne de gauche du parcours) */
+.chrono { display: block; width: 100%; max-width: 440px; overflow: visible; }
+.chrono-grid path { stroke: var(--line); stroke-dasharray: 2 4; }
+.chrono-wave { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: miter; pointer-events: none; }
+.chrono-tail { stroke-dasharray: 2 3; }
+.chrono-lane { font-size: 10px; fill-opacity: 0.75; }
+.chrono-tag { font-size: 9px; }
+.chrono-year { font-size: 10px; fill-opacity: 0.6; }
+.chrono-hit { fill: transparent; }
+.chrono-fill { fill: transparent; transition: fill 0.25s; transform-box: fill-box; transform-origin: left center; }
+.chrono-seg:hover .chrono-fill { fill: rgba(252, 202, 70, 0.5); }
+/* Impulsion active : elle se remplit de gauche à droite, comme un signal qui se propage */
+.chrono-seg.is-on .chrono-fill { fill: var(--sun); animation: chrono-sweep 0.5s ease-out; }
+.chrono-seg:focus { outline: none; }
+.chrono-seg:focus-visible .chrono-hit { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.chrono-led { pointer-events: none; }
+.chrono-led circle:last-child { fill: var(--sun); stroke: var(--ink); stroke-width: 2; }
+.chrono-halo { fill: var(--sun); opacity: 0; animation: chrono-halo 2.4s ease-out infinite; }
+/* Curseurs A et B : invisibles sans JavaScript, placés à chaque image par le script de la page */
+.chrono-span, .chrono-cur, .chrono-delta { opacity: 0; transition: opacity 0.4s, transform 0.25s ease-out; }
+.chrono-span { fill: rgba(252, 202, 70, 0.22); transform-origin: 0 0; }
+.chrono-cur path { stroke: var(--ink); stroke-width: 1.5; }
+.chrono-cur .chrono-handle { fill: var(--sun); stroke-linejoin: round; }
+.chrono-delta { font-size: 9px; font-weight: 700; }
+.chrono.is-live .chrono-span, .chrono.is-live .chrono-cur, .chrono.is-live .chrono-delta { opacity: 1; transition-delay: 0s, 0s; }
+
+/* Entrée : les signaux se tracent de gauche à droite, comme une acquisition, puis le reste apparaît */
+.chrono.is-drawing .chrono-trace { stroke-dasharray: 1; animation: chrono-draw 1.4s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.chrono.is-drawing .chrono-tail, .chrono.is-drawing .chrono-led, .chrono.is-drawing .chrono-tag { animation: chrono-fade 0.4s 1.2s both; }
+.chrono.is-drawing .chrono-seg.is-on .chrono-fill { animation: chrono-sweep 0.5s 1.2s ease-out both; }
+.chrono.is-drawing .chrono-span, .chrono.is-drawing .chrono-cur, .chrono.is-drawing .chrono-delta { transition-delay: 1.2s, 0s; }
+/* Avec JavaScript, le chronogramme attend son entrée à l'écran pour se tracer (pas de flash) */
+@media (scripting: enabled) {
+  .chrono:not(.is-live) .chrono-trace { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .chrono:not(.is-live) :is(.chrono-tail, .chrono-led, .chrono-tag, .chrono-fill) { opacity: 0; }
+}
+@keyframes chrono-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes chrono-fade { from { opacity: 0; } }
+@keyframes chrono-sweep { from { transform: scaleX(0); } }
+@keyframes chrono-halo { 0% { opacity: 0.55; transform: scale(0.5); } 70%, 100% { opacity: 0; transform: scale(1); } }
+.chrono-halo { transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: reduce) {
+  .chrono-fill, .tl-pad, .chrono-span, .chrono-cur, .chrono-delta { transition: none; }
+  .tl-item.is-on .tl-pad, .chrono-seg.is-on .chrono-fill, .chrono-halo,
+  .chrono.is-drawing .chrono-trace, .chrono.is-drawing .chrono-tail, .chrono.is-drawing .chrono-led, .chrono.is-drawing .chrono-tag,
+  .chrono.is-drawing .chrono-seg.is-on .chrono-fill { animation: none; }
+  .chrono.is-drawing .chrono-trace { stroke-dasharray: none; }
+}
 .tl-when { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-70); margin-bottom: 4px; }
 .tl-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(20px, 2vw, 26px); line-height: 1.15; }
 .tl-where { font-weight: 600; font-size: 15px; margin-top: 2px; }
 .tl-line { font-size: 15px; color: var(--ink-70); margin-top: 6px; max-width: 36em; }
 
 /* ---------- Contact */
-.contact { background: var(--ink); color: var(--cream); padding-top: clamp(72px, 10vw, 140px); overflow: hidden; }
-.contact .on-dark .light { color: var(--violet); }
+.contact { background: var(--ink); color: var(--cream); padding-block: clamp(72px, 10vw, 140px) clamp(56px, 7vw, 96px); overflow: hidden; }
+.contact .on-dark .light { color: var(--sun); }
 .contact .on-dark .strong { color: var(--sun); }
 .sec-head.on-dark .sec-num { border-color: var(--cream); }
 .sec-head.on-dark .sec-rule { background: rgba(244, 240, 236, 0.25); }
@@ -606,14 +658,16 @@ svg text { stroke: none; }
 .form-privacy { margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: rgba(244, 240, 236, 0.65); }
 .form-privacy a { color: inherit; text-decoration-color: var(--sun); text-underline-offset: 2px; }
 .contact-or { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(244, 240, 236, 0.75); }
-.contact-direct .mail { margin-top: 12px; font-size: clamp(20px, 2.2vw, 30px); }
+/* L'email suit la largeur de la colonne (environ 16 em de long) pour tenir sur une ligne */
+.contact-direct { container-type: inline-size; }
+.contact-direct .mail { margin-top: 12px; font-size: clamp(16px, 6.1cqi, 30px); }
 .contact-direct .tel {
   display: block; width: fit-content; margin-top: 14px; color: var(--cream);
   font-family: var(--font-display); font-weight: 800; font-size: clamp(18px, 1.8vw, 24px); letter-spacing: 0.02em;
   text-decoration: none; border-bottom: 2px solid rgba(244, 240, 236, 0.35);
 }
 .contact-direct .tel:hover { color: var(--sun); border-bottom-color: var(--sun); }
-.signature { width: clamp(200px, 30vw, 380px); margin: 24px 0 0 auto; color: var(--cream); }
+.signature { width: clamp(200px, 30vw, 380px); max-width: 100%; margin: clamp(40px, 6vw, 72px) 0 0 auto; color: var(--cream); }
 .signature svg { display: block; width: 100%; height: auto; }
 .foot {
   display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;

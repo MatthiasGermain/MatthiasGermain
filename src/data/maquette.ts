@@ -196,37 +196,57 @@ export interface Step {
   formation?: boolean;
   /** Absente du CV (reste dans le parcours du site) */
   cv?: false;
+  /** Date plus courte pour le CV, quand la ligne y manque de place */
+  cvWhen?: string;
+  /** Place dans le chronogramme du parcours : ligne, période (AAAA-MM, `to` absent = en cours)
+   *  et étiquette courte au-dessus de l'impulsion (facultative) */
+  chrono: { lane: Lane; from: string; to?: string; label?: string };
 }
+
+export type Lane = 'formation' | 'stage' | 'freelance' | 'asso';
+/** Lignes du chronogramme, de haut en bas */
+export const lanes: { id: Lane; label: string }[] = [
+  { id: 'formation', label: 'Formation' },
+  { id: 'stage', label: 'Stages' },
+  { id: 'freelance', label: 'Freelance' },
+  { id: 'asso', label: 'Bénévolat' },
+];
 
 export const steps: Step[] = [
   {
     when: 'Depuis janv. 2026',
     title: 'Développeur web freelance',
+    chrono: { lane: 'freelance', from: '2026-01' },
     where: 'Strasbourg',
     line: "chuttt.ch, plateforme multilingue (FR, DE, EN) de mise en relation entre particuliers et artisans, développée seul : authentification, front-end, back-office Payload CMS, Supabase, Vercel. En cours : le site d'un studio de danse.",
     current: true,
   },
   {
-    when: 'En parallèle',
+    when: 'Depuis oct. 2023',
+    cvWhen: 'Depuis 2023',
     title: 'Responsable web bénévole',
+    chrono: { lane: 'asso', from: '2023-10', label: 'Spotlight' },
     where: 'Association Spotlight',
     line: 'Développement et suivi de spotlightcrea.fr.',
   },
   {
     when: 'Avr. - sept. 2025',
     title: "Ingénieur logiciel, automatisation (stage de fin d'études)",
+    chrono: { lane: 'stage', from: '2025-04', to: '2025-09', label: 'Schaeffler' },
     where: 'Schaeffler, Bühl (Allemagne)',
     line: "Automatisation de la chaîne qui génère la documentation technique des calculateurs de la transmission hybride DHT : rapports d'erreurs par équipe, configuration des livraisons vérifiée et générée (Python, Jenkins, Windchill, Confluence).",
   },
   {
     when: 'Juin - juil. 2024',
     title: 'Stage ingénieur systèmes embarqués',
+    chrono: { lane: 'stage', from: '2024-06', to: '2024-07', label: 'UrbanLoop' },
     where: 'Maquette UrbanLoop, TÉLÉCOM Nancy',
     line: "En binôme : logique d'aiguillage sur ESP32 (FreeRTOS) et supervision en temps réel ajoutée au site Flask de la maquette.",
   },
   {
     when: '2022 - 2025',
     title: "Diplôme d'ingénieur",
+    chrono: { lane: 'formation', from: '2022-09', to: '2025-09', label: 'TÉLÉCOM Nancy' },
     formation: true,
     where: 'TÉLÉCOM Nancy',
     line: 'Filière systèmes et logiciels embarqués.',
@@ -234,6 +254,7 @@ export const steps: Step[] = [
   {
     when: '2020 - 2022',
     title: 'Classe préparatoire (PC)',
+    chrono: { lane: 'formation', from: '2020-09', to: '2022-06', label: 'Prépa PC' },
     formation: true,
     where: 'Lycée Victor Hugo, Besançon',
     line: 'Filière physique et chimie.',

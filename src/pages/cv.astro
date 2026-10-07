@@ -61,7 +61,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
                       <h3>
                         {s.title} <span class="cv-where">· {s.where}</span>
                       </h3>
-                      <p class="cv-when">{s.when}</p>
+                      <p class="cv-when">{s.cvWhen ?? s.when}</p>
                     </div>
                     <p>{s.line}</p>
                   </li>
