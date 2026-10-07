@@ -362,13 +362,33 @@ svg text { stroke: none; }
 .case-body h2 .pin-name { font-size: 12px; }
 .case-body h3 { margin-top: 26px !important; font-size: 17px; font-weight: 700; }
 .case-body p, .case-body li { max-width: 44em; font-size: 16px; line-height: 1.7; }
-.case-body ul, .case-body ol { display: grid; gap: 6px; padding-left: 1.3em; }
+.case-body ul, .case-body ol, .legal ul { display: grid; gap: 8px; }
+/* Puces : une pastille de broche jaune ; listes numérotées : une étiquette comme les noms de broches */
+.case-body ul > li, .legal ul > li { position: relative; padding-left: 22px; }
+.case-body ul > li::before, .legal ul > li::before {
+  content: ''; position: absolute; left: 2px; top: 0.62em; width: 8px; height: 8px;
+  border: 1.5px solid var(--ink); border-radius: 1.5px; background: var(--sun);
+}
+.case-body ol { counter-reset: step; }
+.case-body ol > li { counter-increment: step; position: relative; padding-left: 34px; }
+.case-body ol > li::before {
+  content: counter(step); position: absolute; left: 0; top: 0.42em; min-width: 22px; text-align: center;
+  border-radius: 2px; background: var(--ink); color: var(--cream); font-size: 11px; font-weight: 700; line-height: 1.6;
+}
 .case-body b { font-weight: 700; }
 .case-figure {
   margin-block: 26px !important; padding: 18px; border: 2px solid var(--ink); border-radius: 12px;
   background-color: var(--paper); background-image: radial-gradient(var(--line) 1.1px, transparent 1.3px); background-size: 16px 16px;
 }
 .case-figure svg { display: block; width: 100%; height: auto; }
+/* Schémas larges : une version verticale les remplace sur les écrans étroits, pour rester lisibles */
+.case-figure .fig-tall { display: none; max-width: 420px; margin-inline: auto; }
+@media (max-width: 640px) {
+  .case-figure .fig-wide { display: none; }
+  .case-figure .fig-tall { display: block; }
+}
+.case-body p a:not(.pill) { color: inherit; text-decoration-color: var(--sun); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.case-body p a:not(.pill):hover { background: rgba(252, 202, 70, 0.35); }
 .case-figure figcaption { margin-top: 10px; font-size: 13px; color: var(--ink-70); }
 .case-table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; }
 .case-table th, .case-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
@@ -388,7 +408,6 @@ svg text { stroke: none; }
 .legal > * { max-width: 46em; }
 .legal h2 { font-family: var(--font-display); font-weight: 900; font-size: 24px; text-transform: uppercase; margin-bottom: 12px; }
 .legal h3 { font-size: 15px; font-weight: 700; margin: 20px 0 8px; }
-.legal ul { display: grid; gap: 8px; padding-left: 1.2em; }
 .legal a { color: inherit; text-decoration-color: var(--sun); text-decoration-thickness: 2px; text-underline-offset: 3px; }
 .legal a:hover { background: rgba(252, 202, 70, 0.35); }
 .legal .todo { margin-top: 10px; padding: 8px 12px; border: 2px dashed var(--ink); border-radius: 6px; background: rgba(252, 202, 70, 0.45); font-weight: 600; }
@@ -473,7 +492,9 @@ svg text { stroke: none; }
 .spec dt { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-70); padding-top: 3px; }
 .spec dd { font-size: 15px; font-weight: 500; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chips li { border: 1.5px solid var(--ink); border-radius: 999px; padding: 1px 10px; font-size: 12px; font-weight: 600; }
+.chips li { display: inline-flex; align-items: center; gap: 5px; border: 1.5px solid var(--ink); border-radius: 999px; padding: 1px 10px; font-size: 12px; font-weight: 600; }
+.chip-logo { flex: none; width: 12px; height: 12px; fill: currentColor; }
+.case-facts .chips { margin-top: 4px; }
 .proj-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .proj-note { font-size: 13px; font-weight: 500; font-style: italic; color: var(--ink-70); }
 .case-tag { background: var(--ink); color: var(--cream); border-radius: 3px; padding: 1px 8px; letter-spacing: 0.1em; }

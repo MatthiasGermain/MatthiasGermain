@@ -5,6 +5,7 @@
  * Les photos de la maquette appartiennent à l'école (accord avant publication). */
 import MaquettePage from '../../layouts/MaquettePage.astro';
 import ProjectVisual from '../../components/maquette/ProjectVisual.astro';
+import StackChips from '../../components/StackChips.astro';
 ---
 
 <MaquettePage
@@ -19,7 +20,7 @@ import ProjectVisual from '../../components/maquette/ProjectVisual.astro';
       <div><dt>Rôle</dt><dd>Stagiaire ingénieur systèmes embarqués, en binôme</dd></div>
       <div><dt>Période</dt><dd>Juin - juil. 2024, 8 semaines</dd></div>
       <div><dt>Maquette</dt><dd>2 capsules, 2 aiguillages à moteur pas à pas</dd></div>
-      <div><dt>Stack</dt><dd>ESP32, C / C++, FreeRTOS, PlatformIO, IrDA, Python (Flask), JavaScript</dd></div>
+      <div><dt>Stack</dt><dd><StackChips items={['ESP32', 'C / C++', 'FreeRTOS', 'PlatformIO', 'IrDA', 'Python (Flask)', 'JavaScript']} /></dd></div>
       <div><dt>Code</dt><dd>GitLab interne de l'école, non public</dd></div>
     </dl>
 
@@ -37,7 +38,40 @@ import ProjectVisual from '../../components/maquette/ProjectVisual.astro';
           améliorer la supervision et programmer la logique des aiguillages.
         </p>
         <figure class="case-figure">
-          <ProjectVisual visual="urbanloop" />
+          <div class="fig-wide"><ProjectVisual visual="urbanloop" /></div>
+          <svg class="fig-tall" viewBox="0 0 340 410" role="img" aria-label="Schéma de la maquette UrbanLoop : site Flask, serveur Hermes, Wi-Fi vers les capsules et les aiguillages, liaison IrDA entre eux">
+            <defs>
+              <marker id="arr-ul-arch2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="16" y="12" width="144" height="52" rx="6" class="paper" />
+              <path d="M160 38 H188" marker-end="url(#arr-ul-arch2)" />
+              <rect x="190" y="12" width="134" height="52" rx="6" class="paper dash" />
+              <path d="M257 64 V96 M88 96 H257" />
+              <path d="M88 96 V130" marker-end="url(#arr-ul-arch2)" />
+              <path d="M257 96 V287 H204" marker-end="url(#arr-ul-arch2)" />
+              <rect x="16" y="132" width="144" height="56" rx="6" class="paper" />
+              <path d="M88 190 V250" class="dash" marker-start="url(#arr-ul-arch2)" marker-end="url(#arr-ul-arch2)" />
+              <rect x="16" y="252" width="186" height="70" rx="6" class="sun" />
+            </g>
+            <circle cx="257" cy="96" r="3" class="dot" />
+            <text x="88" y="35" class="t" text-anchor="middle">SITE FLASK</text>
+            <text x="88" y="51" class="t muted" text-anchor="middle">SUPERVISION</text>
+            <text x="257" y="35" class="t" text-anchor="middle">HERMES</text>
+            <text x="257" y="51" class="t muted" text-anchor="middle">SERVEUR TCP</text>
+            <text x="265" y="124" class="t muted">WI-FI</text>
+            <text x="88" y="157" class="t" text-anchor="middle">2 CAPSULES</text>
+            <text x="88" y="173" class="t muted" text-anchor="middle">ESP32</text>
+            <text x="98" y="224" class="t">IRDA</text>
+            <text x="109" y="278" class="t" text-anchor="middle">2 AIGUILLAGES</text>
+            <text x="109" y="294" class="t muted" text-anchor="middle">ESP32 · FREERTOS</text>
+            <text x="109" y="309" class="t muted" text-anchor="middle">MOTEUR PAS À PAS</text>
+            <text x="109" y="342" class="t muted" text-anchor="middle">SÉRIE ENTRE AIGUILLAGES</text>
+            <text x="16" y="384" class="t muted">EN JAUNE : CONÇU PENDANT LE STAGE</text>
+            <text x="16" y="398" class="t muted">POINTILLÉS : EXISTANT</text>
+          </svg>
           <figcaption>
             Le site envoie ses commandes au serveur Hermes, qui les relaie en Wi-Fi aux ESP32. Capsules et
             aiguillages échangent par infrarouge ; deux aiguillages face à face, par liaison série.
@@ -98,8 +132,8 @@ import ProjectVisual from '../../components/maquette/ProjectVisual.astro';
         <h2><span class="pin-name">04</span> La supervision, en temps réel</h2>
         <p>Sur le site Flask existant, j'ai ajouté :</p>
         <ul>
-          <li>une barre latérale, présente sur toutes les pages, qui interroge chaque entité et passe en rouge celles qui sont déconnectées du Wi-Fi ;</li>
-          <li>une page de commande des aiguillages, pour les ouvrir et les fermer.</li>
+          <li>Une barre latérale, présente sur toutes les pages, qui interroge chaque entité et passe en rouge celles qui sont déconnectées du Wi-Fi.</li>
+          <li>Une page de commande des aiguillages, pour les ouvrir et les fermer.</li>
         </ul>
         <p>
           En binôme, nous avons ajouté les modes manuel et automatique, verrouillés entre eux : chaque mode
@@ -108,7 +142,7 @@ import ProjectVisual from '../../components/maquette/ProjectVisual.astro';
           dont le message traverse quatre langages.
         </p>
         <figure class="case-figure">
-          <svg viewBox="0 0 700 112" role="img" aria-label="Chemin du rappel des capsules : page web en JavaScript, site Flask en Python, serveur Hermes en C#, puis Wi-Fi jusqu'à l'ESP32 de la capsule en C++">
+          <svg class="fig-wide" viewBox="0 0 700 112" role="img" aria-label="Chemin du rappel des capsules : page web en JavaScript, site Flask en Python, serveur Hermes en C#, puis Wi-Fi jusqu'à l'ESP32 de la capsule en C++">
             <defs>
               <marker id="arr-ul-chain" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -132,6 +166,31 @@ import ProjectVisual from '../../components/maquette/ProjectVisual.astro';
             <text x="529" y="22" class="t muted" text-anchor="middle">WI-FI</text>
             <text x="620" y="55" class="t" text-anchor="middle">ESP32 DE LA CAPSULE</text>
             <text x="620" y="71" class="t muted" text-anchor="middle">C++</text>
+          </svg>
+          <svg class="fig-tall" viewBox="0 0 340 330" role="img" aria-label="Chemin du rappel des capsules : page web en JavaScript, site Flask en Python, serveur Hermes en C#, puis Wi-Fi jusqu'à l'ESP32 de la capsule en C++">
+            <defs>
+              <marker id="arr-ul-chain2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="60" y="12" width="220" height="54" rx="6" class="paper" />
+              <path d="M170 66 V94" marker-end="url(#arr-ul-chain2)" />
+              <rect x="60" y="96" width="220" height="54" rx="6" class="paper" />
+              <path d="M170 150 V178" marker-end="url(#arr-ul-chain2)" />
+              <rect x="60" y="180" width="220" height="54" rx="6" class="paper dash" />
+              <path d="M170 234 V262" marker-end="url(#arr-ul-chain2)" />
+              <rect x="60" y="264" width="220" height="54" rx="6" class="paper" />
+            </g>
+            <text x="170" y="36" class="t" text-anchor="middle">PAGE WEB</text>
+            <text x="170" y="52" class="t muted" text-anchor="middle">JAVASCRIPT</text>
+            <text x="170" y="120" class="t" text-anchor="middle">SITE FLASK</text>
+            <text x="170" y="136" class="t muted" text-anchor="middle">PYTHON</text>
+            <text x="170" y="204" class="t" text-anchor="middle">SERVEUR HERMES</text>
+            <text x="170" y="220" class="t muted" text-anchor="middle">C# · EXISTANT</text>
+            <text x="180" y="252" class="t muted">WI-FI</text>
+            <text x="170" y="288" class="t" text-anchor="middle">ESP32 DE LA CAPSULE</text>
+            <text x="170" y="304" class="t muted" text-anchor="middle">C++</text>
           </svg>
           <figcaption>Le rappel d'une capsule, du clic sur la page jusqu'au microcontrôleur.</figcaption>
         </figure>

@@ -4,6 +4,7 @@
  * orders, pages), la bibliothèque interne d'accès à Windchill. Aucun gain chiffré : rien n'a été
  * mesuré avant et après. */
 import MaquettePage from '../../layouts/MaquettePage.astro';
+import StackChips from '../../components/StackChips.astro';
 ---
 
 <MaquettePage
@@ -20,7 +21,7 @@ import MaquettePage from '../../layouts/MaquettePage.astro';
       <div><dt>Période</dt><dd>Mars - sept. 2025</dd></div>
       <div><dt>Lieu</dt><dd>Bühl (Allemagne), en hybride</dd></div>
       <div><dt>Langue</dt><dd>Anglais, au quotidien</dd></div>
-      <div><dt>Stack</dt><dd>Python, Jenkins, Windchill, Confluence (API REST), ETAS eHandbook, Excel, PowerShell</dd></div>
+      <div><dt>Stack</dt><dd><StackChips items={['Python', 'Jenkins', 'Windchill', 'Confluence (API REST)', 'ETAS eHandbook', 'Excel', 'PowerShell']} /></dd></div>
       <div><dt>Code</dt><dd>Interne, non publié</dd></div>
     </dl>
 
@@ -29,7 +30,8 @@ import MaquettePage from '../../layouts/MaquettePage.astro';
         <h2><span class="pin-name">01</span> Le contexte</h2>
         <p>
           L'équipe Tools/Script Developers ne développe pas le produit. Elle maintient les scripts et la
-          chaîne d'outils qui génèrent la documentation technique du logiciel des calculateurs de la DHT,
+          chaîne d'outils qui génèrent la documentation technique du logiciel des calculateurs de la
+          <a href="https://www.schaeffler.com/en/media/dates-events/kolloquium/digital-conference-book-2022/hybrid-powertrain/">DHT</a>,
           une transmission conçue pour les véhicules hybrides.
         </p>
         <p>
@@ -67,7 +69,7 @@ import MaquettePage from '../../layouts/MaquettePage.astro';
       <section>
         <h2><span class="pin-name">03</span> Des rapports d'erreurs par équipe</h2>
         <figure class="case-figure">
-          <svg viewBox="0 0 710 226" role="img" aria-label="Chaîne des rapports : le build eHandbook produit un log CSV, que mon générateur enrichit avec Windchill pour produire un classeur Excel par catégorie">
+          <svg class="fig-wide" viewBox="0 0 710 226" role="img" aria-label="Chaîne des rapports : le build eHandbook produit un log CSV, que mon générateur enrichit avec Windchill pour produire un classeur Excel par catégorie">
             <defs>
               <marker id="arr-sch-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -100,6 +102,39 @@ import MaquettePage from '../../layouts/MaquettePage.astro';
             <text x="595" y="182" class="t muted" text-anchor="middle">ÉQUIPES DIAGNOSTIC ET INTERFACES</text>
             <text x="10" y="216" class="t muted">EN JAUNE : MON DÉVELOPPEMENT · POINTILLÉS : EXISTANT OU EXTERNE</text>
           </svg>
+          <svg class="fig-tall" viewBox="0 0 340 410" role="img" aria-label="Chaîne des rapports : le build eHandbook produit un log CSV, que mon générateur enrichit avec Windchill pour produire un classeur Excel par catégorie">
+            <defs>
+              <marker id="arr-sch-a2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="16" y="12" width="196" height="54" rx="6" class="paper dash" />
+              <path d="M114 66 V96" marker-end="url(#arr-sch-a2)" />
+              <rect x="16" y="98" width="196" height="54" rx="6" class="paper" />
+              <path d="M114 152 V182" marker-end="url(#arr-sch-a2)" />
+              <rect x="16" y="184" width="196" height="64" rx="6" class="sun" />
+              <rect x="232" y="190" width="102" height="52" rx="6" class="paper dash" />
+              <path d="M232 216 H214" marker-end="url(#arr-sch-a2)" />
+              <path d="M114 248 V278" marker-end="url(#arr-sch-a2)" />
+              <rect x="16" y="280" width="196" height="64" rx="6" class="paper" />
+            </g>
+            <text x="114" y="36" class="t" text-anchor="middle">BUILD EHANDBOOK</text>
+            <text x="114" y="52" class="t muted" text-anchor="middle">JENKINS · EXISTANT</text>
+            <text x="114" y="122" class="t" text-anchor="middle">LOG CSV</text>
+            <text x="114" y="138" class="t muted" text-anchor="middle">10 000+ LIGNES</text>
+            <text x="114" y="208" class="t" text-anchor="middle">GÉNÉRATEUR DE RAPPORTS</text>
+            <text x="114" y="224" class="t muted" text-anchor="middle">PYTHON</text>
+            <text x="114" y="238" class="t muted" text-anchor="middle">APPELS PARALLÈLES</text>
+            <text x="283" y="213" class="t" text-anchor="middle">WINDCHILL</text>
+            <text x="283" y="228" class="t muted" text-anchor="middle">DONNÉES</text>
+            <text x="114" y="304" class="t" text-anchor="middle">CLASSEURS EXCEL</text>
+            <text x="114" y="319" class="t muted" text-anchor="middle">UN PAR CATÉGORIE</text>
+            <text x="114" y="333" class="t muted" text-anchor="middle">4 TABLEAUX CROISÉS</text>
+            <text x="114" y="364" class="t muted" text-anchor="middle">ÉQUIPES DIAGNOSTIC ET INTERFACES</text>
+            <text x="16" y="390" class="t muted">EN JAUNE : MON DÉVELOPPEMENT</text>
+            <text x="16" y="404" class="t muted">POINTILLÉS : EXISTANT OU EXTERNE</text>
+          </svg>
           <figcaption>Le générateur tourne à la fin de chaque génération eHandbook.</figcaption>
         </figure>
         <p>
@@ -110,12 +145,12 @@ import MaquettePage from '../../layouts/MaquettePage.astro';
         </p>
         <p>Il produit un classeur Excel par catégorie, déposé à côté des fichiers eHandbook :</p>
         <ul>
-          <li>une table de données (20 champs pour le diagnostic, 12 pour les interfaces) ;</li>
+          <li>Une table de données : 20 champs pour le diagnostic, 12 pour les interfaces.</li>
           <li>
-            quatre tableaux croisés générés automatiquement, par exemple par responsable ou par fonction,
-            pour que chaque équipe voie d'un coup d'œil les corrections qui la concernent ;
+            Quatre tableaux croisés générés automatiquement, par exemple par responsable ou par fonction :
+            chaque équipe voit d'un coup d'œil les corrections qui la concernent.
           </li>
-          <li>un onglet de journal, pour suivre l'exécution.</li>
+          <li>Un onglet de journal, pour suivre l'exécution.</li>
         </ul>
         <p>
           Pourquoi Excel ? Parce que les équipes l'utilisaient déjà : un rapport qu'on ouvre sans
@@ -132,7 +167,7 @@ import MaquettePage from '../../layouts/MaquettePage.astro';
       <section>
         <h2><span class="pin-name">04</span> La configuration des livraisons</h2>
         <figure class="case-figure">
-          <svg viewBox="0 0 736 248" role="img" aria-label="Chaîne de configuration : l'outil lit la page de livraison et les règles dans Confluence, contrôle les données dans Windchill, réécrit les statuts dans Confluence et génère les fichiers, relus avant l'upload">
+          <svg class="fig-wide" viewBox="0 0 736 248" role="img" aria-label="Chaîne de configuration : l'outil lit la page de livraison et les règles dans Confluence, contrôle les données dans Windchill, réécrit les statuts dans Confluence et génère les fichiers, relus avant l'upload">
             <defs>
               <marker id="arr-sch-b" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -169,6 +204,43 @@ import MaquettePage from '../../layouts/MaquettePage.astro';
             <text x="464" y="214" class="t muted">EN JAUNE : MON DÉVELOPPEMENT</text>
             <text x="464" y="229" class="t muted">POINTILLÉS : EXISTANT OU EXTERNE</text>
           </svg>
+          <svg class="fig-tall" viewBox="0 0 340 452" role="img" aria-label="Chaîne de configuration : l'outil lit la page de livraison et les règles dans Confluence, contrôle les données dans Windchill, réécrit les statuts dans Confluence et génère les fichiers, relus avant l'upload">
+            <defs>
+              <marker id="arr-sch-b2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="16" y="12" width="196" height="54" rx="6" class="paper dash" />
+              <path d="M90 66 V110" marker-end="url(#arr-sch-b2)" />
+              <path d="M140 112 V68" marker-end="url(#arr-sch-b2)" />
+              <rect x="16" y="112" width="196" height="54" rx="6" class="sun" />
+              <rect x="232" y="78" width="102" height="44" rx="6" class="paper dash" />
+              <path d="M232 112 H224 V128 H214" marker-end="url(#arr-sch-b2)" />
+              <rect x="232" y="152" width="102" height="44" rx="6" class="paper dash" />
+              <path d="M232 162 H224 V150 H214" marker-start="url(#arr-sch-b2)" marker-end="url(#arr-sch-b2)" />
+              <path d="M114 166 V206" marker-end="url(#arr-sch-b2)" />
+              <rect x="16" y="208" width="196" height="54" rx="6" class="paper" />
+              <path d="M114 262 V292" marker-end="url(#arr-sch-b2)" />
+              <rect x="16" y="294" width="196" height="54" rx="6" class="paper dash" />
+            </g>
+            <text x="114" y="36" class="t" text-anchor="middle">PAGE DE LIVRAISON</text>
+            <text x="114" y="52" class="t muted" text-anchor="middle">CONFLUENCE · ÉQUIPES</text>
+            <text x="84" y="93" class="t muted" text-anchor="end">SAISIES</text>
+            <text x="146" y="93" class="t muted">STATUTS</text>
+            <text x="114" y="136" class="t" text-anchor="middle">OUTIL DE CONFIGURATION</text>
+            <text x="114" y="152" class="t muted" text-anchor="middle">PYTHON · JENKINS</text>
+            <text x="283" y="97" class="t" text-anchor="middle">RÈGLES</text>
+            <text x="283" y="111" class="t muted" text-anchor="middle">CONFLUENCE</text>
+            <text x="283" y="171" class="t" text-anchor="middle">WINDCHILL</text>
+            <text x="283" y="185" class="t muted" text-anchor="middle">5 CONTRÔLES</text>
+            <text x="114" y="232" class="t" text-anchor="middle">FICHIERS DE CONFIGURATION</text>
+            <text x="114" y="248" class="t muted" text-anchor="middle">JSON, PROPERTIES</text>
+            <text x="114" y="318" class="t" text-anchor="middle">REVUE HUMAINE</text>
+            <text x="114" y="334" class="t muted" text-anchor="middle">PUIS UPLOAD WINDCHILL</text>
+            <text x="16" y="380" class="t muted">EN JAUNE : MON DÉVELOPPEMENT</text>
+            <text x="16" y="394" class="t muted">POINTILLÉS : EXISTANT OU EXTERNE</text>
+          </svg>
           <figcaption>L'outil remplace la vérification et la recopie manuelles ; la revue humaine est gardée volontairement.</figcaption>
         </figure>
         <p>
@@ -179,11 +251,11 @@ import MaquettePage from '../../layouts/MaquettePage.astro';
         </p>
         <p>Avant de générer quoi que ce soit, elle vérifie chaque ligne dans Windchill :</p>
         <ol>
-          <li>le document existe ;</li>
-          <li>le label existe, avec sa date ;</li>
-          <li>le filtre renvoie bien des documents, et combien ;</li>
-          <li>les parenthèses du filtre sont équilibrées ;</li>
-          <li>la révision logicielle existe.</li>
+          <li>Le document existe.</li>
+          <li>Le label existe, avec sa date.</li>
+          <li>Le filtre renvoie bien des documents, et combien.</li>
+          <li>Les parenthèses du filtre sont équilibrées.</li>
+          <li>La révision logicielle existe.</li>
         </ol>
         <p>Elle repère aussi les champs vides ou marqués « TBD ».</p>
         <p>
@@ -238,16 +310,24 @@ import MaquettePage from '../../layouts/MaquettePage.astro';
 
       <section>
         <h2><span class="pin-name">07</span> Ce que j'en retire</h2>
-        <p>
-          Techniquement : Python orienté objet, expressions régulières, automatisation d'Excel, API REST
-          et analyse HTML, appels parallèles, intégration Jenkins (Groovy, batch, PowerShell), et un outil
-          de gestion du cycle de vie produit, Windchill, avec sa gestion des changements.
-        </p>
-        <p>
-          Surtout, j'ai appris à outiller des équipes sans toucher à leur contenu : faire remonter l'erreur
-          au bon endroit, au bon moment, dans un outil qu'elles connaissent déjà. Le tout en anglais, au
-          quotidien.
-        </p>
+        <ul>
+          <li>
+            <b>Une entreprise internationale.</b> Six mois dans un groupe automobile international, au sein
+            d'une équipe d'ingénierie, avec ses processus de revue et de gestion des changements.
+          </li>
+          <li>
+            <b>L'anglais au quotidien.</b> C'était la langue de travail de l'équipe : j'ai beaucoup
+            progressé, à l'écrit comme à l'oral.
+          </li>
+          <li>
+            <b>L'autonomie et la prise de décision.</b> J'ai conçu mes deux outils de bout en bout, en
+            faisant moi-même les choix techniques, puis en les faisant valider.
+          </li>
+          <li>
+            <b>Côté technique :</b> Python orienté objet, expressions régulières, automatisation d'Excel,
+            API REST, appels parallèles, intégration Jenkins (Groovy, batch, PowerShell) et Windchill.
+          </li>
+        </ul>
       </section>
 
       <p class="case-back"><a class="pill pill-outline pill-sm" href="/experiences">← Toutes les expériences</a></p>

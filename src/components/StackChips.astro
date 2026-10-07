@@ -1,0 +1,28 @@
+---
+/* Stack d'un projet ou d'une expérience : une étiquette par outil, avec son logo quand il en existe un. */
+import { iconFor } from '../data/icons';
+
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="chips">
+  {
+    items.map((label) => {
+      const d = iconFor(label);
+      return (
+        <li>
+          {d && (
+            <svg class="chip-logo" viewBox="0 0 24 24" aria-hidden="true">
+              <path d={d} />
+            </svg>
+          )}
+          {label}
+        </li>
+      );
+    })
+  }
+</ul>
