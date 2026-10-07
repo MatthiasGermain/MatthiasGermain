@@ -2,7 +2,9 @@
 // Fiche projet, présentée comme une fiche technique (référence, rôle, contexte, stack, liens).
 import ProjectVisual from './ProjectVisual.astro';
 import StackChips from '../StackChips.astro';
-import { catLabel, refOf, type Project } from '../../data/maquette';
+import { refOf, type Project } from '../../data/maquette';
+import { content } from '../../data/content';
+import { langOf, tr } from '../../i18n';
 
 interface Props {
   project: Project;
@@ -10,6 +12,9 @@ interface Props {
 }
 
 const { project: p, flip = false } = Astro.props;
+const lang = langOf(Astro.url);
+const t = tr(lang);
+const { catLabel } = content(lang);
 ---
 
 <article class:list={['proj', { flip, 'is-case': p.experience }]} data-cats={p.cats.join(' ')}>
@@ -30,11 +35,11 @@ const { project: p, flip = false } = Astro.props;
     <p class="proj-pitch">{p.pitch}</p>
     <dl class="spec">
       <div>
-        <dt>Rôle</dt>
+        <dt>{t('Rôle', 'Role')}</dt>
         <dd>{p.role}</dd>
       </div>
       <div>
-        <dt>Contexte</dt>
+        <dt>{t('Contexte', 'Context')}</dt>
         <dd>{p.context}</dd>
       </div>
       <div>
@@ -48,7 +53,7 @@ const { project: p, flip = false } = Astro.props;
       {
         p.caseHref && (
           <a class="pill pill-solid pill-sm" href={p.caseHref}>
-            Lire la présentation détaillée →
+            {t('Lire la présentation détaillée', 'Read the full write-up')} →
           </a>
         )
       }
@@ -58,7 +63,7 @@ const { project: p, flip = false } = Astro.props;
             Code ↗
           </a>
         ) : (
-          <span class="proj-note">{p.codeNote ?? "Code propriétaire : pas de dépôt public"}</span>
+          <span class="proj-note">{p.codeNote ?? t('Code propriétaire : pas de dépôt public', 'Proprietary code: no public repository')}</span>
         )
       }
       {

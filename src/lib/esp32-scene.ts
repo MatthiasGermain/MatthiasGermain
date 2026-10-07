@@ -335,6 +335,8 @@ void main() {
 interface MarkingOptions {
   signaturePath: string;
   signatureViewBox: [number, number];
+  /** Ligne gravée sous le nom (par défaut, en français) */
+  tagline?: string;
 }
 
 /** Dessine le marquage complet (sans animation) sur un canevas hors écran. */
@@ -381,8 +383,9 @@ function drawMarking(w: number, h: number, opts: MarkingOptions): HTMLCanvasElem
 
   // Une seule ligne, assez grande pour rester lisible à l'échelle du hero
   ctx.fillStyle = ink;
-  fit('EMBARQUÉ & IoT', 700, "'Montserrat Variable', system-ui, sans-serif", w * 0.085);
-  ctx.fillText('EMBARQUÉ & IoT', pad, h - pad * 0.95);
+  const tagline = opts.tagline ?? 'EMBARQUÉ & IoT';
+  fit(tagline, 700, "'Montserrat Variable', system-ui, sans-serif", w * 0.085);
+  ctx.fillText(tagline, pad, h - pad * 0.95);
   return c;
 }
 

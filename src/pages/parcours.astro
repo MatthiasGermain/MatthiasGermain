@@ -1,7 +1,12 @@
 ---
 import MaquettePage from '../layouts/MaquettePage.astro';
 import Chronogram from '../components/maquette/Chronogram.astro';
-import { steps } from '../data/maquette';
+import { content } from '../data/content';
+import { href, langOf, tr } from '../i18n';
+
+const lang = langOf(Astro.url);
+const t = tr(lang);
+const { steps } = content(lang);
 ---
 
 <MaquettePage current="parcours">
@@ -9,10 +14,15 @@ import { steps } from '../data/maquette';
     <div class="parcours-grid">
       <div class="parcours-intro">
         <p class="lead small">
-          De l'embarqué automobile au web en production, en passant par les capsules UrbanLoop.
+          {
+            t(
+              "De l'embarqué automobile au web en production, en passant par les capsules UrbanLoop.",
+              'From automotive software to web platforms in production, by way of the UrbanLoop capsules.',
+            )
+          }
         </p>
         <Chronogram steps={steps} />
-        <a class="pill pill-solid" href="/cv" data-flash>Voir le CV</a>
+        <a class="pill pill-solid" href={href(lang, '/cv')} data-flash>{t('Voir le CV', 'See the CV')}</a>
       </div>
       <ol class="timeline">
         {

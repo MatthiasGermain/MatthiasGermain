@@ -6,7 +6,10 @@
 import '../styles/maquette.css';
 import Signature from '../components/Signature.astro';
 import SeoHead from '../components/SeoHead.astro';
-import { HOME, buttons, sections, type SectionId } from '../data/maquette';
+import LangSwitch from '../components/LangSwitch.astro';
+import { content } from '../data/content';
+import type { SectionId } from '../data/maquette';
+import { href, langOf, tr } from '../i18n';
 
 interface Props {
   /** Section affichée (allume sa broche dans la barrette) ; absente pour une page annexe */
@@ -19,24 +22,27 @@ interface Props {
 }
 
 const { current, title, description, subtitle } = Astro.props;
+const lang = langOf(Astro.url);
+const t = tr(lang);
+const { HOME, buttons, sections } = content(lang);
 const section = sections.find((s) => s.id === current);
 const pageTitle = title ?? section?.label ?? '';
 // Ordre de la barrette : EN (retour à la carte) puis les sections
 const strip = [
-  { id: 'carte', label: 'Carte', pinLabel: 'EN', href: HOME },
+  { id: 'carte', label: t('Carte', 'Board'), pinLabel: 'EN', href: HOME },
   ...sections.map((s) => ({ id: s.id, label: s.label, pinLabel: s.pinLabel, href: s.href })),
 ];
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang={lang}>
   <head>
     <SeoHead title={`${pageTitle} - Matthias Germain`} description={description ?? section?.meta ?? ''} />
   </head>
   <body>
     <header class="page-top">
       <div class="wrap page-top-row">
-        <a class="logo" href={HOME} aria-label="Matthias Germain, retour à la carte">
+        <a class="logo" href={HOME} aria-label={t('Matthias Germain, retour à la carte', 'Matthias Germain, back to the board')}>
           <span class="logo-sign" aria-hidden="true"><Signature /></span>
           <span class="logo-bold">GERMAIN</span>
         </a>
@@ -51,10 +57,14 @@ const strip = [
             ))
           }
         </nav>
-        <a class="pill pill-outline boot-link" href={buttons.boot.href} data-flash>
-          <span class="pin-name">{buttons.boot.pinLabel}</span>
-          {buttons.boot.label}
-        </a>
+        <div class="page-top-end">
+          <LangSwitch />
+          <a class="pill pill-outline boot-link" href={buttons.boot.href} data-flash>
+            <span class="pin-name">{buttons.boot.pinLabel}</span>
+            <!-- Sur écran étroit, avec le sélecteur de langue, le libellé court tient dans l'en-tête -->
+            <span class="boot-long">{buttons.boot.label}</span><span class="boot-short">CV</span>
+          </a>
+        </div>
       </div>
     </header>
 
@@ -63,7 +73,7 @@ const strip = [
         {
           section && (
             <p class="page-pin">
-              Broche <span class="pin-name">{section.pinLabel}</span>
+              {t('Broche', 'Pin')} <span class="pin-name">{section.pinLabel}</span>
               {title && <a href={section.href}>{section.label}</a>}
             </p>
           )
@@ -76,7 +86,7 @@ const strip = [
 
     <footer class="wrap page-foot">
       <span>© 2026 Matthias Germain · Strasbourg</span>
-      <a href="/mentions-legales">Mentions légales et confidentialité</a>
+      <a href={href(lang, '/mentions-legales')}>{t('Mentions légales et confidentialité', 'Legal notice and privacy')}</a>
     </footer>
 
     <script>

@@ -1,0 +1,332 @@
+---
+/* Présentation détaillée du stage de fin d'études chez Schaeffler, en anglais (version française :
+ * /experiences/schaeffler). Mêmes règles : ne jamais nommer le client constructeur, des personnes,
+ * des numéros internes (pièces, change orders, pages), la bibliothèque interne d'accès à Windchill.
+ * Aucun gain chiffré : rien n'a été mesuré avant et après. */
+import MaquettePage from '../../../layouts/MaquettePage.astro';
+import StackChips from '../../../components/StackChips.astro';
+---
+
+<MaquettePage
+  current="experiences"
+  title="Schaeffler"
+  subtitle="Final-year internship: automating the toolchain that generates the technical documentation for the control units of the DHT hybrid transmission."
+  description="Matthias Germain's final-year internship at Schaeffler: per-team error reports and an automated delivery configuration for the technical documentation (ETAS eHandbook) of the DHT control units."
+>
+  <div class="wrap case">
+    <dl class="case-facts">
+      <div><dt>Company</dt><dd>Schaeffler, E-Mobility division</dd></div>
+      <div><dt>Team</dt><dd>Tools/Script Developers, about ten people</dd></div>
+      <div><dt>Role</dt><dd>Software engineer, automation (final-year internship)</dd></div>
+      <div><dt>Period</dt><dd>Apr. - Sept. 2025</dd></div>
+      <div><dt>Location</dt><dd>Bühl (Germany), hybrid</dd></div>
+      <div><dt>Language</dt><dd>English, every day</dd></div>
+      <div><dt>Stack</dt><dd><StackChips items={['Python', 'Jenkins', 'Windchill', 'Confluence (REST API)', 'ETAS eHandbook', 'Excel', 'PowerShell']} /></dd></div>
+      <div><dt>Code</dt><dd>Internal, not published</dd></div>
+    </dl>
+
+    <div class="case-body">
+      <section>
+        <h2><span class="pin-name">01</span> The context</h2>
+        <p>
+          The Tools/Script Developers team does not develop the product. It maintains the scripts and the
+          toolchain that generate the technical documentation for the software of the control units of the
+          <a href="https://www.schaeffler.com/en/media/dates-events/kolloquium/digital-conference-book-2022/hybrid-powertrain/">DHT</a>,
+          a transmission designed for hybrid vehicles.
+        </p>
+        <p>
+          This documentation is produced with ETAS eHandbook: interactive documentation of a control unit's
+          software, generated from its models and its code. Its content belongs to other teams (diagnostics,
+          interfaces and others). Our job is the chain that builds it.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">02</span> The problem</h2>
+        <p>Two steps of this chain were costly for the teams.</p>
+        <h3>Unreadable logs</h3>
+        <p>
+          Each build produced a log of often more than 10,000 entries, most of them about diagnostics and
+          interfaces. The teams that supply this data had to interpret it themselves, with a filterable HTML
+          view as their only help. And errors only showed up at the end of the build: a wrong filter could
+          empty a set of documents and make a build fail after several hours of computation.
+        </p>
+        <h3>A configuration copied by hand</h3>
+        <p>
+          For each delivery, the build parameters (document IDs, labels, filters, title page data) were
+          entered on a Confluence page, checked by hand, then copied by hand into the configuration files.
+          Only the import and the upload to Windchill were automated. The result: copy errors, JSON format
+          errors, and no automatic check.
+        </p>
+        <p>
+          My two goals: <b>validate the data upstream</b>, with quick feedback to the teams, and
+          <b>automate the definition, validation and generation of the configurations</b>.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">03</span> Error reports per team</h2>
+        <figure class="case-figure">
+          <svg class="fig-wide" viewBox="0 0 710 226" role="img" aria-label="Report chain: the eHandbook build produces a CSV log, which my generator enriches with Windchill data to produce one Excel workbook per category">
+            <defs>
+              <marker id="arr-sch-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="280" y="14" width="200" height="44" rx="6" class="paper dash" />
+              <path d="M380 58 V96" marker-end="url(#arr-sch-a)" />
+              <rect x="10" y="100" width="140" height="60" rx="6" class="paper dash" />
+              <path d="M150 130 H174" marker-end="url(#arr-sch-a)" />
+              <rect x="176" y="100" width="114" height="60" rx="6" class="paper" />
+              <path d="M290 130 H308" marker-end="url(#arr-sch-a)" />
+              <rect x="310" y="100" width="140" height="60" rx="6" class="sun" />
+              <path d="M450 130 H488" marker-end="url(#arr-sch-a)" />
+              <rect x="490" y="100" width="210" height="60" rx="6" class="paper" />
+            </g>
+            <text x="380" y="33" class="t" text-anchor="middle">WINDCHILL</text>
+            <text x="380" y="48" class="t muted" text-anchor="middle">DOCUMENT DATA</text>
+            <text x="390" y="82" class="t muted">PARALLEL CALLS</text>
+            <text x="80" y="126" class="t" text-anchor="middle">EHANDBOOK BUILD</text>
+            <text x="80" y="142" class="t muted" text-anchor="middle">JENKINS · EXISTING</text>
+            <text x="233" y="126" class="t" text-anchor="middle">CSV LOG</text>
+            <text x="233" y="142" class="t muted" text-anchor="middle">10,000+ LINES</text>
+            <text x="380" y="122" class="t" text-anchor="middle">REPORT</text>
+            <text x="380" y="136" class="t" text-anchor="middle">GENERATOR</text>
+            <text x="380" y="150" class="t muted" text-anchor="middle">PYTHON</text>
+            <text x="595" y="120" class="t" text-anchor="middle">EXCEL WORKBOOKS</text>
+            <text x="595" y="135" class="t muted" text-anchor="middle">ONE PER CATEGORY</text>
+            <text x="595" y="149" class="t muted" text-anchor="middle">4 PIVOT TABLES</text>
+            <text x="595" y="182" class="t muted" text-anchor="middle">DIAGNOSTICS AND INTERFACE TEAMS</text>
+            <text x="10" y="216" class="t muted">IN YELLOW: MY WORK · DASHED: EXISTING OR EXTERNAL</text>
+          </svg>
+          <svg class="fig-tall" viewBox="0 0 340 410" role="img" aria-label="Report chain: the eHandbook build produces a CSV log, which my generator enriches with Windchill data to produce one Excel workbook per category">
+            <defs>
+              <marker id="arr-sch-a2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="16" y="12" width="196" height="54" rx="6" class="paper dash" />
+              <path d="M114 66 V96" marker-end="url(#arr-sch-a2)" />
+              <rect x="16" y="98" width="196" height="54" rx="6" class="paper" />
+              <path d="M114 152 V182" marker-end="url(#arr-sch-a2)" />
+              <rect x="16" y="184" width="196" height="64" rx="6" class="sun" />
+              <rect x="232" y="190" width="102" height="52" rx="6" class="paper dash" />
+              <path d="M232 216 H214" marker-end="url(#arr-sch-a2)" />
+              <path d="M114 248 V278" marker-end="url(#arr-sch-a2)" />
+              <rect x="16" y="280" width="196" height="64" rx="6" class="paper" />
+            </g>
+            <text x="114" y="36" class="t" text-anchor="middle">EHANDBOOK BUILD</text>
+            <text x="114" y="52" class="t muted" text-anchor="middle">JENKINS · EXISTING</text>
+            <text x="114" y="122" class="t" text-anchor="middle">CSV LOG</text>
+            <text x="114" y="138" class="t muted" text-anchor="middle">10,000+ LINES</text>
+            <text x="114" y="208" class="t" text-anchor="middle">REPORT GENERATOR</text>
+            <text x="114" y="224" class="t muted" text-anchor="middle">PYTHON</text>
+            <text x="114" y="238" class="t muted" text-anchor="middle">PARALLEL CALLS</text>
+            <text x="283" y="213" class="t" text-anchor="middle">WINDCHILL</text>
+            <text x="283" y="228" class="t muted" text-anchor="middle">DATA</text>
+            <text x="114" y="304" class="t" text-anchor="middle">EXCEL WORKBOOKS</text>
+            <text x="114" y="319" class="t muted" text-anchor="middle">ONE PER CATEGORY</text>
+            <text x="114" y="333" class="t muted" text-anchor="middle">4 PIVOT TABLES</text>
+            <text x="114" y="364" class="t muted" text-anchor="middle">DIAGNOSTICS AND INTERFACE TEAMS</text>
+            <text x="16" y="390" class="t muted">IN YELLOW: MY WORK</text>
+            <text x="16" y="404" class="t muted">DASHED: EXISTING OR EXTERNAL</text>
+          </svg>
+          <figcaption>The generator runs at the end of each eHandbook generation.</figcaption>
+        </figure>
+        <p>
+          I wrote a report generator in Python, started by Jenkins at the end of each eHandbook generation.
+          It reads the CSV log, parses it with regular expressions and sorts it by category (diagnostics,
+          interfaces). It then enriches each entry with data from Windchill (owner, state, function, change
+          orders), through parallel calls.
+        </p>
+        <p>It produces one Excel workbook per category, stored next to the eHandbook files:</p>
+        <ul>
+          <li>A data table: 20 fields for diagnostics, 12 for interfaces.</li>
+          <li>
+            Four automatically generated pivot tables, for example by owner or by function: each team sees at
+            a glance the fixes that concern it.
+          </li>
+          <li>A log sheet, to follow the run.</li>
+        </ul>
+        <p>
+          Why Excel? Because the teams already used it: a report you can open without training is a report
+          people read. I also added columns to the existing HTML view, in Jinja2.
+        </p>
+        <p>
+          On the code side, an abstract class handles the Excel output, and each category is a subclass.
+          Fields and pivot tables are described separately from the logic: adding a category means writing a
+          subclass.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">04</span> The delivery configuration</h2>
+        <figure class="case-figure">
+          <svg class="fig-wide" viewBox="0 0 736 248" role="img" aria-label="Configuration chain: the tool reads the delivery page and the rules in Confluence, checks the data in Windchill, writes the statuses back to Confluence and generates the files, reviewed before the upload">
+            <defs>
+              <marker id="arr-sch-b" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="230" y="12" width="180" height="42" rx="6" class="paper dash" />
+              <path d="M320 54 V94" marker-end="url(#arr-sch-b)" />
+              <rect x="10" y="96" width="160" height="60" rx="6" class="paper dash" />
+              <path d="M170 116 H228" marker-end="url(#arr-sch-b)" />
+              <path d="M230 138 H172" marker-end="url(#arr-sch-b)" />
+              <rect x="230" y="96" width="180" height="60" rx="6" class="sun" />
+              <path d="M320 158 V194" marker-start="url(#arr-sch-b)" marker-end="url(#arr-sch-b)" />
+              <rect x="230" y="196" width="180" height="42" rx="6" class="paper dash" />
+              <path d="M410 126 H462" marker-end="url(#arr-sch-b)" />
+              <rect x="464" y="96" width="126" height="60" rx="6" class="paper" />
+              <path d="M590 126 H610" marker-end="url(#arr-sch-b)" />
+              <rect x="612" y="96" width="116" height="60" rx="6" class="paper dash" />
+            </g>
+            <text x="320" y="30" class="t" text-anchor="middle">VALIDATION RULES</text>
+            <text x="320" y="45" class="t muted" text-anchor="middle">CONFLUENCE PAGE</text>
+            <text x="90" y="122" class="t" text-anchor="middle">DELIVERY PAGE</text>
+            <text x="90" y="138" class="t muted" text-anchor="middle">CONFLUENCE · TEAMS</text>
+            <text x="200" y="108" class="t muted" text-anchor="middle">INPUT</text>
+            <text x="200" y="152" class="t muted" text-anchor="middle">STATUSES</text>
+            <text x="320" y="122" class="t" text-anchor="middle">CONFIGURATION TOOL</text>
+            <text x="320" y="138" class="t muted" text-anchor="middle">PYTHON · JENKINS</text>
+            <text x="320" y="214" class="t" text-anchor="middle">WINDCHILL</text>
+            <text x="320" y="229" class="t muted" text-anchor="middle">5 CHECKS</text>
+            <text x="527" y="122" class="t" text-anchor="middle">FILES</text>
+            <text x="527" y="138" class="t muted" text-anchor="middle">JSON, PROPERTIES</text>
+            <text x="670" y="122" class="t" text-anchor="middle">HUMAN REVIEW</text>
+            <text x="670" y="138" class="t muted" text-anchor="middle">THEN UPLOAD</text>
+            <text x="464" y="214" class="t muted">IN YELLOW: MY WORK</text>
+            <text x="464" y="229" class="t muted">DASHED: EXISTING OR EXTERNAL</text>
+          </svg>
+          <svg class="fig-tall" viewBox="0 0 340 452" role="img" aria-label="Configuration chain: the tool reads the delivery page and the rules in Confluence, checks the data in Windchill, writes the statuses back to Confluence and generates the files, reviewed before the upload">
+            <defs>
+              <marker id="arr-sch-b2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="16" y="12" width="196" height="54" rx="6" class="paper dash" />
+              <path d="M90 66 V110" marker-end="url(#arr-sch-b2)" />
+              <path d="M140 112 V68" marker-end="url(#arr-sch-b2)" />
+              <rect x="16" y="112" width="196" height="54" rx="6" class="sun" />
+              <rect x="232" y="78" width="102" height="44" rx="6" class="paper dash" />
+              <path d="M232 112 H224 V128 H214" marker-end="url(#arr-sch-b2)" />
+              <rect x="232" y="152" width="102" height="44" rx="6" class="paper dash" />
+              <path d="M232 162 H224 V150 H214" marker-start="url(#arr-sch-b2)" marker-end="url(#arr-sch-b2)" />
+              <path d="M114 166 V206" marker-end="url(#arr-sch-b2)" />
+              <rect x="16" y="208" width="196" height="54" rx="6" class="paper" />
+              <path d="M114 262 V292" marker-end="url(#arr-sch-b2)" />
+              <rect x="16" y="294" width="196" height="54" rx="6" class="paper dash" />
+            </g>
+            <text x="114" y="36" class="t" text-anchor="middle">DELIVERY PAGE</text>
+            <text x="114" y="52" class="t muted" text-anchor="middle">CONFLUENCE · TEAMS</text>
+            <text x="84" y="93" class="t muted" text-anchor="end">INPUT</text>
+            <text x="146" y="93" class="t muted">STATUSES</text>
+            <text x="114" y="136" class="t" text-anchor="middle">CONFIGURATION TOOL</text>
+            <text x="114" y="152" class="t muted" text-anchor="middle">PYTHON · JENKINS</text>
+            <text x="283" y="97" class="t" text-anchor="middle">RULES</text>
+            <text x="283" y="111" class="t muted" text-anchor="middle">CONFLUENCE</text>
+            <text x="283" y="171" class="t" text-anchor="middle">WINDCHILL</text>
+            <text x="283" y="185" class="t muted" text-anchor="middle">5 CHECKS</text>
+            <text x="114" y="232" class="t" text-anchor="middle">CONFIGURATION FILES</text>
+            <text x="114" y="248" class="t muted" text-anchor="middle">JSON, PROPERTIES</text>
+            <text x="114" y="318" class="t" text-anchor="middle">HUMAN REVIEW</text>
+            <text x="114" y="334" class="t muted" text-anchor="middle">THEN WINDCHILL UPLOAD</text>
+            <text x="16" y="380" class="t muted">IN YELLOW: MY WORK</text>
+            <text x="16" y="394" class="t muted">DASHED: EXISTING OR EXTERNAL</text>
+          </svg>
+          <figcaption>The tool replaces the manual checking and copying; the human review is kept on purpose.</figcaption>
+        </figure>
+        <p>
+          Second tool: a Python application, started from Jenkins. It reads three sources: the Confluence
+          delivery page, where the teams enter their values; a Confluence settings page, which describes the
+          mapping, format and validation rules, editable without touching the code; and the existing
+          configuration files, stored in Windchill.
+        </p>
+        <p>Before generating anything, it checks each row in Windchill:</p>
+        <ol>
+          <li>The document exists.</li>
+          <li>The label exists, with its date.</li>
+          <li>The filter does return documents, and how many.</li>
+          <li>The filter's parentheses are balanced.</li>
+          <li>The software revision exists.</li>
+        </ol>
+        <p>It also flags empty fields or fields marked "TBD".</p>
+        <p>
+          The result of each check is written back directly into the Confluence table, with a status and a
+          message: each team sees its error where it entered it. If there is an error, no file is generated,
+          except in "force write" mode, meant for emergencies. Everything is logged, and the Jenkins job does
+          not crash.
+        </p>
+        <p>
+          If everything is fine, the tool generates the two configuration files of the build, a JSON file and
+          a properties file. It also produces the internal and external variants of the filters, so that an
+          external delivery carries no internal document. The files then go through a human review before the
+          upload to Windchill.
+        </p>
+        <p>
+          The code follows four layers: import, processing and validation, generation, integration. The
+          trickiest part was extracting the Confluence tables reliably (merged cells, non-breaking spaces,
+          encoding artifacts): I wrote a dedicated parser and normalization rules. The table format was
+          designed with the project manager.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">05</span> The chain day to day</h2>
+        <p>
+          Alongside this, I handled about ten support requests on the build chain, tracked as change orders in
+          Windchill, with review: installing tools on a Jenkins agent, migrating a script to the new internal
+          Windchill access library, adding a cache, fixing an exception in the ETAS tool, a compiler fix on the
+          build machines, a file naming convention.
+        </p>
+        <p>
+          The environment runs on Windows: batch and PowerShell scripts, Excel automation through COM,
+          dedicated Jenkins agents and several authentication modes to handle.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">06</span> Results and limits</h2>
+        <ul>
+          <li>By the end of the internship, the Excel reports were integrated into the Jenkins pipeline and delivered with every build.</li>
+          <li>The configuration tool was available to authorized users, from Jenkins.</li>
+          <li>Both tools were approved by the team lead.</li>
+        </ul>
+        <p>I have no measured gain to show: there was no before-and-after measurement.</p>
+        <p>
+          Still to do, and proposed as next steps: start the tool from a button in Confluence, without going
+          through Jenkins; trigger the eHandbook build automatically when all checks pass; extend the reports to
+          other categories.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">07</span> What I take away</h2>
+        <ul>
+          <li>
+            <b>An international company.</b> Six months in an international automotive group, within an
+            engineering team, with its review and change management processes.
+          </li>
+          <li>
+            <b>English every day.</b> It was the team's working language: I made a lot of progress, in writing
+            and in speaking.
+          </li>
+          <li>
+            <b>Autonomy and decision-making.</b> I designed both of my tools end to end, making the technical
+            choices myself, then getting them approved.
+          </li>
+          <li>
+            <b>On the technical side:</b> object-oriented Python, regular expressions, Excel automation, REST
+            APIs, parallel calls, Jenkins integration (Groovy, batch, PowerShell) and Windchill.
+          </li>
+        </ul>
+      </section>
+
+      <p class="case-back"><a class="pill pill-outline pill-sm" href="/en/experience">← All experience</a></p>
+    </div>
+  </div>
+</MaquettePage>

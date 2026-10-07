@@ -1,4 +1,5 @@
-/* Données du portfolio, partagées par toutes ses pages.
+/* Données du portfolio, partagées par toutes ses pages (en français ; la traduction anglaise est
+ * dans maquette.en.ts, et content.ts assemble les données d'une langue).
  * Première ébauche de la source unique de données : le site, le CV et le README GitHub
  * en seront générés une fois le contenu figé. */
 
@@ -175,18 +176,23 @@ export const projects: Project[] = [
   },
 ];
 
-// Numérotation : les projets en PRJ-xx, les expériences à part en EXP-xx.
+// Numérotation : les projets en PRJ-xx, les expériences à part en EXP-xx. Clé : le visuel, propre à
+// chaque fiche, pour que les copies traduites (content.ts) gardent leur numéro.
 export const refOf = (() => {
-  const refs = new Map<Project, string>();
+  const refs = new Map<Visual, string>();
   let prj = 0;
   let exp = 0;
   for (const p of projects) {
-    refs.set(p, p.experience ? `EXP-${String(++exp).padStart(2, '0')}` : `PRJ-${String(++prj).padStart(2, '0')}`);
+    refs.set(p.visual, p.experience ? `EXP-${String(++exp).padStart(2, '0')}` : `PRJ-${String(++prj).padStart(2, '0')}`);
   }
-  return (p: Project) => refs.get(p)!;
+  return (p: Project) => refs.get(p.visual)!;
 })();
 
+export type StepId = 'freelance' | 'spotlight' | 'schaeffler' | 'urbanloop' | 'diplome' | 'prepa';
+
 export interface Step {
+  /** Identifiant stable (traductions) */
+  id: StepId;
   when: string;
   title: string;
   where: string;
@@ -214,6 +220,7 @@ export const lanes: { id: Lane; label: string }[] = [
 
 export const steps: Step[] = [
   {
+    id: 'freelance',
     when: 'Depuis janv. 2026',
     title: 'Développeur web freelance',
     chrono: { lane: 'freelance', from: '2026-01' },
@@ -222,6 +229,7 @@ export const steps: Step[] = [
     current: true,
   },
   {
+    id: 'spotlight',
     when: 'Depuis oct. 2023',
     cvWhen: 'Depuis 2023',
     title: 'Responsable web bénévole',
@@ -230,6 +238,7 @@ export const steps: Step[] = [
     line: 'Développement et suivi de spotlightcrea.fr.',
   },
   {
+    id: 'schaeffler',
     when: 'Avr. - sept. 2025',
     title: "Ingénieur logiciel, automatisation (stage de fin d'études)",
     chrono: { lane: 'stage', from: '2025-04', to: '2025-09', label: 'Schaeffler' },
@@ -237,6 +246,7 @@ export const steps: Step[] = [
     line: "Automatisation de la chaîne qui génère la documentation technique des calculateurs de la transmission hybride DHT : rapports d'erreurs par équipe, configuration des livraisons vérifiée et générée (Python, Jenkins, Windchill, Confluence).",
   },
   {
+    id: 'urbanloop',
     when: 'Juin - juil. 2024',
     title: 'Stage ingénieur systèmes embarqués',
     chrono: { lane: 'stage', from: '2024-06', to: '2024-07', label: 'UrbanLoop' },
@@ -244,6 +254,7 @@ export const steps: Step[] = [
     line: "En binôme : logique d'aiguillage sur ESP32 (FreeRTOS) et supervision en temps réel ajoutée au site Flask de la maquette.",
   },
   {
+    id: 'diplome',
     when: '2022 - 2025',
     title: "Diplôme d'ingénieur",
     chrono: { lane: 'formation', from: '2022-09', to: '2025-09', label: 'TÉLÉCOM Nancy' },
@@ -252,6 +263,7 @@ export const steps: Step[] = [
     line: 'Filière systèmes et logiciels embarqués.',
   },
   {
+    id: 'prepa',
     when: '2020 - 2022',
     title: 'Classe préparatoire (PC)',
     chrono: { lane: 'formation', from: '2020-09', to: '2022-06', label: 'Prépa PC' },
@@ -360,7 +372,7 @@ export const skills: { area: string; items: string[] }[] = [
 export const links = {
   email: 'matthias.germain.pro@gmail.com',
   // Affiché sur la page Contact (choix de Matthias, 2026-10-07)
-  phone: { display: '06 02 32 17 20', tel: '+33602321720' },
+  phone: { display: '06 02 32 17 20', intl: '+33 6 02 32 17 20', tel: '+33602321720' },
   linkedin: 'https://www.linkedin.com/in/matthias-germain/',
   github: 'https://github.com/MatthiasGermain',
   site: 'https://matthias-germain.vercel.app',

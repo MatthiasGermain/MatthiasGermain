@@ -17,10 +17,10 @@ export default defineConfig({
     '/web': '/',
     '/python': '/',
     '/cicd': '/',
-    '/en': '/',
-    '/en/web': '/',
-    '/en/python': '/',
-    '/en/cicd': '/',
+    // Anciennes pages anglaises : vers l'accueil anglais
+    '/en/web': '/en',
+    '/en/python': '/en',
+    '/en/cicd': '/en',
     // Adresses de la maquette, avant le passage du site à la racine
     '/maquette': '/',
     '/maquette/projets': '/projets',

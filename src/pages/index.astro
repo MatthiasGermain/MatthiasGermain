@@ -3,7 +3,15 @@
  * chaque section est au bout d'une broche et s'ouvre sur sa propre page, avec une transition. */
 import '../styles/maquette.css';
 import SeoHead from '../components/SeoHead.astro';
-import { DESCRIPTION, buttons, portraitRows, sections } from '../data/maquette';
+import LangSwitch from '../components/LangSwitch.astro';
+import { content } from '../data/content';
+import { href, langOf, localeOf, tr } from '../i18n';
+
+const lang = langOf(Astro.url);
+const t = tr(lang);
+const { DESCRIPTION, buttons, portraitRows, sections } = content(lang);
+// Rendu fixe de la carte (sans 3D) : le marquage du blindage est dans la langue de la page
+const poster = lang === 'en' ? 'esp32-board-en' : 'esp32-board';
 
 // Rangée et place de chaque étiquette sur mobile (carte debout)
 const bandOf = (id: string) => {
@@ -15,7 +23,7 @@ const bandOf = (id: string) => {
 
 // Date de la ligne « Disponible » : celle du build, remplacée par celle du jour par le script
 const built = new Date();
-const builtLabel = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+const builtLabel = new Intl.DateTimeFormat(localeOf(lang), { day: '2-digit', month: 'short', year: 'numeric' })
   .format(built)
   .replace('.', '')
   .toUpperCase();
@@ -28,12 +36,16 @@ const links = [
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang={lang}>
   <head>
-    <SeoHead title="Matthias Germain - Ingénieur logiciel embarqué et IoT" description={DESCRIPTION} />
+    <SeoHead
+      title={t('Matthias Germain - Ingénieur logiciel embarqué et IoT', 'Matthias Germain - Embedded and IoT software engineer')}
+      description={DESCRIPTION}
+    />
   </head>
   <body>
-    <main id="accueil" class="stage">
+    <main id="accueil" class="stage" data-tagline={t('EMBARQUÉ & IoT', 'EMBEDDED & IoT')}>
+      <div class="stage-lang"><LangSwitch /></div>
       <!-- Le nom est gravé sur le blindage de l'ESP32 ; ce titre reste pour l'accessibilité,
            le référencement et l'affichage sans 3D (mobile). -->
       <h1 class="stage-title display">Matthias <span class="hl">GERMAIN</span></h1>
@@ -44,8 +56,8 @@ const links = [
              ne pas la télécharger sinon ; sans JavaScript, c'est la copie du <noscript>. -->
         <img
           class="stage-poster"
-          data-src="/images/esp32-board-800.webp"
-          data-srcset="/images/esp32-board-800.webp 800w, /images/esp32-board.webp 1536w"
+          data-src={`/images/${poster}-800.webp`}
+          data-srcset={`/images/${poster}-800.webp 800w, /images/${poster}.webp 1536w`}
           sizes="(min-width: 900px) 720px, 100vw"
           width="1536"
           height="710"
@@ -55,8 +67,8 @@ const links = [
         <noscript>
           <img
             class="stage-poster-static"
-            src="/images/esp32-board-800.webp"
-            srcset="/images/esp32-board-800.webp 800w, /images/esp32-board.webp 1536w"
+            src={`/images/${poster}-800.webp`}
+            srcset={`/images/${poster}-800.webp 800w, /images/${poster}.webp 1536w`}
             sizes="(min-width: 900px) 720px, 100vw"
             width="1536"
             height="710"
@@ -93,34 +105,62 @@ const links = [
       <!-- Description mise en valeur avec les codes de la DA : accroche (contraste fin / gras +
            surligneur), la chaîne en trois maillons surlignés, puis formation et disponibilité. -->
       <div class="stage-foot">
-        <p class="intro-title display">
-          <span class="light">Ingénieur logiciel</span> <span class="hl">EMBARQUÉ &amp; IoT</span>
-        </p>
-        <p class="intro-chain">
-          Toute la chaîne d'un système connecté : <span class="hl-soft">le firmware</span>,
-          <span class="hl-soft">l'outillage Python</span> qui l'entoure et
-          <span class="hl-soft">l'interface web</span>.
-        </p>
+        {
+          lang === 'en' ? (
+            <>
+              <p class="intro-title display">
+                <span class="hl">EMBEDDED &amp; IoT</span> <span class="light">software engineer</span>
+              </p>
+              <p class="intro-chain">
+                The whole chain of a connected system: <span class="hl-soft">the firmware</span>,
+                <span class="hl-soft">the Python tooling</span> around it and
+                <span class="hl-soft">the web interface</span>.
+              </p>
+            </>
+          ) : (
+            <>
+              <p class="intro-title display">
+                <span class="light">Ingénieur logiciel</span> <span class="hl">EMBARQUÉ &amp; IoT</span>
+              </p>
+              <p class="intro-chain">
+                Toute la chaîne d'un système connecté : <span class="hl-soft">le firmware</span>,
+                <span class="hl-soft">l'outillage Python</span> qui l'entoure et
+                <span class="hl-soft">l'interface web</span>.
+              </p>
+            </>
+          )
+        }
         <p class="intro-meta">
           <!-- Photo en pastille, avec la LED « Disponible » posée dessus comme un statut « en ligne » -->
           <span class="avatar">
-            <img src="/images/matthias-avatar.webp" alt="Photo de Matthias Germain" width="44" height="44" />
+            <img src="/images/matthias-avatar.webp" alt={t('Photo de Matthias Germain', 'Photo of Matthias Germain')} width="44" height="44" />
             <span class="chip-led" aria-hidden="true"></span>
           </span>
-          <span>Diplômé de TÉLÉCOM Nancy · basé à Strasbourg</span>
+          <span>{t('Diplômé de TÉLÉCOM Nancy · basé à Strasbourg', 'TÉLÉCOM Nancy graduate · based in Strasbourg')}</span>
           <span class="availability">
-            <b>Disponible</b> · <time id="today" datetime={built.toISOString().slice(0, 10)}>{builtLabel}</time>
-            <span class="sub">poste embarqué ou web, Strasbourg ou Nancy</span>
+            <b>{t('Disponible', 'Available')}</b> · <time id="today" datetime={built.toISOString().slice(0, 10)}>{builtLabel}</time>
+            <span class="sub">{t('poste embarqué ou web, Strasbourg ou Nancy', 'embedded or web role, Strasbourg or Nancy')}</span>
           </span>
         </p>
         <p class="stage-hint">
-          <span class="credit">
-            Modèle 3D :
-            <a href="https://sketchfab.com/3d-models/esp32-wroom-fd714190aacc4e3f9c26b8d7e27807fc">« ESP32 Wroom »</a>
-            par <a href="https://sketchfab.com/TER1Z">TER1Z</a>,
-            <a href="https://creativecommons.org/licenses/by/4.0/deed.fr">CC BY 4.0</a>, modifié (traits, couleurs, marquage)
-          </span>
-          <a href="/mentions-legales">Mentions légales et confidentialité</a>
+          {
+            lang === 'en' ? (
+              <span class="credit">
+                3D model:
+                <a href="https://sketchfab.com/3d-models/esp32-wroom-fd714190aacc4e3f9c26b8d7e27807fc">"ESP32 Wroom"</a>
+                by <a href="https://sketchfab.com/TER1Z">TER1Z</a>,
+                <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, modified (lines, colors, marking)
+              </span>
+            ) : (
+              <span class="credit">
+                Modèle 3D :
+                <a href="https://sketchfab.com/3d-models/esp32-wroom-fd714190aacc4e3f9c26b8d7e27807fc">« ESP32 Wroom »</a>
+                par <a href="https://sketchfab.com/TER1Z">TER1Z</a>,
+                <a href="https://creativecommons.org/licenses/by/4.0/deed.fr">CC BY 4.0</a>, modifié (traits, couleurs, marquage)
+              </span>
+            )
+          }
+          <a href={href(lang, '/mentions-legales')}>{t('Mentions légales et confidentialité', 'Legal notice and privacy')}</a>
         </p>
       </div>
     </main>
@@ -138,7 +178,7 @@ const links = [
       const today = document.getElementById('today');
       if (today) {
         const now = new Date();
-        today.textContent = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+        today.textContent = new Intl.DateTimeFormat(document.documentElement.lang === 'en' ? 'en-GB' : 'fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
           .format(now)
           .replace('.', '')
           .toUpperCase();
@@ -347,6 +387,7 @@ const links = [
           reducedMotion: reduced,
           signaturePath: SIGNATURE_PATH,
           signatureViewBox: SIGNATURE_VIEWBOX,
+          tagline: stage.dataset.tagline,
           // Debout : vue plus plongeante (la carte paraît plus haute), pas de balancement, et rendu
           // arrêté au repos pour ménager la batterie.
           ...(portrait
@@ -362,7 +403,7 @@ const links = [
             chipLed.style.opacity = String(0.25 + 0.75 * v);
             chipLed.style.boxShadow = `0 0 0 3px rgba(252, 202, 70, ${0.25 * v}), 0 0 ${10 * v}px rgba(252, 202, 70, ${0.8 * v})`;
           },
-          onBoot: () => runFlash('/cv'),
+          onBoot: () => runFlash(links.find((a) => a.dataset.action === 'boot')?.getAttribute('href') ?? '/cv'),
           onRestart: showPinsLater,
           onFrame: (projectInCanvas) => {
             // Le canevas est centré dans la scène, entre les deux colonnes d'étiquettes

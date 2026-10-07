@@ -208,6 +208,11 @@ svg text { stroke: none; }
   .pin-links { justify-content: center; }
 }
 .stage-board { position: relative; flex: 1; }
+/* Sélecteur de langue de l'accueil : en haut à droite, au-dessus de la carte sur grand écran */
+.stage-lang { display: flex; justify-content: flex-end; width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 14px var(--gutter) 0; }
+@media (min-width: 900px) {
+  .stage-lang { position: absolute; top: 0; right: 0; z-index: 5; width: auto; max-width: none; padding: 22px var(--gutter) 0; }
+}
 /* Sans 3D : pas de carte, le contenu se resserre et se centre verticalement (sans déborder par le
    haut quand il est plus grand que l'écran) */
 .stage:not(.has-3d) { justify-content: center; justify-content: safe center; gap: 28px; }
@@ -316,6 +321,19 @@ svg text { stroke: none; }
 .page-top-row { display: flex; align-items: center; gap: 32px; padding-block: 14px 12px; }
 .page-top .pill { font-size: 13px; padding: 0.5em 1.2em; }
 .page-top .boot-link .pin-name { margin-right: 6px; }
+.page-top-end { display: flex; align-items: center; gap: 20px; }
+.boot-short { display: none; }
+@media (max-width: 520px) {
+  .boot-long { display: none; }
+  .boot-short { display: inline; }
+}
+
+/* Sélecteur de langue FR · EN : la langue affichée est soulignée au surligneur */
+.lang-switch { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; }
+.lang-switch a, .lang-switch span[aria-current] { padding: 2px 1px; color: var(--ink-70); text-decoration: none; }
+.lang-switch a:hover { color: var(--ink); box-shadow: inset 0 -3px var(--sun); }
+.lang-switch span[aria-current] { color: var(--ink); box-shadow: inset 0 -3px var(--sun); }
+.lang-sep { color: var(--ink-70); }
 
 /* La barrette : une piste horizontale, une pastille par section, l'actuelle allumée */
 .strip { position: relative; display: flex; justify-content: space-between; flex: 1; max-width: 640px; margin-inline: auto; }
@@ -707,6 +725,7 @@ svg text { stroke: none; }
      il ferait de l'en-tête le repère de la barrette fixe. */
   .page-top { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--cream); }
   .page-top-row { justify-content: space-between; gap: 14px; padding-block: 10px; }
+  .page-top-end { gap: 14px; }
   .strip {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-width: none; margin: 0;
     padding: 10px 0 calc(8px + env(safe-area-inset-bottom));

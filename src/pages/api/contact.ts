@@ -25,6 +25,26 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Result = { ok: true } | { ok: false; error: string; field?: 'name' | 'email' | 'message' };
 
+// Messages affichés sous le formulaire, dans la langue de la page qui l'envoie (champ caché `lang`)
+const MESSAGES = {
+  fr: {
+    unreadable: 'Formulaire illisible.',
+    name: 'Indiquez votre nom.',
+    email: 'Cette adresse email ne semble pas valide.',
+    message: 'Le message doit faire entre 10 et 5000 caractères.',
+    unavailable: 'L’envoi est indisponible pour le moment.',
+    failed: 'Le message n’est pas parti.',
+  },
+  en: {
+    unreadable: 'The form could not be read.',
+    name: 'Please enter your name.',
+    email: 'This email address does not look valid.',
+    message: 'The message must be between 10 and 5,000 characters.',
+    unavailable: 'Sending is unavailable for the moment.',
+    failed: "The message didn't go through.",
+  },
+};
+
 // Visite directe de l'adresse (lien, robot) : retour au formulaire. Sans ce cas, Vercel tente
 // d'afficher la page 404, prérendue donc absente de la fonction, et répond par une erreur 500.
 export const GET: APIRoute = () =>
@@ -32,22 +52,25 @@ export const GET: APIRoute = () =>
 
 export const POST: APIRoute = async ({ request }) => {
   const wantsJson = request.headers.get('accept')?.includes('application/json') ?? false;
+  let lang: 'fr' | 'en' = 'fr';
   const reply = (result: Result, status: number) =>
     wantsJson
       ? new Response(JSON.stringify(result), { status, headers: { 'Content-Type': 'application/json' } })
       : // Sans JavaScript : retour sur la page Contact, l'ancre affiche le bon message (CSS :target)
         new Response(null, {
           status: 303,
-          headers: { Location: `${BASE}/contact#${result.ok ? 'message-envoye' : 'message-erreur'}` },
+          headers: { Location: `${lang === 'en' ? '/en' : BASE}/contact#${result.ok ? 'message-envoye' : 'message-erreur'}` },
         });
 
   let form: FormData;
   try {
     form = await request.formData();
   } catch {
-    return reply({ ok: false, error: 'Formulaire illisible.' }, 400);
+    return reply({ ok: false, error: MESSAGES[lang].unreadable }, 400);
   }
   const field = (key: string) => String(form.get(key) ?? '').trim();
+  if (field('lang') === 'en') lang = 'en';
+  const msg = MESSAGES[lang];
 
   // Champ piège invisible : seuls les robots le remplissent. On leur répond « envoyé » sans rien envoyer.
   if (field('site')) return reply({ ok: true }, 200);
@@ -56,15 +79,15 @@ export const POST: APIRoute = async ({ request }) => {
   const name = field('name').replace(/[\r\n]+/g, ' ');
   const email = field('email');
   const message = field('message');
-  if (!name || name.length > LIMITS.name) return reply({ ok: false, error: 'Indiquez votre nom.', field: 'name' }, 400);
+  if (!name || name.length > LIMITS.name) return reply({ ok: false, error: msg.name, field: 'name' }, 400);
   if (!EMAIL.test(email) || email.length > LIMITS.email)
-    return reply({ ok: false, error: 'Cette adresse email ne semble pas valide.', field: 'email' }, 400);
+    return reply({ ok: false, error: msg.email, field: 'email' }, 400);
   if (message.length < 10 || message.length > LIMITS.message)
-    return reply({ ok: false, error: 'Le message doit faire entre 10 et 5000 caractères.', field: 'message' }, 400);
+    return reply({ ok: false, error: msg.message, field: 'message' }, 400);
 
   if (!RESEND_API_KEY) {
     console.error('Contact : RESEND_API_KEY manquant (variable d’environnement).');
-    return reply({ ok: false, error: 'L’envoi est indisponible pour le moment.' }, 503);
+    return reply({ ok: false, error: msg.unavailable }, 503);
   }
 
   try {
@@ -75,17 +98,17 @@ export const POST: APIRoute = async ({ request }) => {
         from: CONTACT_FROM,
         to: [CONTACT_TO],
         reply_to: email,
-        subject: `Portfolio : message de ${name}`,
+        subject: `Portfolio${lang === 'en' ? ' (EN)' : ''} : message de ${name}`,
         text: `${name} <${email}>\n\n${message}\n\n--\nEnvoyé depuis le formulaire de contact du portfolio.`,
       }),
     });
     if (!res.ok) {
       console.error('Contact : Resend a refusé l’envoi', res.status, await res.text());
-      return reply({ ok: false, error: 'Le message n’est pas parti.' }, 502);
+      return reply({ ok: false, error: msg.failed }, 502);
     }
   } catch (err) {
     console.error('Contact : Resend injoignable', err);
-    return reply({ ok: false, error: 'Le message n’est pas parti.' }, 502);
+    return reply({ ok: false, error: msg.failed }, 502);
   }
 
   return reply({ ok: true }, 200);

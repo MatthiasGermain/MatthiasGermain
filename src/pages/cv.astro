@@ -1,9 +1,18 @@
 ---
 /* CV (mode recruteur, atteint par BOOT) : une page A4, générée à partir des mêmes données que le
- * site. « Télécharger en PDF » passe par l'impression du navigateur. */
+ * site, en français ou en anglais (/en/cv). « Télécharger en PDF » passe par l'impression du
+ * navigateur. */
 import '../styles/maquette.css';
 import SeoHead from '../components/SeoHead.astro';
-import { PROFILE, cvExtras, links, projects, skills, steps } from '../data/maquette';
+import LangSwitch from '../components/LangSwitch.astro';
+import { content } from '../data/content';
+import { langOf, tr } from '../i18n';
+
+const lang = langOf(Astro.url);
+const t = tr(lang);
+const { PROFILE, cvExtras, links, projects, skills, steps, HOME } = content(lang);
+// Le portfolio dans la langue du CV
+const site = lang === 'en' ? `${links.site}/en` : links.site;
 
 const experience = steps.filter((s) => !s.formation && s.cv !== false);
 const education = steps.filter((s) => s.formation);
@@ -13,46 +22,58 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang={lang}>
   <head>
     <SeoHead
       title="CV - Matthias Germain"
-      description="CV de Matthias Germain, ingénieur logiciel embarqué et IoT à Strasbourg : expériences, projets et compétences."
+      description={t(
+        'CV de Matthias Germain, ingénieur logiciel embarqué et IoT à Strasbourg : expériences, projets et compétences.',
+        'CV of Matthias Germain, embedded and IoT software engineer in Strasbourg: experience, projects and skills.',
+      )}
     />
   </head>
   <body class="cv-page">
     <div class="cv-bar">
-      <a class="pill pill-outline pill-sm" href="/">← Retour au site</a>
-      <button class="pill pill-solid pill-sm" type="button" id="cv-print">Télécharger en PDF</button>
+      <a class="pill pill-outline pill-sm" href={HOME}>← {t('Retour au site', 'Back to the site')}</a>
+      <div class="cv-bar-end">
+        <LangSwitch />
+        <button class="pill pill-solid pill-sm" type="button" id="cv-print">{t('Télécharger en PDF', 'Download as PDF')}</button>
+      </div>
     </div>
 
     <main class="cv-sheet">
       <header class="cv-head">
-        <img class="cv-photo" src="/images/matthias-portrait.webp" alt="Photo de Matthias Germain" width="352" height="440" />
+        <img class="cv-photo" src="/images/matthias-portrait.webp" alt={t('Photo de Matthias Germain', 'Photo of Matthias Germain')} width="352" height="440" />
         <div>
           <h1 class="cv-name display"><span class="light">Matthias</span> <span class="strong">GERMAIN</span></h1>
-          <p class="cv-role">Ingénieur logiciel <span class="hl">embarqué &amp; IoT</span></p>
-          <p class="cv-chain">Du firmware à l'interface web</p>
+          {
+            lang === 'en' ? (
+              <p class="cv-role"><span class="hl">Embedded &amp; IoT</span> software engineer</p>
+            ) : (
+              <p class="cv-role">Ingénieur logiciel <span class="hl">embarqué &amp; IoT</span></p>
+            )
+          }
+          <p class="cv-chain">{t("Du firmware à l'interface web", 'From firmware to web interface')}</p>
         </div>
         <dl class="cv-contact">
-          <div><dt>Tél.</dt><dd><a href={`tel:${links.phone.tel}`}>{links.phone.display}</a></dd></div>
+          <div><dt>{t('Tél.', 'Phone')}</dt><dd><a href={`tel:${links.phone.tel}`}>{links.phone.display}</a></dd></div>
           <div><dt>Email</dt><dd><a href={`mailto:${links.email}`}>{links.email}</a></dd></div>
           <div><dt>LinkedIn</dt><dd><a href={links.linkedin}>{short(links.linkedin)}</a></dd></div>
           <div><dt>GitHub</dt><dd><a href={links.github}>{short(links.github)}</a></dd></div>
-          <div><dt>Site</dt><dd><a href={links.site}>{short(links.site)}</a></dd></div>
-          <div><dt>Basé à</dt><dd>Strasbourg</dd></div>
+          <div><dt>{t('Site', 'Website')}</dt><dd><a href={site}>{short(site)}</a></dd></div>
+          <div><dt>{t('Basé à', 'Based in')}</dt><dd>Strasbourg{t('', ', France')}</dd></div>
         </dl>
       </header>
 
       <div class="cv-cols">
         <div class="cv-main">
           <section>
-            <h2>Profil</h2>
+            <h2>{t('Profil', 'Profile')}</h2>
             <p>{PROFILE}</p>
           </section>
 
           <section>
-            <h2>Expériences</h2>
+            <h2>{t('Expériences', 'Experience')}</h2>
             <ol class="cv-list">
               {
                 experience.map((s) => (
@@ -71,7 +92,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
           </section>
 
           <section>
-            <h2>Projets</h2>
+            <h2>{t('Projets', 'Projects')}</h2>
             <ul class="cv-list">
               {
                 cvProjects.map((p) => (
@@ -92,7 +113,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
 
         <aside class="cv-side">
           <section>
-            <h2>Compétences</h2>
+            <h2>{t('Compétences', 'Skills')}</h2>
             {
               skills.map((g) => (
                 <div class="cv-skill">
@@ -104,7 +125,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
           </section>
 
           <section>
-            <h2>Formation</h2>
+            <h2>{t('Formation', 'Education')}</h2>
             {
               education.map((s) => (
                 <div class="cv-skill">
@@ -120,18 +141,29 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
           </section>
 
           <section>
-            <h2>Langues</h2>
-            <p><b>Français :</b> langue maternelle.</p>
-            <p class="cv-lang"><b>Anglais :</b> B2 (TOEIC), langue de travail de mon stage chez Schaeffler.</p>
+            <h2>{t('Langues', 'Languages')}</h2>
+            <p><b>{t('Français :', 'French:')}</b> {t('langue maternelle.', 'native.')}</p>
+            <p class="cv-lang">
+              <b>{t('Anglais :', 'English:')}</b>
+              {t('B2 (TOEIC), langue de travail de mon stage chez Schaeffler.', 'B2 (TOEIC), working language during my internship at Schaeffler.')}
+            </p>
           </section>
 
           <section>
-            <h2>Disponibilité</h2>
-            <p class="cv-avail"><span class="chip-led" aria-hidden="true"></span> Immédiatement, en CDI : poste embarqué ou web, à Strasbourg ou à Nancy.</p>
+            <h2>{t('Disponibilité', 'Availability')}</h2>
+            <p class="cv-avail">
+              <span class="chip-led" aria-hidden="true"></span>
+              {
+                t(
+                  'Immédiatement, en CDI : poste embarqué ou web, à Strasbourg ou à Nancy.',
+                  'Immediately, permanent position: embedded or web role, in Strasbourg or Nancy.',
+                )
+              }
+            </p>
           </section>
 
           <section>
-            <h2>Autres</h2>
+            <h2>{t('Autres', 'Other')}</h2>
             <ul class="cv-extras">{cvExtras.map((e) => <li>{e}</li>)}</ul>
           </section>
         </aside>
@@ -149,6 +181,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
         width: min(210mm, 100%); margin: 0 auto; padding: 20px 16px 16px;
       }
       .cv-bar button { cursor: pointer; }
+      .cv-bar-end { display: flex; align-items: center; gap: 16px; }
 
       /* Feuille A4 : 210 × 297 mm à l'écran comme à l'impression */
       .cv-sheet {

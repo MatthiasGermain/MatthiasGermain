@@ -5,12 +5,17 @@
  * frise ; le script de la page allume celle qui est à l'écran et y amène deux curseurs (A et B,
  * comme sur un analyseur) qui encadrent sa période et affichent sa durée. La date du jour est celle
  * du build. */
-import { lanes, type Step } from '../../data/maquette';
+import type { Step } from '../../data/maquette';
+import { content } from '../../data/content';
+import { langOf, tr } from '../../i18n';
 
 interface Props {
   steps: Step[];
 }
 const { steps } = Astro.props;
+const lang = langOf(Astro.url);
+const t = tr(lang);
+const { lanes } = content(lang);
 
 // Temps en années décimales ; une période couvre ses mois de début et de fin en entier
 const at = (ym: string) => {
@@ -32,7 +37,8 @@ const end = now + 0.25;
 
 // Géométrie (unités du viewBox)
 const W = 350;
-const X0 = 76;
+// Colonne des noms de ligne, à la largeur du plus long (capitales espacées, 10 px)
+const X0 = Math.max(76, Math.ceil(Math.max(...lanes.map((l) => l.label.length)) * 7.4) + 6);
 const X1 = W - 6;
 const GAP = 36;
 // En tête : la durée affichée entre les curseurs et leurs poignées
@@ -49,9 +55,9 @@ const r = (n: number) => Math.round(n * 10) / 10;
 // Durée affichée entre les curseurs : en mois, puis en années arrondies
 const delta = (t0: number, t1: number) => {
   const m = Math.max(1, Math.round((t1 - t0) * 12));
-  if (m < 12) return `Δ ${m} MOIS`;
+  if (m < 12) return lang === 'en' ? `Δ ${m} MONTH${m > 1 ? 'S' : ''}` : `Δ ${m} MOIS`;
   const y = Math.round(m / 12);
-  return `Δ ${y} AN${y > 1 ? 'S' : ''}`;
+  return lang === 'en' ? `Δ ${y} YEAR${y > 1 ? 'S' : ''}` : `Δ ${y} AN${y > 1 ? 'S' : ''}`;
 };
 
 // Étiquettes des impulsions : centrées, gardées dans le tracé ; deux voisines qui se gênent
@@ -97,7 +103,7 @@ const rows = lanes.map((lane, k) => {
 });
 ---
 
-<svg class="chrono" viewBox={`0 0 ${W} ${H}`} data-x0={X0} data-x1={X1} role="group" aria-label="Chronogramme du parcours, de 2020 à aujourd'hui">
+<svg class="chrono" viewBox={`0 0 ${W} ${H}`} data-x0={X0} data-x1={X1} role="group" aria-label={t("Chronogramme du parcours, de 2020 à aujourd'hui", 'Timeline chart, from 2020 to today')}>
   <g class="chrono-grid" aria-hidden="true">
     {years.map((y) => <path d={`M${r(x(y))} ${HEAD + 2} V${BOTTOM}`} />)}
   </g>

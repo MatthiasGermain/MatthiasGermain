@@ -1,6 +1,8 @@
 ---
 /* Capture pleine page d'un site dans un cadre de navigateur où l'on peut faire défiler la page
  * d'accueil. L'image n'est chargée qu'à l'approche de la fiche (loading="lazy"). */
+import { langOf, tr } from '../i18n';
+
 interface Props {
   src: string;
   url: string;
@@ -10,6 +12,7 @@ interface Props {
 }
 
 const { src, url, alt, width, height } = Astro.props;
+const t = tr(langOf(Astro.url));
 ---
 
 <div class="browser">
@@ -17,7 +20,7 @@ const { src, url, alt, width, height } = Astro.props;
     <span class="browser-dots"><i></i><i></i><i></i></span>
     <span class="browser-url">{url}</span>
   </div>
-  <div class="browser-view" tabindex="0" role="region" aria-label={`${alt} : faites défiler pour voir toute la page`}>
+  <div class="browser-view" tabindex="0" role="region" aria-label={`${alt}${t(' : faites défiler pour voir toute la page', ': scroll to see the whole page')}`}>
     <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
   </div>
 </div>

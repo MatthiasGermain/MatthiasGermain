@@ -25,11 +25,12 @@ function ensureOverlay() {
   overlay = document.createElement('div');
   overlay.className = 'flash';
   overlay.hidden = true;
+  const en = document.documentElement.lang === 'en';
   overlay.innerHTML =
     '<div class="flash-term" role="status" aria-live="polite">' +
-    '<p class="flash-title">Mode programmation · BOOT</p>' +
+    `<p class="flash-title">${en ? 'Programming mode · BOOT' : 'Mode programmation · BOOT'}</p>` +
     '<pre class="flash-log"></pre>' +
-    '<p class="flash-skip">Clic ou Échap pour passer</p>' +
+    `<p class="flash-skip">${en ? 'Click or press Esc to skip' : 'Clic ou Échap pour passer'}</p>` +
     '</div>';
   document.body.append(overlay);
   return overlay;

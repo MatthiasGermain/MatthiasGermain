@@ -1,0 +1,101 @@
+---
+/* Présentation détaillée de l'activité de développeur web freelance, en anglais (version française :
+ * /experiences/web). Mêmes règles : rien sur le code des clients au-delà de son architecture ; nommer
+ * un client et montrer son site suppose son accord. */
+import MaquettePage from '../../../layouts/MaquettePage.astro';
+import StackChips from '../../../components/StackChips.astro';
+import BrowserShot from '../../../components/BrowserShot.astro';
+---
+
+<MaquettePage
+  current="experiences"
+  title="Freelance web development"
+  subtitle="Freelance web developer since January 2026: websites and web platforms for clients, from design to production."
+  description="Matthias Germain, freelance web developer: the website and admin area of the BAPZ dance studio, the Swiss quote platform ChuTTT, and websites for associations."
+>
+  <div class="wrap case">
+    <dl class="case-facts">
+      <div><dt>Setting</dt><dd>Freelance web developer, alongside my job search</dd></div>
+      <div><dt>Since</dt><dd>January 2026</dd></div>
+      <div><dt>Location</dt><dd>Strasbourg, remote</dd></div>
+      <div><dt>Role</dt><dd>Design, development and deployment to production</dd></div>
+      <div><dt>Stack</dt><dd><StackChips items={['Next.js', 'TypeScript', 'React', 'Payload CMS', 'Supabase', 'PostgreSQL', 'Tailwind CSS', 'Astro', 'Resend', 'Vercel', 'Docker']} /></dd></div>
+      <div><dt>Code</dt><dd>Clients' code: no public repository</dd></div>
+    </dl>
+
+    <div class="case-body">
+      <section>
+        <h2><span class="pin-name">01</span> How I work</h2>
+        <p>
+          I start from the client's needs and deliver a website in production, which they can then run on their
+          own. In practice:
+        </p>
+        <ul>
+          <li><b>An admin area in French</b> (Payload CMS): the client edits their content without going through me.</li>
+          <li><b>Code split up to last:</b> a single module talks to the CMS, a single one sends emails, and the database migrations are versioned.</li>
+          <li><b>Protected forms:</b> bot protection, and messages sent through Resend.</li>
+          <li><b>A launch that is easy to reproduce:</b> documented environment variables, seed content, continuous deployment.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">02</span> BAPZ Studio</h2>
+        <figure class="case-figure">
+          <BrowserShot src="/images/bapz.webp" url="bapz-web.vercel.app" alt="Home page of the BAPZ Studio website" id="bapz" />
+          <figcaption>Work in progress.</figcaption>
+        </figure>
+        <p>
+          A dance studio in Metz (heels, hip-hop, commercial). The website presents the classes, the schedule,
+          the teachers, the prices and the gallery, and receives booking requests. The client manages this
+          content herself from the admin area.
+        </p>
+        <ul>
+          <li>A single Next.js 16 and Payload 3 application: the public website and its admin area, in French.</li>
+          <li>Structured content: classes, teachers, prices, rooms, gallery, requests and site settings.</li>
+          <li>A PostgreSQL database (Neon), images on UploadThing, emails through Resend and Cloudflare Turnstile bot protection.</li>
+          <li>Seed content and versioned migrations, to restore the site in a single command.</li>
+        </ul>
+        <p><a class="pill pill-outline pill-sm" href="https://bapz-web.vercel.app/">Visit the website ↗</a></p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">03</span> ChuTTT</h2>
+        <figure class="case-figure">
+          <BrowserShot src="/images/chuttt.webp" url="chuttt.ch" alt="Home page of the ChuTTT platform" id="chuttt" />
+        </figure>
+        <p>
+          A Swiss platform for comparing quotes: an individual describes their project and receives quotes from
+          verified professionals, with cashback and a referral program. I built it on my own, end to end.
+        </p>
+        <ul>
+          <li>A website in three languages (French, German, English), with next-intl.</li>
+          <li>A multi-step quote request flow, with a progress bar: category, budget, contact details, summary.</li>
+          <li>User authentication, and a Payload CMS back office for the services, the categories and the requests (quotes, professional sign-ups).</li>
+          <li>A Supabase database and deployment on Vercel.</li>
+          <li>Next.js, TypeScript and Tailwind CSS.</li>
+        </ul>
+        <p><a class="pill pill-outline pill-sm" href="https://chuttt.ch">Visit the website ↗</a></p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">04</span> For associations</h2>
+        <ul>
+          <li>
+            <b>Fortin</b>, an audiovisual association (documentaries, memory across generations) of which I am
+            vice-president: design and development of its website, in Astro and Tailwind CSS, with a contact form
+            through Resend. <a href="https://www.fortin-projet.fr">fortin-projet.fr ↗</a>
+          </li>
+          <li>
+            <b>Spotlight</b>, an association where I am the volunteer web lead: development and upkeep of its
+            website. <a href="/en/projects">See it in the projects</a>
+          </li>
+          <li>
+            <b>narthex</b>, my own product: a platform for churches, in testing. <a href="/en/projects">See it in the projects</a>
+          </li>
+        </ul>
+      </section>
+
+      <p class="case-back"><a class="pill pill-outline pill-sm" href="/en/experience">← All experience</a></p>
+    </div>
+  </div>
+</MaquettePage>

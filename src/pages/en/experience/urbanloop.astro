@@ -1,0 +1,349 @@
+---
+/* Présentation détaillée du stage de 2e année sur la maquette UrbanLoop, en anglais (version
+ * française : /experiences/urbanloop). Mêmes règles : ne pas nommer la binôme ; distinguer ce que
+ * Matthias a fait seul, à deux, et ce qui existait déjà ; rien n'a été mesuré. */
+import MaquettePage from '../../../layouts/MaquettePage.astro';
+import ProjectVisual from '../../../components/maquette/ProjectVisual.astro';
+import StackChips from '../../../components/StackChips.astro';
+---
+
+<MaquettePage
+  current="experiences"
+  title="UrbanLoop scale model"
+  subtitle="Second-year internship: the switch logic and the monitoring of TÉLÉCOM Nancy's UrbanLoop scale model."
+  description="Matthias Germain's internship on TÉLÉCOM Nancy's UrbanLoop scale model: switch logic on ESP32 under FreeRTOS and real-time monitoring in Flask."
+>
+  <div class="wrap case">
+    <dl class="case-facts">
+      <div><dt>Location</dt><dd>TÉLÉCOM Nancy, on site</dd></div>
+      <div><dt>Role</dt><dd>Embedded systems engineering intern, in a pair</dd></div>
+      <div><dt>Period</dt><dd>June - July 2024, 8 weeks</dd></div>
+      <div><dt>Model</dt><dd>2 capsules, 2 stepper-motor switches</dd></div>
+      <div><dt>Stack</dt><dd><StackChips items={['ESP32', 'C / C++', 'FreeRTOS', 'PlatformIO', 'IrDA', 'Python (Flask)', 'JavaScript']} /></dd></div>
+      <div><dt>Code</dt><dd>School's internal GitLab, not public</dd></div>
+    </dl>
+
+    <div class="case-body">
+      <section>
+        <h2><span class="pin-name">01</span> The context</h2>
+        <p>
+          UrbanLoop is a transport project based on autonomous capsules that run on loops. TÉLÉCOM Nancy owns a
+          small-scale model of it, used as a demonstrator and for embedded systems lab sessions. Its rails and
+          capsules had been rebuilt in 2023: this new version had to be made usable.
+        </p>
+        <p>
+          The internship, in a pair with another intern: bring back the features of the previous version,
+          improve the monitoring and program the switch logic.
+        </p>
+        <h3>What the model is made of</h3>
+        <ul>
+          <li><b>Two loops</b> running in opposite directions, joined by <b>two switches</b> (101 and 102), each one driven by an ESP32 and moved by a stepper motor.</li>
+          <li><b>Two capsules</b>, with distance sensors to keep their spacing and rear LEDs that signal a capsule detected ahead of them, or their direction at a switch. They continuously transmit their ID and destination over infrared (IrDA).</li>
+          <li><b>Two stations</b> (141 and 142), stopping points whose RGB LED shows their state: free, capsule detected, full.</li>
+          <li><b>Radars</b>, standalone and battery-powered, which give the capsules their speed, their direction and an ID.</li>
+        </ul>
+        <figure class="case-figure">
+          <div class="fig-wide"><ProjectVisual visual="urbanloop" /></div>
+          <svg class="fig-tall" viewBox="0 0 252 440" role="img" aria-label="Track of the UrbanLoop scale model: two loops running in opposite directions, joined by switches 101 and 102, two stations, infrared sensors and two capsules">
+            <defs>
+              <marker id="arr-urbanloop-v" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g transform="translate(252 0) rotate(90)">
+              <g class="s">
+              <path d="M98 28 Q120 18 142 28" marker-end="url(#arr-urbanloop-v)" />
+              <path d="M302 28 Q280 18 258 28" marker-end="url(#arr-urbanloop-v)" />
+              <path d="M164 84 L226 154" class="dash" />
+              </g>
+              <g fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round">
+              <ellipse cx="120" cy="132" rx="62" ry="92" />
+              <ellipse cx="280" cy="132" rx="62" ry="92" />
+              <path d="M168 73 C190 82 208 94 220 108" />
+              <path d="M222 164 C206 170 188 178 171 185" />
+              <path d="M66 86 Q92 132 66 178" />
+              <path d="M334 86 Q308 132 334 178" />
+              </g>
+              <g class="ink">
+              <path d="M112 58 l4 -7 l4 7 z" />
+              <path d="M140 100 l4 -7 l4 7 z" />
+              <path d="M90 116 l4 -7 l4 7 z" />
+              <path d="M90 156 l4 -7 l4 7 z" />
+              <path d="M106 206 l4 -7 l4 7 z" />
+              <path d="M276 58 l4 -7 l4 7 z" />
+              <path d="M238 152 l4 -7 l4 7 z" />
+              <path d="M304 116 l4 -7 l4 7 z" />
+              <path d="M304 156 l4 -7 l4 7 z" />
+              <path d="M290 206 l4 -7 l4 7 z" />
+              <rect x="112" y="220" width="16" height="8" rx="3" />
+              <rect x="272" y="36" width="16" height="8" rx="3" />
+              </g>
+              <circle cx="168" cy="73" r="7" class="sun" stroke="var(--ink)" stroke-width="2" />
+              <circle cx="222" cy="164" r="7" class="sun" stroke="var(--ink)" stroke-width="2" />
+            </g>
+            <text x="120" y="40" class="t" text-anchor="middle">STATION 141</text>
+            <text x="114" y="128" class="t" text-anchor="middle">LOOP 1</text>
+            <text x="200" y="182" class="t">101</text>
+            <text x="98" y="244" class="t">102</text>
+            <text x="114" y="276" class="t" text-anchor="middle">LOOP 2</text>
+            <text x="120" y="378" class="t" text-anchor="middle">STATION 142</text>
+            <path d="M8 414 l4 -7 l4 7 z" class="ink" />
+            <text x="20" y="414" class="t muted">IRDA SENSOR</text>
+            <path d="M128 410 H142" class="s dash" />
+            <text x="147" y="414" class="t muted">SERIAL LINK</text>
+            <circle cx="12" cy="430" r="4.5" class="sun" stroke="var(--ink)" stroke-width="1.5" />
+            <text x="20" y="434" class="t muted">SWITCH</text>
+            <rect x="128" y="427" width="12" height="7" rx="2.5" class="ink" />
+            <text x="147" y="434" class="t muted">CAPSULE</text>
+          </svg>
+          <figcaption>The track, based on the diagram in my internship report: infrared sensors line the loops, and the two switches talk to each other over a serial link.</figcaption>
+        </figure>
+        <h3>How it communicates</h3>
+        <p>
+          The monitoring website (Flask) and a message generator, used for tests and configuration, go through
+          the Hermes server, a TCP server written in C#. Hermes relays the orders to the ESP server, and the
+          servers talk to the model's ESP32 boards over TCP, through Wi-Fi.
+        </p>
+        <figure class="case-figure">
+          <svg class="fig-wide" viewBox="0 0 720 262" role="img" aria-label="Model network: the website and the message generator go through the Hermes server, then the ESP server, which reaches the capsules, switches and stations over Wi-Fi">
+            <defs>
+              <marker id="arr-ul-net" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="10" y="30" width="160" height="56" rx="6" class="paper" />
+              <rect x="10" y="158" width="160" height="56" rx="6" class="paper dash" />
+              <path d="M170 58 H190 V112 H208" marker-end="url(#arr-ul-net)" />
+              <path d="M170 186 H190 V132 H208" marker-end="url(#arr-ul-net)" />
+              <rect x="210" y="94" width="130" height="56" rx="6" class="paper dash" />
+              <path d="M340 122 H378" marker-end="url(#arr-ul-net)" />
+              <rect x="380" y="94" width="130" height="56" rx="6" class="paper dash" />
+              <path d="M510 122 H535 M535 40 V204" />
+              <path d="M535 40 H558" marker-end="url(#arr-ul-net)" />
+              <path d="M535 122 H558" marker-end="url(#arr-ul-net)" />
+              <path d="M535 204 H558" marker-end="url(#arr-ul-net)" />
+              <rect x="560" y="14" width="150" height="52" rx="6" class="paper" />
+              <path d="M635 66 V94" class="dash" marker-start="url(#arr-ul-net)" marker-end="url(#arr-ul-net)" />
+              <rect x="560" y="96" width="150" height="52" rx="6" class="sun" />
+              <rect x="560" y="178" width="150" height="52" rx="6" class="paper" />
+            </g>
+            <text x="90" y="54" class="t" text-anchor="middle">WEBSITE</text>
+            <text x="90" y="70" class="t muted" text-anchor="middle">FLASK · MONITORING</text>
+            <text x="90" y="182" class="t" text-anchor="middle">MESSAGE</text>
+            <text x="90" y="198" class="t muted" text-anchor="middle">GENERATOR · TESTS</text>
+            <text x="275" y="118" class="t" text-anchor="middle">HERMES</text>
+            <text x="275" y="134" class="t muted" text-anchor="middle">TCP SERVER · C#</text>
+            <text x="445" y="118" class="t" text-anchor="middle">ESP SERVER</text>
+            <text x="445" y="134" class="t muted" text-anchor="middle">WI-FI MANAGEMENT</text>
+            <text x="541" y="168" class="t muted">TCP OVER WI-FI</text>
+            <text x="635" y="37" class="t" text-anchor="middle">2 CAPSULES</text>
+            <text x="635" y="52" class="t muted" text-anchor="middle">ESP32 · SENSORS</text>
+            <text x="645" y="85" class="t muted">IRDA</text>
+            <text x="635" y="116" class="t" text-anchor="middle">2 SWITCHES</text>
+            <text x="635" y="130" class="t muted" text-anchor="middle">ESP32 · FREERTOS</text>
+            <text x="635" y="143" class="t muted" text-anchor="middle">LINKED OVER SERIAL</text>
+            <text x="635" y="201" class="t" text-anchor="middle">2 STATIONS</text>
+            <text x="635" y="216" class="t muted" text-anchor="middle">STATUS LED</text>
+            <text x="710" y="250" class="t muted" text-anchor="end">RADARS: STANDALONE, BATTERY-POWERED</text>
+            <text x="10" y="236" class="t muted">IN YELLOW: DESIGNED DURING THE INTERNSHIP</text>
+            <text x="10" y="250" class="t muted">DASHED: EXISTING, UNCHANGED</text>
+          </svg>
+          <svg class="fig-tall" viewBox="0 0 340 556" role="img" aria-label="Model network: the website and the message generator go through the Hermes server, then the ESP server, which reaches the capsules, switches and stations over Wi-Fi">
+            <defs>
+              <marker id="arr-ul-net2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="10" y="12" width="150" height="52" rx="6" class="paper" />
+              <rect x="180" y="12" width="150" height="52" rx="6" class="paper dash" />
+              <path d="M85 64 V80 H255 V64" />
+              <path d="M170 80 V94" marker-end="url(#arr-ul-net2)" />
+              <rect x="70" y="96" width="200" height="52" rx="6" class="paper dash" />
+              <path d="M170 148 V174" marker-end="url(#arr-ul-net2)" />
+              <rect x="70" y="176" width="200" height="52" rx="6" class="paper dash" />
+              <path d="M170 228 V250 H24 V456" />
+              <path d="M24 296 H38" marker-end="url(#arr-ul-net2)" />
+              <path d="M24 376 H38" marker-end="url(#arr-ul-net2)" />
+              <path d="M24 456 H38" marker-end="url(#arr-ul-net2)" />
+              <rect x="40" y="270" width="260" height="52" rx="6" class="paper" />
+              <path d="M170 322 V348" class="dash" marker-start="url(#arr-ul-net2)" marker-end="url(#arr-ul-net2)" />
+              <rect x="40" y="350" width="260" height="56" rx="6" class="sun" />
+              <rect x="40" y="430" width="260" height="52" rx="6" class="paper" />
+            </g>
+            <text x="85" y="35" class="t" text-anchor="middle">WEBSITE</text>
+            <text x="85" y="51" class="t muted" text-anchor="middle">FLASK</text>
+            <text x="255" y="35" class="t" text-anchor="middle">MESSAGE</text>
+            <text x="255" y="51" class="t muted" text-anchor="middle">GENERATOR</text>
+            <text x="170" y="119" class="t" text-anchor="middle">HERMES</text>
+            <text x="170" y="135" class="t muted" text-anchor="middle">TCP SERVER · C#</text>
+            <text x="170" y="199" class="t" text-anchor="middle">ESP SERVER</text>
+            <text x="170" y="215" class="t muted" text-anchor="middle">WI-FI MANAGEMENT</text>
+            <text x="178" y="244" class="t muted">TCP OVER WI-FI</text>
+            <text x="170" y="293" class="t" text-anchor="middle">2 CAPSULES</text>
+            <text x="170" y="309" class="t muted" text-anchor="middle">ESP32 · SENSORS</text>
+            <text x="180" y="340" class="t muted">IRDA</text>
+            <text x="170" y="373" class="t" text-anchor="middle">2 SWITCHES</text>
+            <text x="170" y="388" class="t muted" text-anchor="middle">ESP32 · FREERTOS</text>
+            <text x="170" y="401" class="t muted" text-anchor="middle">LINKED OVER SERIAL</text>
+            <text x="170" y="453" class="t" text-anchor="middle">2 STATIONS</text>
+            <text x="170" y="469" class="t muted" text-anchor="middle">STATUS LED</text>
+            <text x="40" y="506" class="t muted">RADARS: STANDALONE, BATTERY-POWERED</text>
+            <text x="10" y="532" class="t muted">IN YELLOW: DESIGNED DURING THE INTERNSHIP</text>
+            <text x="10" y="546" class="t muted">DASHED: EXISTING, UNCHANGED</text>
+          </svg>
+          <figcaption>Hermes, the ESP server and the message generator existed before the internship; I extended the website and redesigned the switch logic.</figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">02</span> The problem</h2>
+        <p>
+          Each switch is driven by an ESP32. But its decision relied on a "current loop" variable hard-coded in
+          each capsule, with a "first come, first served" rule.
+        </p>
+        <ul>
+          <li>As soon as a capsule was moved by hand, this variable became wrong, and the switch made the wrong call.</li>
+          <li>A switch left open could send a capsule back into its starting loop.</li>
+          <li>When two capsules arrived close together, the rule created needless waits, or even conflicts.</li>
+        </ul>
+        <p>
+          On the monitoring side, no page could control the switches, and nothing flagged a disconnected
+          device.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">03</span> A new switch logic</h2>
+        <table class="case-table">
+          <thead>
+            <tr><th scope="col"></th><th scope="col">Before</th><th scope="col">After</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Decision</th><td>Based on the "current loop", hard-coded in the capsule</td><td class="after">Based only on the destination loop, sent by the capsule</td></tr>
+            <tr><th scope="row">Priority</th><td>First come, first served</td><td class="after">The capsule leaving its loop goes first</td></tr>
+            <tr><th scope="row">Idle switch</th><td>Could stay open</td><td class="after">Always closed again</td></tr>
+            <tr><th scope="row">Sensors</th><td>One infrared sensor per switch</td><td class="after">Two, to follow the capsule to the exit</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Each switch is assigned to a loop, and decides only from the destination the capsule sends it over
+          infrared. No more hard-coded state, so no more errors when a capsule is moved by hand.
+        </p>
+        <p>
+          When a capsule is detected, a FreeRTOS task starts. It asks the capsule to slow down if needed, checks
+          whether it can enter the loop, then opens the switch or leaves it closed. The opposite switch is
+          notified over the serial link. A second infrared sensor, which I wired on each switch, follows the
+          capsule to the exit; two waiting lists separate the capsules that leave from those that stay. The
+          switch, moved by a stepper motor, is then closed again.
+        </p>
+        <p>
+          Always closing the idle switch removed one identified cause of derailment and of capsules looping
+          back.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">04</span> Real-time monitoring</h2>
+        <p>On the existing Flask site, I added:</p>
+        <ul>
+          <li>A sidebar, on every page, that polls each device and turns red the ones disconnected from Wi-Fi.</li>
+          <li>A switch control page, to open and close them.</li>
+        </ul>
+        <p>
+          As a pair, we added the manual and automatic modes, locked against each other: each mode blocks access
+          to the other's pages, to avoid conflicting orders, and the mode change is broadcast to all capsules. We
+          also wrote the recall of capsules to their station, whose message goes through four languages.
+        </p>
+        <figure class="case-figure">
+          <svg class="fig-wide" viewBox="0 0 700 112" role="img" aria-label="Path of a capsule recall: web page in JavaScript, Flask site in Python, Hermes server in C#, then Wi-Fi to the capsule's ESP32 in C++">
+            <defs>
+              <marker id="arr-ul-chain" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="10" y="30" width="140" height="56" rx="6" class="paper" />
+              <path d="M150 58 H188" marker-end="url(#arr-ul-chain)" />
+              <rect x="190" y="30" width="140" height="56" rx="6" class="paper" />
+              <path d="M330 58 H368" marker-end="url(#arr-ul-chain)" />
+              <rect x="370" y="30" width="140" height="56" rx="6" class="paper dash" />
+              <path d="M510 58 H548" marker-end="url(#arr-ul-chain)" />
+              <rect x="550" y="30" width="140" height="56" rx="6" class="paper" />
+            </g>
+            <text x="80" y="55" class="t" text-anchor="middle">WEB PAGE</text>
+            <text x="80" y="71" class="t muted" text-anchor="middle">JAVASCRIPT</text>
+            <text x="260" y="55" class="t" text-anchor="middle">FLASK SITE</text>
+            <text x="260" y="71" class="t muted" text-anchor="middle">PYTHON</text>
+            <text x="440" y="55" class="t" text-anchor="middle">HERMES SERVER</text>
+            <text x="440" y="71" class="t muted" text-anchor="middle">C# · EXISTING</text>
+            <text x="529" y="22" class="t muted" text-anchor="middle">WI-FI</text>
+            <text x="620" y="55" class="t" text-anchor="middle">CAPSULE ESP32</text>
+            <text x="620" y="71" class="t muted" text-anchor="middle">C++</text>
+          </svg>
+          <svg class="fig-tall" viewBox="0 0 340 330" role="img" aria-label="Path of a capsule recall: web page in JavaScript, Flask site in Python, Hermes server in C#, then Wi-Fi to the capsule's ESP32 in C++">
+            <defs>
+              <marker id="arr-ul-chain2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="60" y="12" width="220" height="54" rx="6" class="paper" />
+              <path d="M170 66 V94" marker-end="url(#arr-ul-chain2)" />
+              <rect x="60" y="96" width="220" height="54" rx="6" class="paper" />
+              <path d="M170 150 V178" marker-end="url(#arr-ul-chain2)" />
+              <rect x="60" y="180" width="220" height="54" rx="6" class="paper dash" />
+              <path d="M170 234 V262" marker-end="url(#arr-ul-chain2)" />
+              <rect x="60" y="264" width="220" height="54" rx="6" class="paper" />
+            </g>
+            <text x="170" y="36" class="t" text-anchor="middle">WEB PAGE</text>
+            <text x="170" y="52" class="t muted" text-anchor="middle">JAVASCRIPT</text>
+            <text x="170" y="120" class="t" text-anchor="middle">FLASK SITE</text>
+            <text x="170" y="136" class="t muted" text-anchor="middle">PYTHON</text>
+            <text x="170" y="204" class="t" text-anchor="middle">HERMES SERVER</text>
+            <text x="170" y="220" class="t muted" text-anchor="middle">C# · EXISTING</text>
+            <text x="180" y="252" class="t muted">WI-FI</text>
+            <text x="170" y="288" class="t" text-anchor="middle">CAPSULE ESP32</text>
+            <text x="170" y="304" class="t muted" text-anchor="middle">C++</text>
+          </svg>
+          <figcaption>Recalling a capsule, from the click on the page down to the microcontroller.</figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">05</span> The difficulties</h2>
+        <ul>
+          <li>Infrared links that were sometimes unstable.</li>
+          <li>Frequent Wi-Fi disconnections, reduced but not solved for good.</li>
+          <li>Build errors caused by the board configuration, solved by reworking the build environments.</li>
+          <li>Taking over complex existing code, in C, C++, Python and JavaScript.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">06</span> Results and limits</h2>
+        <p>
+          By the end of the internship, the model had real-time monitoring with disconnection detection,
+          insertion of capsules into an active loop with priority handling, locked manual and automatic modes,
+          and the new switch logic. Nothing was measured.
+        </p>
+        <p>
+          For lack of time, some points were left open. Leads left to the next team: make the Wi-Fi more
+          reliable, add capsules to test the model under load, install a camera to track the capsules.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">07</span> What I take away</h2>
+        <p>
+          A distributed embedded system, end to end: microcontrollers talking over infrared, serial and Wi-Fi,
+          FreeRTOS tasks, wiring and soldering on the model. I also learned to take over code I had not written,
+          and to carry a message across four languages.
+        </p>
+      </section>
+
+      <p class="case-back"><a class="pill pill-outline pill-sm" href="/en/experience">← All experience</a></p>
+    </div>
+  </div>
+</MaquettePage>

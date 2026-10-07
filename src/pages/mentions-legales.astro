@@ -1,75 +1,170 @@
 ---
+/* Mentions légales et confidentialité, en français ou en anglais (/en/legal). */
 import MaquettePage from '../layouts/MaquettePage.astro';
+import { langOf } from '../i18n';
+
+const lang = langOf(Astro.url);
 ---
 
-<MaquettePage
-  title="Mentions légales"
-  description="Mentions légales et politique de confidentialité du portfolio de Matthias Germain."
->
-  <div class="wrap legal">
-    <section>
-      <h2>Éditeur</h2>
-      <p>
-        Matthias Germain, ingénieur logiciel, Strasbourg.<br />
-        Contact : <a href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a><br />
-        Directeur de la publication : Matthias Germain.
-      </p>
-    </section>
+{
+  lang === 'en' ? (
+    <MaquettePage title="Legal notice" description="Legal notice and privacy policy of Matthias Germain's portfolio.">
+      <div class="wrap legal">
+        <section>
+          <h2>Publisher</h2>
+          <p>
+            Matthias Germain, software engineer, Strasbourg, France.
+            <br />
+            Contact: <a href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>
+            <br />
+            Publication director: Matthias Germain.
+          </p>
+        </section>
 
-    <section>
-      <h2>Hébergement</h2>
-      <p>
-        Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.
-        <a href="https://vercel.com">vercel.com</a>
-      </p>
-    </section>
+        <section>
+          <h2>Hosting</h2>
+          <p>
+            Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, United States.
+            <a href="https://vercel.com">vercel.com</a>
+          </p>
+        </section>
 
-    <section>
-      <h2>Contenus et crédits</h2>
-      <ul>
-        <li>Textes, photos, schémas et code du site : Matthias Germain, sauf mention contraire. Le code source est sur <a href="https://github.com/MatthiasGermain/MatthiasGermain">GitHub</a>.</li>
-        <li>
-          Modèle 3D de l'accueil :
-          <a href="https://sketchfab.com/3d-models/esp32-wroom-fd714190aacc4e3f9c26b8d7e27807fc">« ESP32 Wroom »</a>
-          par <a href="https://sketchfab.com/TER1Z">TER1Z</a>, sous licence
-          <a href="https://creativecommons.org/licenses/by/4.0/deed.fr">Creative Commons Attribution 4.0</a>.
-          Il a été modifié : rendu au trait, couleurs, marquage du blindage et sérigraphie simplifiée.
-        </li>
-        <li>Polices : Figtree et Montserrat, sous licence SIL Open Font License.</li>
-        <li>Logos des outils : <a href="https://simpleicons.org">Simple Icons</a> (CC0). Les marques appartiennent à leurs propriétaires.</li>
-      </ul>
-    </section>
+        <section>
+          <h2>Content and credits</h2>
+          <ul>
+            <li>
+              Text, photos, diagrams and code of the site: Matthias Germain, unless stated otherwise. The source code is
+              on <a href="https://github.com/MatthiasGermain/MatthiasGermain">GitHub</a>.
+            </li>
+            <li>The English version of the site was translated by Claude (Anthropic).</li>
+            <li>
+              3D model on the home page:
+              <a href="https://sketchfab.com/3d-models/esp32-wroom-fd714190aacc4e3f9c26b8d7e27807fc">"ESP32 Wroom"</a>
+              by <a href="https://sketchfab.com/TER1Z">TER1Z</a>, under the
+              <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0</a> license. It
+              was modified: line rendering, colors, marking on the shield and simplified silkscreen.
+            </li>
+            <li>Fonts: Figtree and Montserrat, under the SIL Open Font License.</li>
+            <li>
+              Tool logos: <a href="https://simpleicons.org">Simple Icons</a> (CC0). Trademarks belong to their owners.
+            </li>
+          </ul>
+        </section>
 
-    <section>
-      <h2>Confidentialité</h2>
-      <h3>Formulaire de contact</h3>
-      <ul>
-        <li><b>Données recueillies :</b> votre nom, votre adresse email et votre message.</li>
-        <li><b>Utilisation :</b> uniquement pour vous répondre. Rien n'est revendu ni utilisé à d'autres fins.</li>
-        <li>
-          <b>Parcours :</b> le site ne conserve rien. Le message m'est transmis par email via
-          <a href="https://resend.com">Resend</a> (Plus Five Five, Inc.), puis arrive dans ma boîte Gmail
-          (Google). Ces deux prestataires peuvent traiter les données aux États-Unis.
-        </li>
-        <li><b>Durée de conservation :</b> le temps de notre échange, et au plus trois ans après notre dernier contact.</li>
-        <li><b>Base légale :</b> l'intérêt légitime à répondre à une demande que vous m'adressez.</li>
-      </ul>
+        <section>
+          <h2>Privacy</h2>
+          <h3>Contact form</h3>
+          <ul>
+            <li><b>Data collected:</b> your name, your email address and your message.</li>
+            <li><b>Use:</b> only to reply to you. Nothing is sold or used for any other purpose.</li>
+            <li>
+              <b>Path:</b> the site keeps nothing. The message is sent to me by email through
+              <a href="https://resend.com">Resend</a> (Plus Five Five, Inc.), then reaches my Gmail inbox (Google).
+              Both providers may process the data in the United States.
+            </li>
+            <li><b>Retention:</b> for the time of our exchange, and at most three years after our last contact.</li>
+            <li><b>Legal basis:</b> legitimate interest in replying to a request you send me.</li>
+          </ul>
 
-      <h3>Vos droits</h3>
-      <p>
-        Vous pouvez demander à consulter, corriger ou supprimer vos données, ou vous opposer à leur
-        utilisation, en écrivant à <a href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>.
-        Vous pouvez aussi adresser une réclamation à la <a href="https://www.cnil.fr">CNIL</a>.
-      </p>
+          <h3>Your rights</h3>
+          <p>
+            You can ask to access, correct or delete your data, or object to its use, by writing to
+            <a href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>. You can also lodge a
+            complaint with the <a href="https://www.cnil.fr/en">CNIL</a>, the French data protection authority.
+          </p>
 
-      <h3>Cookies et mesure d'audience</h3>
-      <p>
-        Le site ne dépose aucun cookie et n'utilise aucun outil de mesure d'audience. Les polices sont
-        hébergées sur le site lui-même. L'hébergeur conserve des journaux techniques (adresse IP, pages
-        demandées) pour assurer le fonctionnement et la sécurité du service.
-      </p>
-    </section>
+          <h3>Cookies and analytics</h3>
+          <p>
+            The site sets no cookies and uses no analytics tool. The fonts are hosted on the site itself. The host
+            keeps technical logs (IP address, requested pages) to run and secure the service.
+          </p>
+        </section>
 
-    <p class="legal-date">Dernière mise à jour : 6 octobre 2026.</p>
-  </div>
-</MaquettePage>
+        <p class="legal-date">Last updated: 7 October 2026.</p>
+      </div>
+    </MaquettePage>
+  ) : (
+    <MaquettePage
+      title="Mentions légales"
+      description="Mentions légales et politique de confidentialité du portfolio de Matthias Germain."
+    >
+      <div class="wrap legal">
+        <section>
+          <h2>Éditeur</h2>
+          <p>
+            Matthias Germain, ingénieur logiciel, Strasbourg.
+            <br />
+            Contact : <a href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>
+            <br />
+            Directeur de la publication : Matthias Germain.
+          </p>
+        </section>
+
+        <section>
+          <h2>Hébergement</h2>
+          <p>
+            Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis.
+            <a href="https://vercel.com">vercel.com</a>
+          </p>
+        </section>
+
+        <section>
+          <h2>Contenus et crédits</h2>
+          <ul>
+            <li>
+              Textes, photos, schémas et code du site : Matthias Germain, sauf mention contraire. Le code source est
+              sur <a href="https://github.com/MatthiasGermain/MatthiasGermain">GitHub</a>.
+            </li>
+            <li>La version anglaise du site a été traduite par Claude (Anthropic).</li>
+            <li>
+              Modèle 3D de l'accueil :
+              <a href="https://sketchfab.com/3d-models/esp32-wroom-fd714190aacc4e3f9c26b8d7e27807fc">« ESP32 Wroom »</a>
+              par <a href="https://sketchfab.com/TER1Z">TER1Z</a>, sous licence
+              <a href="https://creativecommons.org/licenses/by/4.0/deed.fr">Creative Commons Attribution 4.0</a>. Il a
+              été modifié : rendu au trait, couleurs, marquage du blindage et sérigraphie simplifiée.
+            </li>
+            <li>Polices : Figtree et Montserrat, sous licence SIL Open Font License.</li>
+            <li>
+              Logos des outils : <a href="https://simpleicons.org">Simple Icons</a> (CC0). Les marques appartiennent à
+              leurs propriétaires.
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Confidentialité</h2>
+          <h3>Formulaire de contact</h3>
+          <ul>
+            <li><b>Données recueillies :</b> votre nom, votre adresse email et votre message.</li>
+            <li><b>Utilisation :</b> uniquement pour vous répondre. Rien n'est revendu ni utilisé à d'autres fins.</li>
+            <li>
+              <b>Parcours :</b> le site ne conserve rien. Le message m'est transmis par email via
+              <a href="https://resend.com">Resend</a> (Plus Five Five, Inc.), puis arrive dans ma boîte Gmail
+              (Google). Ces deux prestataires peuvent traiter les données aux États-Unis.
+            </li>
+            <li>
+              <b>Durée de conservation :</b> le temps de notre échange, et au plus trois ans après notre dernier contact.
+            </li>
+            <li><b>Base légale :</b> l'intérêt légitime à répondre à une demande que vous m'adressez.</li>
+          </ul>
+
+          <h3>Vos droits</h3>
+          <p>
+            Vous pouvez demander à consulter, corriger ou supprimer vos données, ou vous opposer à leur utilisation, en
+            écrivant à <a href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>. Vous pouvez
+            aussi adresser une réclamation à la <a href="https://www.cnil.fr">CNIL</a>.
+          </p>
+
+          <h3>Cookies et mesure d'audience</h3>
+          <p>
+            Le site ne dépose aucun cookie et n'utilise aucun outil de mesure d'audience. Les polices sont hébergées sur
+            le site lui-même. L'hébergeur conserve des journaux techniques (adresse IP, pages demandées) pour assurer le
+            fonctionnement et la sécurité du service.
+          </p>
+        </section>
+
+        <p class="legal-date">Dernière mise à jour : 7 octobre 2026.</p>
+      </div>
+    </MaquettePage>
+  )
+}

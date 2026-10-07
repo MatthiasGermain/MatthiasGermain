@@ -1,7 +1,12 @@
 ---
 import MaquettePage from '../layouts/MaquettePage.astro';
 import ProjectCard from '../components/maquette/ProjectCard.astro';
-import { projects } from '../data/maquette';
+import { content } from '../data/content';
+import { langOf, tr } from '../i18n';
+
+const lang = langOf(Astro.url);
+const t = tr(lang);
+const { projects } = content(lang);
 
 const experiences = projects.filter((p) => p.experience);
 ---
@@ -9,8 +14,12 @@ const experiences = projects.filter((p) => p.experience);
 <MaquettePage current="experiences">
   <section class="wrap">
     <p class="lead">
-      Mon activité de développeur web freelance et mes stages, racontés sans leur code quand il
-      appartient à d'autres : le problème, ce que j'ai construit et la stack utilisée.
+      {
+        t(
+          "Mon activité de développeur web freelance et mes stages, racontés sans leur code quand il appartient à d'autres : le problème, ce que j'ai construit et la stack utilisée.",
+          'My work as a freelance web developer and my internships, told without their code when it belongs to others: the problem, what I built and the stack I used.',
+        )
+      }
     </p>
     <div class="projects" style="margin-top: clamp(40px, 6vw, 72px)">
       {experiences.map((p, i) => <ProjectCard project={p} flip={i % 2 === 1} />)}

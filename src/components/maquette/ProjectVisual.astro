@@ -3,16 +3,18 @@
 // (web). Le tableau de bord de narthex reste dessiné en attendant une capture avec des données de démo.
 import type { Visual } from '../../data/maquette';
 import ScrollShot from '../ScrollShot.astro';
+import { langOf, tr } from '../../i18n';
 
 interface Props {
   visual: Visual;
 }
 
 const { visual } = Astro.props;
+const t = tr(langOf(Astro.url));
 ---
 
   {visual === 'routine' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Schéma de routine-station : capteurs, ESP32, moteur et alarme dans la station ; broker MQTT ; page web et API sur le site">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t('Schéma de routine-station : capteurs, ESP32, moteur et alarme dans la station ; broker MQTT ; page web et API sur le site', 'routine-station diagram: sensors, ESP32, motor and alarm in the station; MQTT broker; web page and API on the website')}>
       <defs>
         <marker id="arr-routine" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -40,24 +42,24 @@ const { visual } = Astro.props;
       </g>
       <text x="16" y="17" class="t">STATION</text>
       <text x="53" y="55" class="t" text-anchor="middle">TEMP.</text>
-      <text x="53" y="87" class="t" text-anchor="middle">LUMIÈRE</text>
-      <text x="53" y="119" class="t" text-anchor="middle">FLAMME</text>
+      <text x="53" y="87" class="t" text-anchor="middle">{t('LUMIÈRE', 'LIGHT')}</text>
+      <text x="53" y="119" class="t" text-anchor="middle">{t('FLAMME', 'FLAME')}</text>
       <text x="154" y="80" class="tb" text-anchor="middle">ESP32</text>
       <text x="154" y="97" class="t muted" text-anchor="middle">FREERTOS</text>
       <text x="128" y="173" class="tb" text-anchor="middle">M</text>
-      <text x="177" y="172" class="t" text-anchor="middle">ALARME</text>
-      <text x="108" y="222" class="t muted" text-anchor="middle">ALARME LOCALE, SANS RÉSEAU</text>
-      <text x="284" y="68" class="t" text-anchor="middle">BROKER MQTT</text>
+      <text x="177" y="172" class="t" text-anchor="middle">{t('ALARME', 'ALARM')}</text>
+      <text x="108" y="222" class="t muted" text-anchor="middle">{t('ALARME LOCALE, SANS RÉSEAU', 'LOCAL ALARM, NO NETWORK')}</text>
+      <text x="284" y="68" class="t" text-anchor="middle">{t('BROKER MQTT', 'MQTT BROKER')}</text>
       <text x="284" y="36" class="t muted" text-anchor="middle">HIVEMQ · TLS</text>
-      <text x="271" y="186" class="t" text-anchor="middle">PAGE WEB</text>
+      <text x="271" y="186" class="t" text-anchor="middle">{t('PAGE WEB', 'WEB PAGE')}</text>
       <text x="354" y="179" class="tb" text-anchor="middle">API</text>
-      <text x="232" y="232" class="t muted">SITE · VERCEL</text>
+      <text x="232" y="232" class="t muted">{t('SITE · VERCEL', 'WEBSITE · VERCEL')}</text>
     </svg>
   )}
   {visual === 'risc' && (
     // Chemin de données simplifié, d'après RISC_V_Processor.vhd : pas de pipeline, une instruction par
     // cycle d'horloge. Pas de mux de branchement devant le PC : les sauts ne sont pas câblés.
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Chemin de données simplifié du processeur RISC-V : PC, mémoire d'instructions, registres, ALU et mémoire de données, avec les cinq étapes d'une instruction dans un seul cycle d'horloge">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t("Chemin de données simplifié du processeur RISC-V : PC, mémoire d'instructions, registres, ALU et mémoire de données, avec les cinq étapes d'une instruction dans un seul cycle d'horloge", 'Simplified datapath of the RISC-V processor: PC, instruction memory, registers, ALU and data memory, with the five stages of an instruction in a single clock cycle')}>
       <defs>
         <marker id="arr-risc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -101,18 +103,18 @@ const { visual } = Astro.props;
       <text x="254" y="96" class="t" text-anchor="middle">ALU</text>
       <text x="322" y="96" class="t" text-anchor="middle">DMEM</text>
       <g class="t" style="font-size: 9px">
-        <text x="45" y="173">LECTURE</text>
-        <text x="109" y="173">DÉCODAGE</text>
-        <text x="180" y="173">EXÉCUTION</text>
-        <text x="258" y="173">MÉMOIRE</text>
-        <text x="322" y="173">ÉCRITURE</text>
+        <text x="45" y="173">{t('LECTURE', 'FETCH')}</text>
+        <text x="109" y="173">{t('DÉCODAGE', 'DECODE')}</text>
+        <text x="180" y="173">{t('EXÉCUTION', 'EXECUTE')}</text>
+        <text x="258" y="173">{t('MÉMOIRE', 'MEMORY')}</text>
+        <text x="322" y="173">{t('ÉCRITURE', 'WRITE-BACK')}</text>
       </g>
       <text x="4" y="209" class="t muted">CLK</text>
-      <text x="200" y="240" class="t muted" text-anchor="middle">UNE INSTRUCTION PAR CYCLE · SANS PIPELINE</text>
+      <text x="200" y="240" class="t muted" text-anchor="middle">{t('UNE INSTRUCTION PAR CYCLE · SANS PIPELINE', 'ONE INSTRUCTION PER CYCLE · NO PIPELINE')}</text>
     </svg>
   )}
   {visual === 'irda' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Chaîne du bureau d'études UrbanLoop : l'équipe détecte les obstacles et envoie GO, SLOW ou STOP par liaison série ; l'ESP32 radar envoie une consigne par infrarouge ; l'ESP32 de la capsule applique la vitesse">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t("Chaîne du bureau d'études UrbanLoop : l'équipe détecte les obstacles et envoie GO, SLOW ou STOP par liaison série ; l'ESP32 radar envoie une consigne par infrarouge ; l'ESP32 de la capsule applique la vitesse", 'UrbanLoop engineering project chain: the team detects obstacles and sends GO, SLOW or STOP over a serial link; the radar ESP32 sends a setpoint over infrared; the capsule ESP32 applies the speed')}>
       <defs>
         <marker id="arr-irda" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -131,11 +133,11 @@ const { visual } = Astro.props;
         <rect x="300" y="143" width="92" height="24" rx="5" class="paper" />
         <rect x="300" y="186" width="92" height="24" rx="5" class="paper" />
       </g>
-      <text x="66" y="36" class="t" text-anchor="middle">CAPTEURS</text>
-      <text x="66" y="51" class="t muted" text-anchor="middle">LIDAR, CAMÉRAS</text>
-      <text x="210" y="36" class="t" text-anchor="middle">DÉTECTION</text>
+      <text x="66" y="36" class="t" text-anchor="middle">{t('CAPTEURS', 'SENSORS')}</text>
+      <text x="66" y="51" class="t muted" text-anchor="middle">{t('LIDAR, CAMÉRAS', 'LIDAR, CAMERAS')}</text>
+      <text x="210" y="36" class="t" text-anchor="middle">{t('DÉTECTION', 'DETECTION')}</text>
       <text x="210" y="51" class="t muted" text-anchor="middle">ROS2 · YOLO · VOTE</text>
-      <text x="202" y="84" class="t muted" text-anchor="end">SÉRIE</text>
+      <text x="202" y="84" class="t muted" text-anchor="end">{t('SÉRIE', 'SERIAL')}</text>
       <text x="202" y="97" class="t" text-anchor="end">GO · SLOW · STOP</text>
       <text x="66" y="137" class="tb" text-anchor="middle">ESP32</text>
       <text x="66" y="152" class="t" text-anchor="middle">RADAR</text>
@@ -144,16 +146,16 @@ const { visual } = Astro.props;
       <text x="210" y="137" class="tb" text-anchor="middle">ESP32</text>
       <text x="210" y="152" class="t" text-anchor="middle">CAPSULE</text>
       <text x="210" y="165" class="t muted" text-anchor="middle">FREERTOS</text>
-      <text x="346" y="116" class="t" text-anchor="middle">BANC 0-5 V</text>
-      <text x="346" y="159" class="t" text-anchor="middle">LED VITESSE</text>
-      <text x="346" y="202" class="t" text-anchor="middle">ÉCRAN OLED</text>
-      <text x="10" y="200" class="t muted">SÉRIE PRIORITAIRE SUR L'INFRAROUGE</text>
-      <text x="10" y="226" class="t muted">EN JAUNE : MA PARTIE</text>
-      <text x="10" y="240" class="t muted">POINTILLÉS : LE RESTE DE L'ÉQUIPE</text>
+      <text x="346" y="116" class="t" text-anchor="middle">{t('BANC 0-5 V', '0-5 V BENCH')}</text>
+      <text x="346" y="159" class="t" text-anchor="middle">{t('LED VITESSE', 'SPEED LED')}</text>
+      <text x="346" y="202" class="t" text-anchor="middle">{t('ÉCRAN OLED', 'OLED SCREEN')}</text>
+      <text x="10" y="200" class="t muted">{t("SÉRIE PRIORITAIRE SUR L'INFRAROUGE", 'SERIAL TAKES PRIORITY OVER INFRARED')}</text>
+      <text x="10" y="226" class="t muted">{t('EN JAUNE : MA PARTIE', 'IN YELLOW: MY PART')}</text>
+      <text x="10" y="240" class="t muted">{t("POINTILLÉS : LE RESTE DE L'ÉQUIPE", 'DASHED: THE REST OF THE TEAM')}</text>
     </svg>
   )}
   {visual === 'schaeffler' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Les deux chaînes du stage Schaeffler : rapports d'erreurs générés depuis le log de build, et configuration des livraisons vérifiée puis générée">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t("Les deux chaînes du stage Schaeffler : rapports d'erreurs générés depuis le log de build, et configuration des livraisons vérifiée puis générée", 'The two toolchains of the Schaeffler internship: error reports generated from the build log, and a delivery configuration checked, then generated')}>
       <defs>
         <marker id="arr-schaeffler" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -172,25 +174,25 @@ const { visual } = Astro.props;
         <rect x="280" y="146" width="104" height="52" rx="6" class="paper" />
         <path d="M200 198 V214 H68 V200" marker-end="url(#arr-schaeffler)" />
       </g>
-      <text x="16" y="30" class="t">1 · RAPPORTS D'ERREURS</text>
-      <text x="68" y="63" class="t" text-anchor="middle">LOG DE BUILD</text>
+      <text x="16" y="30" class="t">{t("1 · RAPPORTS D'ERREURS", '1 · ERROR REPORTS')}</text>
+      <text x="68" y="63" class="t" text-anchor="middle">{t('LOG DE BUILD', 'BUILD LOG')}</text>
       <text x="68" y="78" class="t muted" text-anchor="middle">EHANDBOOK</text>
-      <text x="200" y="63" class="t" text-anchor="middle">GÉNÉRATEUR</text>
+      <text x="200" y="63" class="t" text-anchor="middle">{t('GÉNÉRATEUR', 'GENERATOR')}</text>
       <text x="200" y="78" class="t muted" text-anchor="middle">+ WINDCHILL</text>
       <text x="332" y="63" class="t" text-anchor="middle">EXCEL</text>
-      <text x="332" y="78" class="t muted" text-anchor="middle">PAR ÉQUIPE</text>
-      <text x="16" y="136" class="t">2 · CONFIGURATION DES LIVRAISONS</text>
+      <text x="332" y="78" class="t muted" text-anchor="middle">{t('PAR ÉQUIPE', 'PER TEAM')}</text>
+      <text x="16" y="136" class="t">{t('2 · CONFIGURATION DES LIVRAISONS', '2 · DELIVERY CONFIGURATION')}</text>
       <text x="68" y="169" class="t" text-anchor="middle">CONFLUENCE</text>
-      <text x="68" y="184" class="t muted" text-anchor="middle">SAISIES</text>
-      <text x="200" y="169" class="t" text-anchor="middle">OUTIL PYTHON</text>
-      <text x="200" y="184" class="t muted" text-anchor="middle">5 CONTRÔLES</text>
-      <text x="332" y="169" class="t" text-anchor="middle">FICHIERS</text>
-      <text x="332" y="184" class="t muted" text-anchor="middle">JSON VÉRIFIÉS</text>
-      <text x="134" y="232" class="t muted" text-anchor="middle">STATUTS RÉÉCRITS</text>
+      <text x="68" y="184" class="t muted" text-anchor="middle">{t('SAISIES', 'MANUAL INPUT')}</text>
+      <text x="200" y="169" class="t" text-anchor="middle">{t('OUTIL PYTHON', 'PYTHON TOOL')}</text>
+      <text x="200" y="184" class="t muted" text-anchor="middle">{t('5 CONTRÔLES', '5 CHECKS')}</text>
+      <text x="332" y="169" class="t" text-anchor="middle">{t('FICHIERS', 'FILES')}</text>
+      <text x="332" y="184" class="t muted" text-anchor="middle">{t('JSON VÉRIFIÉS', 'CHECKED JSON')}</text>
+      <text x="134" y="232" class="t muted" text-anchor="middle">{t('STATUTS RÉÉCRITS', 'STATUSES WRITTEN BACK')}</text>
     </svg>
   )}
   {visual === 'urbanloop' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Circuit de la maquette UrbanLoop : deux boucles en sens inverse reliées par les aiguillages 101 et 102, deux stations, des capteurs infrarouges et deux capsules">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t('Circuit de la maquette UrbanLoop : deux boucles en sens inverse reliées par les aiguillages 101 et 102, deux stations, des capteurs infrarouges et deux capsules', 'Track of the UrbanLoop scale model: two loops running in opposite directions, joined by switches 101 and 102, two stations, infrared sensors and two capsules')}>
       <defs>
         <marker id="arr-urbanloop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -227,24 +229,24 @@ const { visual } = Astro.props;
       <circle cx="222" cy="164" r="7" class="sun" stroke="var(--ink)" stroke-width="2" />
       <text x="176" y="62" class="t">101</text>
       <text x="230" y="180" class="t">102</text>
-      <text x="128" y="136" class="t" text-anchor="middle">BOUCLE 1</text>
-      <text x="270" y="136" class="t" text-anchor="middle">BOUCLE 2</text>
+      <text x="128" y="136" class="t" text-anchor="middle">{t('BOUCLE 1', 'LOOP 1')}</text>
+      <text x="270" y="136" class="t" text-anchor="middle">{t('BOUCLE 2', 'LOOP 2')}</text>
       <text x="30" y="128" class="t" text-anchor="middle">STATION</text>
       <text x="30" y="141" class="t muted" text-anchor="middle">141</text>
       <text x="371" y="128" class="t" text-anchor="middle">STATION</text>
       <text x="371" y="141" class="t muted" text-anchor="middle">142</text>
       <path d="M8 244 l4 -7 l4 7 z" class="ink" />
-      <text x="20" y="244" class="t muted">CAPTEUR IRDA</text>
+      <text x="20" y="244" class="t muted">{t('CAPTEUR IRDA', 'IRDA SENSOR')}</text>
       <path d="M114 240 H128" class="s dash" />
-      <text x="133" y="244" class="t muted">LIAISON SÉRIE</text>
+      <text x="133" y="244" class="t muted">{t('LIAISON SÉRIE', 'SERIAL LINK')}</text>
       <circle cx="238" cy="240" r="4.5" class="sun" stroke="var(--ink)" stroke-width="1.5" />
-      <text x="247" y="244" class="t muted">AIGUILLAGE</text>
+      <text x="247" y="244" class="t muted">{t('AIGUILLAGE', 'SWITCH')}</text>
       <rect x="327" y="236" width="12" height="7" rx="2.5" class="ink" />
       <text x="343" y="244" class="t muted">CAPSULE</text>
     </svg>
   )}
   {visual === 'web' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Captures de deux sites réalisés : la plateforme ChuTTT et le site du studio BAPZ">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t('Captures de deux sites réalisés : la plateforme ChuTTT et le site du studio BAPZ', 'Screenshots of two websites I built: the ChuTTT platform and the BAPZ studio website')}>
       <defs>
         <clipPath id="clip-web-back"><path d="M17 39 H285 V178 a7 7 0 0 1 -7 7 H24 a7 7 0 0 1 -7 -7 Z" /></clipPath>
         <clipPath id="clip-web-front"><path d="M115 91 H383 V230 a7 7 0 0 1 -7 7 H122 a7 7 0 0 1 -7 -7 Z" /></clipPath>
@@ -274,7 +276,7 @@ const { visual } = Astro.props;
     </svg>
   )}
   {visual === 'freertos' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Modèle producteur / consommateur sous FreeRTOS : les capteurs alimentent des tâches productrices, une file, puis une tâche consommatrice, sur deux ESP32 reliés en série">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t('Modèle producteur / consommateur sous FreeRTOS : les capteurs alimentent des tâches productrices, une file, puis une tâche consommatrice, sur deux ESP32 reliés en série', 'Producer / consumer pattern under FreeRTOS: the sensors feed producer tasks, a queue, then a consumer task, on two ESP32 boards linked over serial')}>
       <defs>
         <marker id="arr-freertos" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -295,22 +297,22 @@ const { visual } = Astro.props;
         <path d="M228 135 H242" marker-end="url(#arr-freertos)" />
         <rect x="244" y="112" width="142" height="46" rx="6" class="paper" />
       </g>
-      <text x="69" y="48" class="t" text-anchor="middle">ULTRASON</text>
-      <text x="69" y="61" class="t muted" text-anchor="middle">DÉCLENCHEUR</text>
+      <text x="69" y="48" class="t" text-anchor="middle">{t('ULTRASON', 'ULTRASOUND')}</text>
+      <text x="69" y="61" class="t muted" text-anchor="middle">{t('DÉCLENCHEUR', 'TRIGGER')}</text>
       <text x="200" y="54" class="t" text-anchor="middle">CO₂</text>
       <text x="331" y="48" class="t" text-anchor="middle">TEMP.</text>
-      <text x="331" y="61" class="t" text-anchor="middle">HUMIDITÉ</text>
-      <text x="92" y="132" class="t" text-anchor="middle">TÂCHES</text>
-      <text x="92" y="146" class="t" text-anchor="middle">PRODUCTRICES</text>
-      <text x="206" y="164" class="t muted" text-anchor="middle">FILE</text>
-      <text x="315" y="132" class="t" text-anchor="middle">TÂCHE</text>
-      <text x="315" y="146" class="t" text-anchor="middle">CONSOMMATRICE</text>
-      <text x="200" y="206" class="t muted" text-anchor="middle">FREERTOS · PRODUCTEUR / CONSOMMATEUR</text>
-      <text x="200" y="222" class="t muted" text-anchor="middle">SUR DEUX ESP32 RELIÉS EN SÉRIE (RX / TX)</text>
+      <text x="331" y="61" class="t" text-anchor="middle">{t('HUMIDITÉ', 'HUMIDITY')}</text>
+      <text x="92" y="132" class="t" text-anchor="middle">{t('TÂCHES', 'PRODUCER')}</text>
+      <text x="92" y="146" class="t" text-anchor="middle">{t('PRODUCTRICES', 'TASKS')}</text>
+      <text x="206" y="164" class="t muted" text-anchor="middle">{t('FILE', 'QUEUE')}</text>
+      <text x="315" y="132" class="t" text-anchor="middle">{t('TÂCHE', 'CONSUMER')}</text>
+      <text x="315" y="146" class="t" text-anchor="middle">{t('CONSOMMATRICE', 'TASK')}</text>
+      <text x="200" y="206" class="t muted" text-anchor="middle">{t('FREERTOS · PRODUCTEUR / CONSOMMATEUR', 'FREERTOS · PRODUCER / CONSUMER')}</text>
+      <text x="200" y="222" class="t muted" text-anchor="middle">{t('SUR DEUX ESP32 RELIÉS EN SÉRIE (RX / TX)', 'ON TWO ESP32 BOARDS LINKED OVER SERIAL (RX / TX)')}</text>
     </svg>
   )}
   {visual === 'spotify' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Schéma de spotify_report : toutes les heures, les écoutes sont récupérées et enregistrées ; une fois par jour, le rapport de la veille part par email">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t('Schéma de spotify_report : toutes les heures, les écoutes sont récupérées et enregistrées ; une fois par jour, le rapport de la veille part par email', "spotify_report diagram: every hour, the plays are fetched and stored; once a day, the previous day's report goes out by email")}>
       <defs>
         <marker id="arr-spotify" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0 0 L8 4 L0 8 Z" class="ink" />
@@ -334,22 +336,22 @@ const { visual } = Astro.props;
       <rect x="248" y="118" width="8" height="26" class="sun" />
       <rect x="262" y="124" width="8" height="20" class="sun" />
       <rect x="276" y="112" width="8" height="32" class="sun" />
-      <text x="50" y="38" class="t">TOUTES LES HEURES · GITHUB ACTIONS</text>
+      <text x="50" y="38" class="t">{t('TOUTES LES HEURES · GITHUB ACTIONS', 'EVERY HOUR · GITHUB ACTIONS')}</text>
       <text x="58" y="123" class="tb" text-anchor="middle">API</text>
       <text x="58" y="139" class="t" text-anchor="middle">SPOTIFY</text>
-      <text x="58" y="176" class="t muted" text-anchor="middle">50 DERNIÈRES</text>
-      <text x="58" y="189" class="t muted" text-anchor="middle">ÉCOUTES</text>
-      <text x="153" y="172" class="t" text-anchor="middle">CSV / JOUR</text>
-      <text x="153" y="185" class="t muted" text-anchor="middle">SANS DOUBLONS</text>
-      <text x="259" y="172" class="t" text-anchor="middle">RAPPORT</text>
-      <text x="259" y="185" class="t muted" text-anchor="middle">DE LA VEILLE</text>
-      <text x="355" y="172" class="t" text-anchor="middle">E-MAIL</text>
-      <text x="355" y="185" class="t muted" text-anchor="middle">1 PAR JOUR</text>
-      <text x="18" y="232" class="t muted">RUNNER AUTO-HÉBERGÉ</text>
+      <text x="58" y="176" class="t muted" text-anchor="middle">{t('50 DERNIÈRES', 'LAST 50')}</text>
+      <text x="58" y="189" class="t muted" text-anchor="middle">{t('ÉCOUTES', 'PLAYS')}</text>
+      <text x="153" y="172" class="t" text-anchor="middle">{t('CSV / JOUR', 'CSV / DAY')}</text>
+      <text x="153" y="185" class="t muted" text-anchor="middle">{t('SANS DOUBLONS', 'NO DUPLICATES')}</text>
+      <text x="259" y="172" class="t" text-anchor="middle">{t('RAPPORT', 'REPORT')}</text>
+      <text x="259" y="185" class="t muted" text-anchor="middle">{t('DE LA VEILLE', 'PREVIOUS DAY')}</text>
+      <text x="355" y="172" class="t" text-anchor="middle">{t('E-MAIL', 'EMAIL')}</text>
+      <text x="355" y="185" class="t muted" text-anchor="middle">{t('1 PAR JOUR', '1 PER DAY')}</text>
+      <text x="18" y="232" class="t muted">{t('RUNNER AUTO-HÉBERGÉ', 'SELF-HOSTED RUNNER')}</text>
     </svg>
   )}
   {visual === 'narthex' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Aperçu du tableau de bord de narthex">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t('Aperçu du tableau de bord de narthex', 'Preview of the narthex dashboard')}>
       <g class="s">
         <rect x="20" y="18" width="360" height="214" rx="10" class="paper" />
         <line x1="20" y1="44" x2="380" y2="44" />
@@ -369,7 +371,7 @@ const { visual } = Astro.props;
       <rect x="34" y="82" width="44" height="6" rx="3" class="ink-soft" />
       <rect x="34" y="98" width="36" height="6" rx="3" class="ink-soft" />
       <rect x="34" y="114" width="42" height="6" rx="3" class="ink-soft" />
-      <text x="108" y="72" class="t">TABLEAU DE BORD</text>
+      <text x="108" y="72" class="t">{t('TABLEAU DE BORD', 'DASHBOARD')}</text>
       <rect x="118" y="112" width="24" height="16" rx="2" class="sun" />
       <rect x="118" y="100" width="40" height="5" rx="2.5" class="ink-soft" />
       <rect x="208" y="100" width="44" height="5" rx="2.5" class="ink-soft" />
@@ -382,5 +384,5 @@ const { visual } = Astro.props;
     </svg>
   )}
   {visual === 'spotweb' && (
-    <ScrollShot src="/images/spotlightcrea-full.webp" url="spotlightcrea.fr" alt="Page d'accueil de spotlightcrea.fr" width={800} height={3179} />
+    <ScrollShot src="/images/spotlightcrea-full.webp" url="spotlightcrea.fr" alt={t("Page d'accueil de spotlightcrea.fr", 'Home page of spotlightcrea.fr')} width={800} height={3179} />
   )}

@@ -1,7 +1,12 @@
 ---
 import MaquettePage from '../layouts/MaquettePage.astro';
 import Signature from '../components/Signature.astro';
-import { links } from '../data/maquette';
+import { content } from '../data/content';
+import { href, langOf, tr } from '../i18n';
+
+const lang = langOf(Astro.url);
+const t = tr(lang);
+const { links } = content(lang);
 
 // Coupure possible avant le @ plutôt qu'au milieu du domaine
 const [mailUser, mailDomain] = links.email.split('@');
@@ -10,17 +15,33 @@ const [mailUser, mailDomain] = links.email.split('@');
 <MaquettePage current="contact">
   <section class="contact">
     <div class="wrap">
-      <h2 class="display h2 on-dark"><span class="light">On en</span> <span class="strong">PARLE ?</span></h2>
+      <h2 class="display h2 on-dark">
+        <span class="light">{t('On en', "Let's")}</span> <span class="strong">{t('PARLE ?', 'TALK')}</span>
+      </h2>
       <p class="contact-sub">
-        Je cherche un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg ou à Nancy.
+        {
+          t(
+            "Je cherche un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg ou à Nancy.",
+            "I'm looking for a software engineering role, embedded or web, in Strasbourg or Nancy.",
+          )
+        }
       </p>
 
       <div class="contact-grid">
         <!-- TX / RX : le formulaire émet, l'accusé de réception répond. Sans JavaScript, le formulaire
              est envoyé normalement et la route renvoie ici, sur l'ancre du résultat. -->
-        <form class="contact-form" id="ecrire" method="post" action="/api/contact">
+        <form
+          class="contact-form"
+          id="ecrire"
+          method="post"
+          action="/api/contact"
+          data-sending={t('Envoi…', 'Sending…')}
+          data-send={t('Envoyer', 'Send')}
+          data-failed={t("Le message n'est pas parti.", "The message didn't go through.")}
+        >
+          <input type="hidden" name="lang" value={lang} />
           <div class="field">
-            <label for="cf-name">Nom</label>
+            <label for="cf-name">{t('Nom', 'Name')}</label>
             <input id="cf-name" name="name" type="text" autocomplete="name" maxlength="100" required />
           </div>
           <div class="field">
@@ -40,35 +61,40 @@ const [mailUser, mailDomain] = links.email.split('@');
           <div class="form-foot">
             <button class="pill pill-sun form-send" type="submit">
               <span class="pin-name">TX</span>
-              <span class="form-send-label">Envoyer</span>
+              <span class="form-send-label">{t('Envoyer', 'Send')}</span>
             </button>
             <div class="form-notes" aria-live="polite">
               <p class="form-note form-note-rx" id="message-envoye">
                 <span class="pin-name">RX</span>
-                <span class="form-note-text">Message bien reçu. Je vous réponds rapidement.</span>
+                <span class="form-note-text">{t('Message bien reçu. Je vous réponds rapidement.', "Message received. I'll get back to you soon.")}</span>
               </p>
               <p class="form-note is-error" id="message-erreur">
-                <span class="form-error-text">Le message n'est pas parti.</span>
-                Réessayez, ou écrivez-moi directement par email.
+                <span class="form-error-text">{t("Le message n'est pas parti.", "The message didn't go through.")}</span>
+                {t('Réessayez, ou écrivez-moi directement par email.', 'Try again, or email me directly.')}
               </p>
             </div>
           </div>
           <p class="form-privacy">
-            Votre nom, votre email et votre message me sont transmis par email, uniquement pour vous
-            répondre ; le site n'en garde rien. <a href="/mentions-legales">Confidentialité</a>
+            {
+              t(
+                "Votre nom, votre email et votre message me sont transmis par email, uniquement pour vous répondre ; le site n'en garde rien.",
+                'Your name, email and message are sent to me by email, only so I can reply; the site keeps nothing.',
+              )
+            }
+            <a href={href(lang, '/mentions-legales')}>{t('Confidentialité', 'Privacy')}</a>
           </p>
         </form>
 
         <div class="contact-direct">
-          <p class="contact-or">Ou directement</p>
+          <p class="contact-or">{t('Ou directement', 'Or directly')}</p>
           <a class="mail" href={`mailto:${links.email}`}>{mailUser}<wbr />@{mailDomain}</a>
           <a class="tel" href={`tel:${links.phone.tel}`}>{links.phone.display}</a>
           <div class="contact-links">
             <a class="pill pill-light" href={links.linkedin}>LinkedIn ↗</a>
             <a class="pill pill-light" href={links.github}>GitHub ↗</a>
-            <a class="pill pill-sun" href="/cv" data-flash>CV ↗</a>
+            <a class="pill pill-sun" href={href(lang, '/cv')} data-flash>CV ↗</a>
           </div>
-          <div class="signature"><Signature label="Signature de Matthias" /></div>
+          <div class="signature"><Signature label={t('Signature de Matthias', "Matthias's signature")} /></div>
         </div>
       </div>
     </div>
@@ -120,7 +146,7 @@ const [mailUser, mailDomain] = links.email.split('@');
       if (button.disabled) return;
       button.disabled = true;
       button.classList.add('is-sending');
-      label.textContent = 'Envoi…';
+      label.textContent = form.dataset.sending ?? 'Envoi…';
       show(null);
       const started = performance.now();
       let data: { ok?: boolean; error?: string; field?: string } = {};
@@ -146,12 +172,12 @@ const [mailUser, mailDomain] = links.email.split('@');
         if (!reduced) await travel().catch(() => {});
         sent.classList.remove('is-arriving');
       } else {
-        errorText.textContent = data.error ?? "Le message n'est pas parti.";
+        errorText.textContent = data.error ?? form.dataset.failed ?? "Le message n'est pas parti.";
         show(failed);
         if (data.field) form.querySelector<HTMLElement>(`[name="${data.field}"]`)?.focus();
       }
       button.disabled = false;
-      label.textContent = 'Envoyer';
+      label.textContent = form.dataset.send ?? 'Envoyer';
     });
   }
 </script>

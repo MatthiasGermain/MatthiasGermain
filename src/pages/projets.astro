@@ -1,7 +1,12 @@
 ---
 import MaquettePage from '../layouts/MaquettePage.astro';
 import ProjectCard from '../components/maquette/ProjectCard.astro';
-import { filters, projects } from '../data/maquette';
+import { content } from '../data/content';
+import { langOf, tr } from '../i18n';
+
+const lang = langOf(Astro.url);
+const t = tr(lang);
+const { filters, projects } = content(lang);
 
 // Les études de cas ont leur propre page
 const list = projects.filter((p) => !p.experience);
@@ -12,12 +17,16 @@ const defaultFilter = filters.findIndex((f) => f.id === 'tout');
   <section class="wrap">
     <div class="projets-head">
       <p class="lead">
-        Firmware pour microcontrôleurs, outillage Python et CI/CD, interfaces web mises en
-        production : toute la chaîne d'un système connecté.
+        {
+          t(
+            "Firmware pour microcontrôleurs, outillage Python et CI/CD, interfaces web mises en production : toute la chaîne d'un système connecté.",
+            'Microcontroller firmware, Python tooling and CI/CD, web interfaces in production: the whole chain of a connected system.',
+          )
+        }
       </p>
       <div class="filter">
-        <span class="filter-label">Filtre</span>
-        <div class="switch" role="radiogroup" aria-label="Filtrer les projets" style={`--i: ${defaultFilter}; --n: ${filters.length}`}>
+        <span class="filter-label">{t('Filtre', 'Filter')}</span>
+        <div class="switch" role="radiogroup" aria-label={t('Filtrer les projets', 'Filter projects')} style={`--i: ${defaultFilter}; --n: ${filters.length}`}>
           <span class="switch-knob" aria-hidden="true"></span>
           {
             filters.map((f) => (

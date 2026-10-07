@@ -1,0 +1,14 @@
+---
+/* Sélecteur de langue : la même page en français ou en anglais (l'accueil de l'autre langue pour une
+ * page sans équivalent, comme la page introuvable). */
+import { alternates, langOf } from '../i18n';
+
+const lang = langOf(Astro.url);
+const alt = alternates(Astro.url) ?? { fr: '/', en: '/en' };
+---
+
+<nav class="lang-switch" aria-label={lang === 'en' ? 'Language' : 'Langue'}>
+  {lang === 'fr' ? <span aria-current="page">FR</span> : <a href={alt.fr} hreflang="fr" lang="fr" aria-label="Version française">FR</a>}
+  <span class="lang-sep" aria-hidden="true">·</span>
+  {lang === 'en' ? <span aria-current="page">EN</span> : <a href={alt.en} hreflang="en" lang="en" aria-label="English version">EN</a>}
+</nav>

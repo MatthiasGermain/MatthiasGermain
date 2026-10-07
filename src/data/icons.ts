@@ -33,6 +33,7 @@ const byLabel: Record<string, string> = {
   'Python (Flask)': 'flask',
   Jenkins: 'jenkins',
   'Confluence (API REST)': 'confluence',
+  'Confluence (REST API)': 'confluence',
   Confluence: 'confluence',
   ESP32: 'espressif',
   'C++': 'cplusplus',

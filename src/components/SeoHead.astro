@@ -1,6 +1,9 @@
 ---
-/* En-tête commun des pages : titre, description, adresse canonique et aperçu de lien (LinkedIn,
- * messageries) avec l'image de partage. Les adresses absolues partent de `site` (astro.config). */
+/* En-tête commun des pages : titre, description, adresse canonique, liens vers la même page dans
+ * l'autre langue (hreflang) et aperçu de lien (LinkedIn, messageries) avec l'image de partage.
+ * Les adresses absolues partent de `site` (astro.config). */
+import { alternates, langOf, tr } from '../i18n';
+
 interface Props {
   title: string;
   description: string;
@@ -9,12 +12,18 @@ interface Props {
   imageAlt?: string;
 }
 
+const lang = langOf(Astro.url);
+const t = tr(lang);
 const {
   title,
   description,
   image = '/images/og.jpg',
-  imageAlt = "L'ESP32 en 3D de l'accueil, avec le nom de Matthias Germain gravé sur le blindage",
+  imageAlt = t(
+    "L'ESP32 en 3D de l'accueil, avec le nom de Matthias Germain gravé sur le blindage",
+    'The 3D ESP32 from the home page, with the name Matthias Germain engraved on the shield',
+  ),
 } = Astro.props;
+const alt = alternates(Astro.url);
 // Adresse canonique sans barre finale, comme les liens du site (/projets, pas /projets/)
 const url = new URL(Astro.url.pathname.replace(/(.)\/$/, '$1'), Astro.site);
 const imageUrl = new URL(image, Astro.site);
@@ -25,10 +34,20 @@ const imageUrl = new URL(image, Astro.site);
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={url} />
+{
+  alt && (
+    <>
+      <link rel="alternate" hreflang="fr" href={new URL(alt.fr, Astro.site)} />
+      <link rel="alternate" hreflang="en" href={new URL(alt.en, Astro.site)} />
+      <link rel="alternate" hreflang="x-default" href={new URL(alt.fr, Astro.site)} />
+    </>
+  )
+}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <meta name="theme-color" content="#f4f0ec" />
 <meta property="og:type" content="website" />
-<meta property="og:locale" content="fr_FR" />
+<meta property="og:locale" content={t('fr_FR', 'en_GB')} />
+<meta property="og:locale:alternate" content={t('en_GB', 'fr_FR')} />
 <meta property="og:site_name" content="Matthias Germain" />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
