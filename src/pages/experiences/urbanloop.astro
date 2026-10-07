@@ -37,45 +37,165 @@ import StackChips from '../../components/StackChips.astro';
           Le stage, en binôme avec une autre stagiaire : reprendre les fonctions de l'ancienne version,
           améliorer la supervision et programmer la logique des aiguillages.
         </p>
+        <h3>Ce qui compose la maquette</h3>
+        <ul>
+          <li><b>Deux boucles</b> qui tournent en sens inverse, reliées par <b>deux aiguillages</b> (101 et 102), chacun piloté par un ESP32 et actionné par un moteur pas à pas.</li>
+          <li><b>Deux capsules</b>, avec des capteurs de distance pour garder leurs écarts et des LED arrière qui signalent une capsule détectée devant elles, ou leur direction à un aiguillage. Elles transmettent en continu leur identifiant et leur destination par infrarouge (IrDA).</li>
+          <li><b>Deux stations</b> (141 et 142), des points d'arrêt dont une LED RGB indique l'état : libre, capsule détectée, pleine.</li>
+          <li><b>Des radars</b>, autonomes et alimentés par piles, qui donnent aux capsules leur vitesse, leur direction et un identifiant.</li>
+        </ul>
         <figure class="case-figure">
           <div class="fig-wide"><ProjectVisual visual="urbanloop" /></div>
-          <svg class="fig-tall" viewBox="0 0 340 410" role="img" aria-label="Schéma de la maquette UrbanLoop : site Flask, serveur Hermes, Wi-Fi vers les capsules et les aiguillages, liaison IrDA entre eux">
+          <svg class="fig-tall" viewBox="0 0 252 440" role="img" aria-label="Circuit de la maquette UrbanLoop : deux boucles en sens inverse reliées par les aiguillages 101 et 102, deux stations, des capteurs infrarouges et deux capsules">
             <defs>
-              <marker id="arr-ul-arch2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <marker id="arr-urbanloop-v" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g transform="translate(252 0) rotate(90)">
+              <g class="s">
+              <path d="M98 28 Q120 18 142 28" marker-end="url(#arr-urbanloop-v)" />
+              <path d="M302 28 Q280 18 258 28" marker-end="url(#arr-urbanloop-v)" />
+              <path d="M164 84 L226 154" class="dash" />
+              </g>
+              <g fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round">
+              <ellipse cx="120" cy="132" rx="62" ry="92" />
+              <ellipse cx="280" cy="132" rx="62" ry="92" />
+              <path d="M168 73 C190 82 208 94 220 108" />
+              <path d="M222 164 C206 170 188 178 171 185" />
+              <path d="M66 86 Q92 132 66 178" />
+              <path d="M334 86 Q308 132 334 178" />
+              </g>
+              <g class="ink">
+              <path d="M112 58 l4 -7 l4 7 z" />
+              <path d="M140 100 l4 -7 l4 7 z" />
+              <path d="M90 116 l4 -7 l4 7 z" />
+              <path d="M90 156 l4 -7 l4 7 z" />
+              <path d="M106 206 l4 -7 l4 7 z" />
+              <path d="M276 58 l4 -7 l4 7 z" />
+              <path d="M238 152 l4 -7 l4 7 z" />
+              <path d="M304 116 l4 -7 l4 7 z" />
+              <path d="M304 156 l4 -7 l4 7 z" />
+              <path d="M290 206 l4 -7 l4 7 z" />
+              <rect x="112" y="220" width="16" height="8" rx="3" />
+              <rect x="272" y="36" width="16" height="8" rx="3" />
+              </g>
+              <circle cx="168" cy="73" r="7" class="sun" stroke="var(--ink)" stroke-width="2" />
+              <circle cx="222" cy="164" r="7" class="sun" stroke="var(--ink)" stroke-width="2" />
+            </g>
+            <text x="120" y="40" class="t" text-anchor="middle">STATION 141</text>
+            <text x="114" y="128" class="t" text-anchor="middle">BOUCLE 1</text>
+            <text x="200" y="182" class="t">101</text>
+            <text x="98" y="244" class="t">102</text>
+            <text x="114" y="276" class="t" text-anchor="middle">BOUCLE 2</text>
+            <text x="120" y="378" class="t" text-anchor="middle">STATION 142</text>
+            <path d="M8 414 l4 -7 l4 7 z" class="ink" />
+            <text x="20" y="414" class="t muted">CAPTEUR IRDA</text>
+            <path d="M128 410 H142" class="s dash" />
+            <text x="147" y="414" class="t muted">LIAISON SÉRIE</text>
+            <circle cx="12" cy="430" r="4.5" class="sun" stroke="var(--ink)" stroke-width="1.5" />
+            <text x="20" y="434" class="t muted">AIGUILLAGE</text>
+            <rect x="128" y="427" width="12" height="7" rx="2.5" class="ink" />
+            <text x="147" y="434" class="t muted">CAPSULE</text>
+          </svg>
+          <figcaption>Le circuit, d'après le schéma de mon rapport de stage : les capteurs infrarouges jalonnent les boucles, et les deux aiguillages se parlent par liaison série.</figcaption>
+        </figure>
+        <h3>Comment elle communique</h3>
+        <p>
+          Le site de supervision (Flask) et un générateur de messages, qui sert aux tests et à la
+          configuration, passent par le serveur Hermes, un serveur TCP en C#. Hermes relaie les ordres au
+          serveur ESP, et les serveurs échangent avec les ESP32 de la maquette en TCP, par Wi-Fi.
+        </p>
+        <figure class="case-figure">
+          <svg class="fig-wide" viewBox="0 0 720 262" role="img" aria-label="Réseau de la maquette : le site web et le générateur de messages passent par le serveur Hermes, puis le serveur ESP, qui joint en Wi-Fi les capsules, les aiguillages et les stations">
+            <defs>
+              <marker id="arr-ul-net" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0 0 L8 4 L0 8 Z" class="ink" />
               </marker>
             </defs>
             <g class="s">
-              <rect x="16" y="12" width="144" height="52" rx="6" class="paper" />
-              <path d="M160 38 H188" marker-end="url(#arr-ul-arch2)" />
-              <rect x="190" y="12" width="134" height="52" rx="6" class="paper dash" />
-              <path d="M257 64 V96 M88 96 H257" />
-              <path d="M88 96 V130" marker-end="url(#arr-ul-arch2)" />
-              <path d="M257 96 V287 H204" marker-end="url(#arr-ul-arch2)" />
-              <rect x="16" y="132" width="144" height="56" rx="6" class="paper" />
-              <path d="M88 190 V250" class="dash" marker-start="url(#arr-ul-arch2)" marker-end="url(#arr-ul-arch2)" />
-              <rect x="16" y="252" width="186" height="70" rx="6" class="sun" />
+              <rect x="10" y="30" width="160" height="56" rx="6" class="paper" />
+              <rect x="10" y="158" width="160" height="56" rx="6" class="paper dash" />
+              <path d="M170 58 H190 V112 H208" marker-end="url(#arr-ul-net)" />
+              <path d="M170 186 H190 V132 H208" marker-end="url(#arr-ul-net)" />
+              <rect x="210" y="94" width="130" height="56" rx="6" class="paper dash" />
+              <path d="M340 122 H378" marker-end="url(#arr-ul-net)" />
+              <rect x="380" y="94" width="130" height="56" rx="6" class="paper dash" />
+              <path d="M510 122 H535 M535 40 V204" />
+              <path d="M535 40 H558" marker-end="url(#arr-ul-net)" />
+              <path d="M535 122 H558" marker-end="url(#arr-ul-net)" />
+              <path d="M535 204 H558" marker-end="url(#arr-ul-net)" />
+              <rect x="560" y="14" width="150" height="52" rx="6" class="paper" />
+              <path d="M635 66 V94" class="dash" marker-start="url(#arr-ul-net)" marker-end="url(#arr-ul-net)" />
+              <rect x="560" y="96" width="150" height="52" rx="6" class="sun" />
+              <rect x="560" y="178" width="150" height="52" rx="6" class="paper" />
             </g>
-            <circle cx="257" cy="96" r="3" class="dot" />
-            <text x="88" y="35" class="t" text-anchor="middle">SITE FLASK</text>
-            <text x="88" y="51" class="t muted" text-anchor="middle">SUPERVISION</text>
-            <text x="257" y="35" class="t" text-anchor="middle">HERMES</text>
-            <text x="257" y="51" class="t muted" text-anchor="middle">SERVEUR TCP</text>
-            <text x="265" y="124" class="t muted">WI-FI</text>
-            <text x="88" y="157" class="t" text-anchor="middle">2 CAPSULES</text>
-            <text x="88" y="173" class="t muted" text-anchor="middle">ESP32</text>
-            <text x="98" y="224" class="t">IRDA</text>
-            <text x="109" y="278" class="t" text-anchor="middle">2 AIGUILLAGES</text>
-            <text x="109" y="294" class="t muted" text-anchor="middle">ESP32 · FREERTOS</text>
-            <text x="109" y="309" class="t muted" text-anchor="middle">MOTEUR PAS À PAS</text>
-            <text x="109" y="342" class="t muted" text-anchor="middle">SÉRIE ENTRE AIGUILLAGES</text>
-            <text x="16" y="384" class="t muted">EN JAUNE : CONÇU PENDANT LE STAGE</text>
-            <text x="16" y="398" class="t muted">POINTILLÉS : EXISTANT</text>
+            <text x="90" y="54" class="t" text-anchor="middle">SITE WEB</text>
+            <text x="90" y="70" class="t muted" text-anchor="middle">FLASK · SUPERVISION</text>
+            <text x="90" y="182" class="t" text-anchor="middle">GÉNÉRATEUR</text>
+            <text x="90" y="198" class="t muted" text-anchor="middle">DE MESSAGES · TESTS</text>
+            <text x="275" y="118" class="t" text-anchor="middle">HERMES</text>
+            <text x="275" y="134" class="t muted" text-anchor="middle">SERVEUR TCP · C#</text>
+            <text x="445" y="118" class="t" text-anchor="middle">SERVEUR ESP</text>
+            <text x="445" y="134" class="t muted" text-anchor="middle">GESTION DU WI-FI</text>
+            <text x="541" y="168" class="t muted">TCP SUR WI-FI</text>
+            <text x="635" y="37" class="t" text-anchor="middle">2 CAPSULES</text>
+            <text x="635" y="52" class="t muted" text-anchor="middle">ESP32 · CAPTEURS</text>
+            <text x="645" y="85" class="t muted">IRDA</text>
+            <text x="635" y="116" class="t" text-anchor="middle">2 AIGUILLAGES</text>
+            <text x="635" y="130" class="t muted" text-anchor="middle">ESP32 · FREERTOS</text>
+            <text x="635" y="143" class="t muted" text-anchor="middle">SÉRIE ENTRE EUX</text>
+            <text x="635" y="201" class="t" text-anchor="middle">2 STATIONS</text>
+            <text x="635" y="216" class="t muted" text-anchor="middle">LED D'ÉTAT</text>
+            <text x="710" y="250" class="t muted" text-anchor="end">RADARS : AUTONOMES, SUR PILES</text>
+            <text x="10" y="236" class="t muted">EN JAUNE : CONÇU PENDANT LE STAGE</text>
+            <text x="10" y="250" class="t muted">POINTILLÉS : EXISTANT, NON MODIFIÉ</text>
           </svg>
-          <figcaption>
-            Le site envoie ses commandes au serveur Hermes, qui les relaie en Wi-Fi aux ESP32. Capsules et
-            aiguillages échangent par infrarouge ; deux aiguillages face à face, par liaison série.
-          </figcaption>
+          <svg class="fig-tall" viewBox="0 0 340 556" role="img" aria-label="Réseau de la maquette : le site web et le générateur de messages passent par le serveur Hermes, puis le serveur ESP, qui joint en Wi-Fi les capsules, les aiguillages et les stations">
+            <defs>
+              <marker id="arr-ul-net2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="10" y="12" width="150" height="52" rx="6" class="paper" />
+              <rect x="180" y="12" width="150" height="52" rx="6" class="paper dash" />
+              <path d="M85 64 V80 H255 V64" />
+              <path d="M170 80 V94" marker-end="url(#arr-ul-net2)" />
+              <rect x="70" y="96" width="200" height="52" rx="6" class="paper dash" />
+              <path d="M170 148 V174" marker-end="url(#arr-ul-net2)" />
+              <rect x="70" y="176" width="200" height="52" rx="6" class="paper dash" />
+              <path d="M170 228 V250 H24 V456" />
+              <path d="M24 296 H38" marker-end="url(#arr-ul-net2)" />
+              <path d="M24 376 H38" marker-end="url(#arr-ul-net2)" />
+              <path d="M24 456 H38" marker-end="url(#arr-ul-net2)" />
+              <rect x="40" y="270" width="260" height="52" rx="6" class="paper" />
+              <path d="M170 322 V348" class="dash" marker-start="url(#arr-ul-net2)" marker-end="url(#arr-ul-net2)" />
+              <rect x="40" y="350" width="260" height="56" rx="6" class="sun" />
+              <rect x="40" y="430" width="260" height="52" rx="6" class="paper" />
+            </g>
+            <text x="85" y="35" class="t" text-anchor="middle">SITE WEB</text>
+            <text x="85" y="51" class="t muted" text-anchor="middle">FLASK</text>
+            <text x="255" y="35" class="t" text-anchor="middle">GÉNÉRATEUR</text>
+            <text x="255" y="51" class="t muted" text-anchor="middle">DE MESSAGES</text>
+            <text x="170" y="119" class="t" text-anchor="middle">HERMES</text>
+            <text x="170" y="135" class="t muted" text-anchor="middle">SERVEUR TCP · C#</text>
+            <text x="170" y="199" class="t" text-anchor="middle">SERVEUR ESP</text>
+            <text x="170" y="215" class="t muted" text-anchor="middle">GESTION DU WI-FI</text>
+            <text x="178" y="244" class="t muted">TCP SUR WI-FI</text>
+            <text x="170" y="293" class="t" text-anchor="middle">2 CAPSULES</text>
+            <text x="170" y="309" class="t muted" text-anchor="middle">ESP32 · CAPTEURS</text>
+            <text x="180" y="340" class="t muted">IRDA</text>
+            <text x="170" y="373" class="t" text-anchor="middle">2 AIGUILLAGES</text>
+            <text x="170" y="388" class="t muted" text-anchor="middle">ESP32 · FREERTOS</text>
+            <text x="170" y="401" class="t muted" text-anchor="middle">LIAISON SÉRIE ENTRE EUX</text>
+            <text x="170" y="453" class="t" text-anchor="middle">2 STATIONS</text>
+            <text x="170" y="469" class="t muted" text-anchor="middle">LED D'ÉTAT</text>
+            <text x="40" y="506" class="t muted">RADARS : AUTONOMES, SUR PILES</text>
+            <text x="10" y="532" class="t muted">EN JAUNE : CONÇU PENDANT LE STAGE</text>
+            <text x="10" y="546" class="t muted">POINTILLÉS : EXISTANT, NON MODIFIÉ</text>
+          </svg>
+          <figcaption>Hermes, le serveur ESP et le générateur de messages existaient avant le stage ; j'ai étendu le site et repensé la logique des aiguillages.</figcaption>
         </figure>
       </section>
 

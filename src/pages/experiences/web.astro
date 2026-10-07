@@ -1,0 +1,101 @@
+---
+/* Présentation détaillée de l'activité de développeur web freelance, et des sites associatifs.
+ * Faits tirés des dépôts des projets ; rien sur le code des clients au-delà de son architecture.
+ * Nommer un client et montrer son site suppose son accord. */
+import MaquettePage from '../../layouts/MaquettePage.astro';
+import StackChips from '../../components/StackChips.astro';
+import BrowserShot from '../../components/BrowserShot.astro';
+---
+
+<MaquettePage
+  current="experiences"
+  title="Freelance web"
+  subtitle="Développeur web freelance depuis janvier 2026 : des sites et des plateformes web pour des clients, de la conception à la mise en production."
+  description="Matthias Germain, développeur web freelance : le site et l'administration du studio de danse BAPZ, la plateforme suisse de devis ChuTTT, et des sites associatifs."
+>
+  <div class="wrap case">
+    <dl class="case-facts">
+      <div><dt>Cadre</dt><dd>Développeur web freelance, en parallèle de ma recherche de poste</dd></div>
+      <div><dt>Depuis</dt><dd>Janvier 2026</dd></div>
+      <div><dt>Lieu</dt><dd>Strasbourg, à distance</dd></div>
+      <div><dt>Rôle</dt><dd>Conception, développement et mise en production</dd></div>
+      <div><dt>Stack</dt><dd><StackChips items={['Next.js', 'TypeScript', 'React', 'Payload CMS', 'PostgreSQL', 'Tailwind CSS', 'Astro', 'Resend', 'Vercel', 'Docker']} /></dd></div>
+      <div><dt>Code</dt><dd>Celui des clients : pas de dépôt public</dd></div>
+    </dl>
+
+    <div class="case-body">
+      <section>
+        <h2><span class="pin-name">01</span> Ma façon de travailler</h2>
+        <p>
+          Je pars du besoin du client et je livre un site en production, qu'il peut ensuite faire vivre
+          seul. Concrètement :
+        </p>
+        <ul>
+          <li><b>Un espace d'administration en français</b> (Payload CMS) : le client modifie ses contenus sans passer par moi.</li>
+          <li><b>Un code découpé pour durer :</b> un seul module parle au CMS, un seul à l'envoi d'emails, et les migrations de la base sont versionnées.</li>
+          <li><b>Des formulaires protégés :</b> vérification anti-robot et envoi des messages par Resend.</li>
+          <li><b>Une mise en ligne simple à reproduire :</b> variables d'environnement documentées, contenu d'amorçage, déploiement continu.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">02</span> BAPZ Studio</h2>
+        <figure class="case-figure">
+          <BrowserShot src="/images/bapz.webp" url="bapz-web.vercel.app" alt="Page d'accueil du site de BAPZ Studio" id="bapz" />
+          <figcaption>En cours de réalisation.</figcaption>
+        </figure>
+        <p>
+          Un studio de danse à Metz (heels, hip-hop, commercial). Le site présente les cours, le
+          calendrier, les professeurs, les tarifs et la galerie, et reçoit les demandes de réservation. La
+          cliente gère elle-même ces contenus depuis l'administration.
+        </p>
+        <ul>
+          <li>Une seule application Next.js 16 et Payload 3 : le site public et son administration, en français.</li>
+          <li>Des contenus structurés : cours, professeurs, tarifs, salles, galerie, demandes et réglages du site.</li>
+          <li>Une base PostgreSQL (Neon), les images sur UploadThing, les emails par Resend et une vérification anti-robot Cloudflare Turnstile.</li>
+          <li>Un contenu d'amorçage et des migrations versionnées, pour remettre le site en état en une commande.</li>
+        </ul>
+        <p><a class="pill pill-outline pill-sm" href="https://bapz-web.vercel.app/">Voir le site ↗</a></p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">03</span> ChuTTT</h2>
+        <figure class="case-figure">
+          <BrowserShot src="/images/chuttt.webp" url="chuttt.ch" alt="Page d'accueil de la plateforme ChuTTT" id="chuttt" />
+        </figure>
+        <p>
+          Une plateforme suisse de comparaison de devis : un particulier décrit son projet et reçoit des
+          devis de professionnels vérifiés, avec un cashback et un programme de parrainage. J'y ai assuré
+          le développement front-end et l'intégration, au sein d'une petite équipe.
+        </p>
+        <ul>
+          <li>Un site en trois langues (français, allemand, anglais), avec next-intl.</li>
+          <li>Un parcours de demande de devis en plusieurs étapes, avec barre de progression : catégorie, budget, coordonnées, récapitulatif.</li>
+          <li>Les services, les catégories et les demandes (devis, inscriptions de professionnels) gérés dans Payload CMS.</li>
+          <li>Next.js, TypeScript et Tailwind CSS.</li>
+        </ul>
+        <p><a class="pill pill-outline pill-sm" href="https://chuttt.ch">Voir le site ↗</a></p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">04</span> Côté associatif</h2>
+        <ul>
+          <li>
+            <b>Fortin</b>, une association audiovisuelle (documentaires, mémoire entre les générations) dont je suis
+            vice-président : conception et développement de son site, en Astro et Tailwind CSS, avec un
+            formulaire de contact par Resend. <a href="https://www.fortin-projet.fr">fortin-projet.fr ↗</a>
+          </li>
+          <li>
+            <b>Spotlight</b>, une association dont je suis responsable web bénévole : développement et suivi
+            de son site. <a href="/projets">Voir la fiche dans les projets</a>
+          </li>
+          <li>
+            <b>narthex</b>, mon propre produit : une plateforme pour les églises, en test. <a href="/projets">Voir la fiche dans les projets</a>
+          </li>
+        </ul>
+      </section>
+
+      <p class="case-back"><a class="pill pill-outline pill-sm" href="/experiences">← Toutes les expériences</a></p>
+    </div>
+  </div>
+</MaquettePage>

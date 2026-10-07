@@ -4,7 +4,7 @@
 
 // Les trois maillons de la chaîne : l'objet, l'outillage, l'interface.
 export type Cat = 'embarque' | 'python' | 'web';
-export type Visual = 'routine' | 'risc' | 'irda' | 'schaeffler' | 'urbanloop' | 'spotify' | 'narthex' | 'spotweb';
+export type Visual = 'routine' | 'risc' | 'irda' | 'schaeffler' | 'urbanloop' | 'web' | 'spotify' | 'narthex' | 'spotweb';
 
 export interface Project {
   title: string;
@@ -81,6 +81,20 @@ export const projects: Project[] = [
     visualNote: 'Schéma à valider',
     repo: 'https://github.com/MatthiasGermain/RISC-V-Processor',
     site: { label: 'Simulateur', url: 'https://matthiasgermain.github.io/RISC-V-Processor/' },
+  },
+  // Activité de développeur web freelance
+  {
+    title: 'Freelance web',
+    cats: ['web'],
+    experience: 'En cours',
+    pitch:
+      "Développeur web freelance depuis janvier 2026 : des sites et des plateformes web pour des clients, de la conception à la mise en production. Parmi eux, une plateforme suisse de comparaison de devis et le site d'un studio de danse, avec son espace d'administration.",
+    role: 'Développeur web freelance',
+    context: 'Strasbourg, à distance, depuis janv. 2026',
+    stack: ['Next.js', 'TypeScript', 'Payload CMS', 'PostgreSQL', 'Tailwind CSS', 'Vercel'],
+    visual: 'web',
+    caseHref: '/experiences/web',
+    codeNote: 'Code des clients : pas de dépôt public',
   },
   // Ne jamais nommer le client constructeur, des personnes, des numéros internes ni la bibliothèque
   // interne d'accès à Windchill.
@@ -260,7 +274,7 @@ export const sections: Section[] = [
     side: 'top',
     target: { pin: 'SD2', row: 'back' },
     why: 'SD0 à SD3, le bus de la mémoire flash : ce que j’ai appris et gardé.',
-    meta: 'Expériences de Matthias Germain : stage de fin d’études chez Schaeffler, sur l’automatisation de la documentation logicielle, et stage temps réel sur la maquette UrbanLoop.',
+    meta: 'Expériences de Matthias Germain : développeur web freelance, stage de fin d’études chez Schaeffler sur l’automatisation de la documentation logicielle, stage sur la maquette UrbanLoop.',
   },
   {
     id: 'parcours',

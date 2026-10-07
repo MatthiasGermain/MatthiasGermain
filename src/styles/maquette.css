@@ -387,8 +387,8 @@ svg text { stroke: none; }
   .case-figure .fig-wide { display: none; }
   .case-figure .fig-tall { display: block; }
 }
-.case-body p a:not(.pill) { color: inherit; text-decoration-color: var(--sun); text-decoration-thickness: 2px; text-underline-offset: 3px; }
-.case-body p a:not(.pill):hover { background: rgba(252, 202, 70, 0.35); }
+.case-body p a:not(.pill), .case-body li a:not(.pill) { color: inherit; text-decoration-color: var(--sun); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.case-body p a:not(.pill):hover, .case-body li a:not(.pill):hover { background: rgba(252, 202, 70, 0.35); }
 .case-figure figcaption { margin-top: 10px; font-size: 13px; color: var(--ink-70); }
 .case-table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; }
 .case-table th, .case-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }

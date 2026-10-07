@@ -1,0 +1,31 @@
+---
+/* Capture d'un site dans un cadre de navigateur, au style des schémas (trait bleu nuit, papier). */
+interface Props {
+  /** Image 16:10, dans /public */
+  src: string;
+  /** Adresse affichée dans la barre */
+  url: string;
+  alt: string;
+  /** Identifiant unique du masque d'image dans la page */
+  id: string;
+}
+
+const { src, url, alt, id } = Astro.props;
+---
+
+<svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={alt}>
+  <defs>
+    <clipPath id={`clip-${id}`}><path d="M21 45 H379 V222 a9 9 0 0 1 -9 9 H30 a9 9 0 0 1 -9 -9 Z" /></clipPath>
+  </defs>
+  <rect x="20" y="18" width="360" height="214" rx="10" class="paper" />
+  <image href={src} x="21" y="45" width="358" height="186" preserveAspectRatio="xMidYMin slice" clip-path={`url(#clip-${id})`} />
+  <g class="s">
+    <rect x="20" y="18" width="360" height="214" rx="10" />
+    <line x1="20" y1="44" x2="380" y2="44" />
+    <rect x="130" y="25" width="180" height="12" rx="6" />
+  </g>
+  <circle cx="36" cy="31" r="3.5" class="dot" />
+  <circle cx="48" cy="31" r="3.5" class="dot" />
+  <circle cx="60" cy="31" r="3.5" class="dot" />
+  <text x="220" y="34" class="t url" text-anchor="middle">{url}</text>
+</svg>
