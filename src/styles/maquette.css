@@ -493,6 +493,18 @@ svg text { stroke: none; }
 .spec dd { font-size: 15px; font-weight: 500; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chips li { display: inline-flex; align-items: center; gap: 5px; border: 1.5px solid var(--ink); border-radius: 999px; padding: 1px 10px; font-size: 12px; font-weight: 600; }
+.browser { width: 90%; margin: 4% auto; border: 2px solid var(--ink); border-radius: 10px; background: var(--paper); overflow: hidden; }
+.browser-bar { display: flex; align-items: center; gap: 12px; height: 28px; padding: 0 10px; border-bottom: 2px solid var(--ink); }
+.browser-dots { display: flex; gap: 5px; }
+.browser-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+.browser-url {
+  flex: 0 1 50%; margin: 0 auto; transform: translateX(-24px); padding: 1px 10px; border: 2px solid var(--ink); border-radius: 999px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.02em; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* La page d'accueil défile dans le cadre ; arrivé en bas ou en haut, le défilement repasse à la page */
+.browser-view { aspect-ratio: 358 / 186; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--ink) transparent; }
+.browser-view:focus-visible { outline: 3px solid var(--sun); outline-offset: -3px; }
+.browser-view img { display: block; width: 100%; height: auto; }
 .chip-logo { flex: none; width: 12px; height: 12px; fill: currentColor; }
 .case-facts .chips { margin-top: 4px; }
 .proj-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }

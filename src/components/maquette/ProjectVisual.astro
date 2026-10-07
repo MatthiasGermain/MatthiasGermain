@@ -2,6 +2,7 @@
 // Visuel d'une fiche projet : schéma SVG (embarqué, outillage) ou capture dans un cadre de navigateur
 // (web). Le tableau de bord de narthex reste dessiné en attendant une capture avec des données de démo.
 import type { Visual } from '../../data/maquette';
+import ScrollShot from '../ScrollShot.astro';
 
 interface Props {
   visual: Visual;
@@ -98,41 +99,44 @@ const { visual } = Astro.props;
     </svg>
   )}
   {visual === 'irda' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Schéma IRDA : l'ESP32 radar envoie une consigne par infrarouge à l'ESP32 de la capsule, qui reçoit aussi GO, SLOW et STOP par liaison série">
+    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Chaîne du bureau d'études UrbanLoop : l'équipe détecte les obstacles et envoie GO, SLOW ou STOP par liaison série ; l'ESP32 radar envoie une consigne par infrarouge ; l'ESP32 de la capsule applique la vitesse">
       <defs>
         <marker id="arr-irda" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0 0 L8 4 L0 8 Z" class="ink" />
         </marker>
       </defs>
       <g class="s">
-        <rect x="10" y="96" width="100" height="60" rx="6" class="paper" />
-        <path d="M116 116 A12 12 0 0 1 116 136 M124 108 A22 22 0 0 1 124 144 M132 100 A32 32 0 0 1 132 152" />
-        <path d="M150 126 H236" class="dash" marker-end="url(#arr-irda)" />
-        <rect x="232" y="12" width="160" height="30" rx="4" class="paper dash" />
-        <path d="M312 42 V82" marker-end="url(#arr-irda)" />
-        <rect x="240" y="86" width="144" height="80" rx="6" class="paper" />
-        <path d="M268 166 V196 M312 166 V198 M362 166 V200" />
-        <rect x="248" y="196" width="40" height="26" rx="3" class="ink" />
-        <circle cx="312" cy="209" r="10" class="sun" />
-        <circle cx="362" cy="209" r="8" class="paper" />
+        <rect x="10" y="14" width="112" height="50" rx="6" class="paper dash" />
+        <path d="M122 39 H146" marker-end="url(#arr-irda)" />
+        <rect x="148" y="14" width="124" height="50" rx="6" class="paper dash" />
+        <path d="M210 64 V110" marker-end="url(#arr-irda)" />
+        <rect x="10" y="112" width="112" height="62" rx="6" class="sun" />
+        <path d="M122 143 H146" class="dash" marker-end="url(#arr-irda)" />
+        <rect x="148" y="112" width="124" height="62" rx="6" class="sun" />
+        <path d="M272 143 H286 M286 112 V198 M286 112 H298 M286 155 H298 M286 198 H298" />
+        <rect x="300" y="100" width="92" height="24" rx="5" class="paper" />
+        <rect x="300" y="143" width="92" height="24" rx="5" class="paper" />
+        <rect x="300" y="186" width="92" height="24" rx="5" class="paper" />
       </g>
-      <path d="M255 205 H281 M255 213 H273" stroke="var(--cream)" stroke-width="2" stroke-linecap="round" />
-      <text x="60" y="123" class="tb" text-anchor="middle">ESP32</text>
-      <text x="60" y="141" class="t" text-anchor="middle">RADAR</text>
-      <text x="60" y="176" class="t muted" text-anchor="middle">CONSIGNE 0-255</text>
-      <text x="60" y="189" class="t muted" text-anchor="middle">TOUTES LES 10 S</text>
-      <text x="192" y="114" class="t" text-anchor="middle">INFRAROUGE</text>
-      <text x="192" y="144" class="t muted" text-anchor="middle">9600 BAUDS</text>
-      <text x="312" y="31" class="t" text-anchor="middle">DÉTECTION D'OBSTACLES</text>
-      <text x="304" y="66" class="t" text-anchor="end">GO · SLOW · STOP</text>
-      <text x="320" y="66" class="t muted">SÉRIE</text>
-      <text x="312" y="111" class="tb" text-anchor="middle">ESP32</text>
-      <text x="312" y="127" class="t" text-anchor="middle">CAPSULE</text>
-      <text x="312" y="145" class="t muted" text-anchor="middle">TÂCHE FREERTOS</text>
-      <text x="312" y="157" class="t muted" text-anchor="middle">VITESSE / 100 MS</text>
-      <text x="268" y="238" class="t" text-anchor="middle">OLED</text>
-      <text x="312" y="238" class="t" text-anchor="middle">PWM</text>
-      <text x="364" y="238" class="t" text-anchor="middle">LED</text>
+      <text x="66" y="36" class="t" text-anchor="middle">CAPTEURS</text>
+      <text x="66" y="51" class="t muted" text-anchor="middle">LIDAR, CAMÉRAS</text>
+      <text x="210" y="36" class="t" text-anchor="middle">DÉTECTION</text>
+      <text x="210" y="51" class="t muted" text-anchor="middle">ROS2 · YOLO · VOTE</text>
+      <text x="202" y="84" class="t muted" text-anchor="end">SÉRIE</text>
+      <text x="202" y="97" class="t" text-anchor="end">GO · SLOW · STOP</text>
+      <text x="66" y="137" class="tb" text-anchor="middle">ESP32</text>
+      <text x="66" y="152" class="t" text-anchor="middle">RADAR</text>
+      <text x="66" y="165" class="t muted" text-anchor="middle">0-255 / 10 S</text>
+      <text x="134" y="134" class="t muted" text-anchor="middle">IR</text>
+      <text x="210" y="137" class="tb" text-anchor="middle">ESP32</text>
+      <text x="210" y="152" class="t" text-anchor="middle">CAPSULE</text>
+      <text x="210" y="165" class="t muted" text-anchor="middle">FREERTOS</text>
+      <text x="346" y="116" class="t" text-anchor="middle">BANC 0-5 V</text>
+      <text x="346" y="159" class="t" text-anchor="middle">LED VITESSE</text>
+      <text x="346" y="202" class="t" text-anchor="middle">ÉCRAN OLED</text>
+      <text x="10" y="200" class="t muted">SÉRIE PRIORITAIRE SUR L'INFRAROUGE</text>
+      <text x="10" y="226" class="t muted">EN JAUNE : MA PARTIE</text>
+      <text x="10" y="240" class="t muted">POINTILLÉS : LE RESTE DE L'ÉQUIPE</text>
     </svg>
   )}
   {visual === 'schaeffler' && (
@@ -329,20 +333,5 @@ const { visual } = Astro.props;
     </svg>
   )}
   {visual === 'spotweb' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label="Capture de la page d'accueil de spotlightcrea.fr">
-      <defs>
-        <clipPath id="clip-spotweb"><path d="M21 45 H379 V222 a9 9 0 0 1 -9 9 H30 a9 9 0 0 1 -9 -9 Z" /></clipPath>
-      </defs>
-      <rect x="20" y="18" width="360" height="214" rx="10" class="paper" />
-      <image href="/images/spotlightcrea.webp" x="21" y="45" width="358" height="186" preserveAspectRatio="xMidYMin slice" clip-path="url(#clip-spotweb)" />
-      <g class="s">
-        <rect x="20" y="18" width="360" height="214" rx="10" />
-        <line x1="20" y1="44" x2="380" y2="44" />
-        <rect x="130" y="25" width="180" height="12" rx="6" />
-      </g>
-      <circle cx="36" cy="31" r="3.5" class="dot" />
-      <circle cx="48" cy="31" r="3.5" class="dot" />
-      <circle cx="60" cy="31" r="3.5" class="dot" />
-      <text x="220" y="34" class="t url" text-anchor="middle">spotlightcrea.fr</text>
-    </svg>
+    <ScrollShot src="/images/spotlightcrea-full.webp" url="spotlightcrea.fr" alt="Page d'accueil de spotlightcrea.fr" width={800} height={3179} />
   )}

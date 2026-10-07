@@ -60,12 +60,11 @@ export const projects: Project[] = [
     cv: 'Consigne de vitesse envoyée par infrarouge entre deux ESP32, appliquée progressivement sous FreeRTOS.',
     cats: ['embarque'],
     pitch:
-      "Firmware ESP32 qui transmet une consigne de vitesse par infrarouge et la fait appliquer progressivement par une capsule UrbanLoop.",
+      "Pilotage d'une capsule UrbanLoop : un ESP32 « radar » transmet une consigne de vitesse par infrarouge, et l'ESP32 de la capsule l'applique progressivement, sauf ordre GO, SLOW ou STOP de la détection d'obstacles, prioritaire.",
     role: 'Développement des deux ESP32 et de leur communication',
-    context: "Bureau d'études UrbanLoop, équipe de 4",
+    context: "Bureau d'études UrbanLoop, TÉLÉCOM Nancy, équipe de 4 : l'équipe détecte les obstacles (LiDAR, caméras, YOLO), mes ESP32 pilotent la capsule",
     stack: ['ESP32', 'C++', 'FreeRTOS', 'IrDA / UART', 'PlatformIO'],
     visual: 'irda',
-    visualNote: 'Schéma à valider',
     repo: 'https://github.com/MatthiasGermain/IRDA_FOR_BELOOP',
   },
   {
@@ -133,7 +132,6 @@ export const projects: Project[] = [
     context: 'Lancé par GitHub Actions sur un runner auto-hébergé',
     stack: ['Python', 'Spotipy', 'GitHub Actions'],
     visual: 'spotify',
-    visualNote: 'Schéma à valider',
     repo: 'https://github.com/MatthiasGermain/spotify_report',
   },
   {
@@ -160,6 +158,7 @@ export const projects: Project[] = [
     context: 'Bénévolat, travail en équipe par pull requests',
     stack: ['Next.js', 'React', 'Tailwind CSS', 'Resend', 'Vercel'],
     visual: 'spotweb',
+    visualNote: 'Faites défiler la page',
     repo: 'https://github.com/MatthiasGermain/spotweb',
     site: { label: 'Site', url: 'https://spotlightcrea.fr' },
   },
