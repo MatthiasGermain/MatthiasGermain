@@ -363,17 +363,18 @@ svg text { stroke: none; }
 .case-body h3 { margin-top: 26px !important; font-size: 17px; font-weight: 700; }
 .case-body p, .case-body li { max-width: 44em; font-size: 16px; line-height: 1.7; }
 .case-body ul, .case-body ol, .legal ul { display: grid; gap: 8px; }
-/* Puces : une pastille de broche jaune ; listes numérotées : une étiquette comme les noms de broches */
-.case-body ul > li, .legal ul > li { position: relative; padding-left: 22px; }
+/* Puces : un trait de surligneur jaune, comme sous l'accroche ; listes numérotées : une étiquette
+   comme les noms de broches */
+.case-body ul > li, .legal ul > li { position: relative; padding-left: 24px; }
 .case-body ul > li::before, .legal ul > li::before {
-  content: ''; position: absolute; left: 2px; top: 0.62em; width: 8px; height: 8px;
-  border: 1.5px solid var(--ink); border-radius: 1.5px; background: var(--sun);
+  content: ''; position: absolute; left: 0; top: calc(0.82em - 2px); width: 13px; height: 4px;
+  background: var(--sun);
 }
 .case-body ol { counter-reset: step; }
 .case-body ol > li { counter-increment: step; position: relative; padding-left: 34px; }
 .case-body ol > li::before {
   content: counter(step); position: absolute; left: 0; top: 0.42em; min-width: 22px; text-align: center;
-  border-radius: 2px; background: var(--ink); color: var(--cream); font-size: 11px; font-weight: 700; line-height: 1.6;
+  background: var(--ink); color: var(--cream); font-size: 11px; font-weight: 700; line-height: 1.6;
 }
 .case-body b { font-weight: 700; }
 .case-figure {
@@ -606,6 +607,12 @@ svg text { stroke: none; }
 .form-privacy a { color: inherit; text-decoration-color: var(--sun); text-underline-offset: 2px; }
 .contact-or { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(244, 240, 236, 0.75); }
 .contact-direct .mail { margin-top: 12px; font-size: clamp(20px, 2.2vw, 30px); }
+.contact-direct .tel {
+  display: block; width: fit-content; margin-top: 14px; color: var(--cream);
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(18px, 1.8vw, 24px); letter-spacing: 0.02em;
+  text-decoration: none; border-bottom: 2px solid rgba(244, 240, 236, 0.35);
+}
+.contact-direct .tel:hover { color: var(--sun); border-bottom-color: var(--sun); }
 .signature { width: clamp(200px, 30vw, 380px); margin: 24px 0 0 auto; color: var(--cream); }
 .signature svg { display: block; width: 100%; height: auto; }
 .foot {

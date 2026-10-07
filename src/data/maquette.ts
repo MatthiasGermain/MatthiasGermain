@@ -77,7 +77,6 @@ export const projects: Project[] = [
     context: 'TP, TÉLÉCOM Nancy',
     stack: ['VHDL', 'Quartus', 'Questa', 'Python', 'JavaScript'],
     visual: 'risc',
-    visualNote: 'Schéma à valider',
     repo: 'https://github.com/MatthiasGermain/RISC-V-Processor',
     site: { label: 'Simulateur', url: 'https://matthiasgermain.github.io/RISC-V-Processor/' },
   },
@@ -145,7 +144,6 @@ export const projects: Project[] = [
     context: 'En test avec une église',
     stack: ['Next.js', 'Payload CMS', 'PostgreSQL', 'Docker', 'GitHub Actions'],
     visual: 'narthex',
-    visualNote: 'Capture à venir',
     repo: 'https://github.com/MatthiasGermain/narthex',
   },
   {
@@ -206,13 +204,6 @@ export const steps: Step[] = [
     title: "Ingénieur logiciel, automatisation (stage de fin d'études)",
     where: 'Schaeffler, Bühl (Allemagne)',
     line: "Automatisation de la chaîne qui génère la documentation technique des calculateurs de la transmission hybride DHT : rapports d'erreurs par équipe, configuration des livraisons vérifiée et générée (Python, Jenkins, Windchill, Confluence).",
-  },
-  {
-    when: 'Nov. 2024 - fév. 2025',
-    title: "Bureau d'études UrbanLoop",
-    cv: false,
-    where: 'TÉLÉCOM Nancy',
-    line: "Pilotage en vitesse d'une capsule : deux ESP32 reliés par infrarouge.",
   },
   {
     when: 'Juin - juil. 2024',
@@ -327,7 +318,9 @@ export const skills: { area: string; items: string[] }[] = [
 
 export const links = {
   email: 'matthias.germain.pro@gmail.com',
-  linkedin: 'https://www.linkedin.com/in/matthias-germain-98b3ba2a4/',
+  // Affiché sur la page Contact (choix de Matthias, 2026-10-07)
+  phone: { display: '06 02 32 17 20', tel: '+33602321720' },
+  linkedin: 'https://www.linkedin.com/in/matthias-germain/',
   github: 'https://github.com/MatthiasGermain',
   site: 'https://matthias-germain.vercel.app',
 };

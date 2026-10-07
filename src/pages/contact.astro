@@ -1,6 +1,7 @@
 ---
 import MaquettePage from '../layouts/MaquettePage.astro';
 import Signature from '../components/Signature.astro';
+import { links } from '../data/maquette';
 ---
 
 <MaquettePage current="contact">
@@ -57,10 +58,11 @@ import Signature from '../components/Signature.astro';
 
         <div class="contact-direct">
           <p class="contact-or">Ou directement</p>
-          <a class="mail" href="mailto:matthias.germain.pro@gmail.com">matthias.germain.pro@gmail.com</a>
+          <a class="mail" href={`mailto:${links.email}`}>{links.email}</a>
+          <a class="tel" href={`tel:${links.phone.tel}`}>{links.phone.display}</a>
           <div class="contact-links">
-            <a class="pill pill-light" href="https://www.linkedin.com/in/matthias-germain-98b3ba2a4/">LinkedIn ↗</a>
-            <a class="pill pill-light" href="https://github.com/MatthiasGermain">GitHub ↗</a>
+            <a class="pill pill-light" href={links.linkedin}>LinkedIn ↗</a>
+            <a class="pill pill-light" href={links.github}>GitHub ↗</a>
             <a class="pill pill-sun" href="/cv" data-flash>CV ↗</a>
           </div>
         </div>

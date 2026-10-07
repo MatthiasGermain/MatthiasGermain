@@ -1,13 +1,10 @@
 ---
 /* CV (mode recruteur, atteint par BOOT) : une page A4, générée à partir des mêmes données que le
- * site. « Télécharger en PDF » passe par l'impression du navigateur.
- * Téléphone : seulement dans le CV envoyé. Il vient de CV_PHONE dans le `.env` local, qui n'est
- * jamais renseigné sur Vercel : la version en ligne n'affiche pas le numéro. */
+ * site. « Télécharger en PDF » passe par l'impression du navigateur. */
 import '../styles/maquette.css';
 import SeoHead from '../components/SeoHead.astro';
 import { PROFILE, links, projects, skills, steps } from '../data/maquette';
 
-const phone = import.meta.env.CV_PHONE as string | undefined;
 const experience = steps.filter((s) => !s.formation && s.cv !== false);
 const education = steps.filter((s) => s.formation);
 // Les stages présentés dans Expériences figurent déjà dans les expériences du CV
@@ -36,14 +33,6 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
           <h1 class="cv-name display"><span class="light">Matthias</span> <span class="strong">GERMAIN</span></h1>
           <p class="cv-role">Ingénieur logiciel <span class="hl">embarqué &amp; IoT</span></p>
           <p class="cv-chain">Du firmware à l'interface web</p>
-          <ul class="cv-contact">
-            <li>Strasbourg</li>
-            <li><a href={`mailto:${links.email}`}>{links.email}</a></li>
-            {phone && <li><a href={`tel:${phone.replace(/\s/g, '')}`}>{phone}</a></li>}
-            <li><a href={links.linkedin}>{short(links.linkedin)}</a></li>
-            <li><a href={links.github}>{short(links.github)}</a></li>
-            <li><a href={links.site}>{short(links.site)}</a></li>
-          </ul>
         </div>
       </header>
 
@@ -94,6 +83,18 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
         </div>
 
         <aside class="cv-side">
+          <section>
+            <h2>Contact</h2>
+            <dl class="cv-contact">
+              <div><dt>Téléphone</dt><dd><a href={`tel:${links.phone.tel}`}>{links.phone.display}</a></dd></div>
+              <div><dt>Email</dt><dd><a href={`mailto:${links.email}`}>{links.email}</a></dd></div>
+              <div><dt>LinkedIn</dt><dd><a href={links.linkedin}>{short(links.linkedin)}</a></dd></div>
+              <div><dt>GitHub</dt><dd><a href={links.github}>{short(links.github)}</a></dd></div>
+              <div><dt>Portfolio</dt><dd><a href={links.site}>{short(links.site)}</a></dd></div>
+              <div><dt>Basé à</dt><dd>Strasbourg</dd></div>
+            </dl>
+          </section>
+
           <section>
             <h2>Compétences</h2>
             {
@@ -152,11 +153,16 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
 
       /* Feuille A4 : 210 × 297 mm à l'écran comme à l'impression */
       .cv-sheet {
-        width: min(210mm, 100%); min-height: 297mm; margin: 0 auto 48px; padding: 11mm 13mm;
-        background: #fff; box-shadow: 0 10px 40px rgba(30, 41, 82, 0.12);
+        position: relative;
+        width: min(210mm, 100%); min-height: 297mm; margin: 0 auto 48px; padding: 11mm 17mm 11mm 13mm;
+        background: var(--paper); box-shadow: 0 10px 40px rgba(30, 41, 82, 0.12);
         font-size: 8.9pt; line-height: 1.4; color: var(--ink);
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
+      /* Rappel de la charte du site : une bande jaune et une bande violette sur le bord droit */
+      .cv-sheet::before, .cv-sheet::after { content: ''; position: absolute; top: 0; bottom: 0; }
+      .cv-sheet::before { right: 2.5mm; width: 4.5mm; background: var(--sun); }
+      .cv-sheet::after { right: 0; width: 2.5mm; background: var(--violet); }
       .cv-head { display: flex; align-items: center; gap: 6mm; padding-bottom: 4.5mm; border-bottom: 2px solid var(--ink); }
       .cv-photo {
         flex: none; width: 25mm; height: 31mm; object-fit: cover;
@@ -165,17 +171,20 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
       .cv-name { font-size: 24pt; }
       .cv-role { margin-top: 1.5mm; font-family: var(--font-display); font-weight: 800; font-size: 12.5pt; }
       .cv-chain { margin-top: 1mm; color: var(--ink-70); font-weight: 500; }
-      .cv-contact { display: flex; flex-wrap: wrap; gap: 0.8mm 4mm; margin-top: 2.5mm; padding: 0; list-style: none; font-size: 8.6pt; font-weight: 600; }
-      .cv-contact a { color: inherit; text-decoration: none; border-bottom: 1.5px solid var(--sun); }
+      .cv-contact { display: grid; gap: 1.6mm; }
+      .cv-contact dt { font-size: 7pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-70); }
+      .cv-contact dd { font-size: 8pt; font-weight: 600; }
+      .cv-contact a { color: inherit; text-decoration: none; border-bottom: 1.5px solid var(--sun); white-space: nowrap; }
 
-      .cv-cols { display: grid; grid-template-columns: minmax(0, 2.15fr) minmax(0, 1fr); gap: 6mm; margin-top: 5mm; }
+      .cv-cols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 6mm; margin-top: 5mm; }
       .cv-main, .cv-side { display: grid; align-content: start; gap: 4.2mm; }
+      /* Titres soulignés au surligneur jaune, comme l'accroche du site */
       .cv-sheet h2 {
-        display: flex; align-items: center; gap: 2.5mm; margin-bottom: 2mm;
+        width: fit-content; margin-bottom: 2mm; padding: 0 1mm;
         font-family: var(--font-display); font-weight: 900; font-size: 11pt; letter-spacing: 0.06em; text-transform: uppercase;
+        background: linear-gradient(transparent 55%, var(--sun) 55%, var(--sun) 92%, transparent 92%);
       }
       /* Pastille de broche devant chaque titre, comme sur le site */
-      .cv-sheet h2::before { content: ''; width: 2.6mm; height: 2.6mm; border: 1.5px solid var(--ink); border-radius: 0.6mm; background: var(--sun); }
       .cv-sheet h3 { font-weight: 700; font-size: 9.8pt; }
       .cv-list { display: grid; gap: 2mm; padding: 0; list-style: none; }
       .cv-row { display: flex; justify-content: space-between; align-items: baseline; gap: 3mm; }
@@ -192,9 +201,9 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
       .cv-avail .chip-led { flex: none; animation: none; }
       .todo { margin-top: 2mm; padding: 1.5mm 2.5mm; border: 1.5px dashed var(--ink); border-radius: 1.5mm; background: rgba(252, 202, 70, 0.45); font-weight: 600; font-size: 8.4pt; }
 
-      /* Écran étroit : la feuille devient une page fluide */
-      @media (max-width: 760px) {
-        .cv-sheet { min-height: 0; padding: 22px 18px; box-shadow: none; }
+      /* Écran étroit : la feuille devient une page fluide (jamais à l'impression, qui garde l'A4) */
+      @media screen and (max-width: 760px) {
+        .cv-sheet { min-height: 0; padding: 22px calc(18px + 7mm) 22px 18px; box-shadow: none; }
         .cv-head { flex-direction: column; align-items: flex-start; }
         .cv-cols { grid-template-columns: 1fr; }
         .cv-side { padding-left: 0; border-left: 0; }

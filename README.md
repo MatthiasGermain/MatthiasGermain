@@ -10,7 +10,7 @@ Six mois chez Schaeffler (Allemagne) sur un outil Python d'automatisation intég
 
 En recherche d'un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg ou Nancy.
 
-[LinkedIn](https://www.linkedin.com/in/matthias-germain-98b3ba2a4/)
+[LinkedIn](https://www.linkedin.com/in/matthias-germain/)
 
 ### Stack
 
@@ -52,7 +52,7 @@ Six months at Schaeffler (Germany) on a Python automation tool integrated with J
 
 Looking for a software engineering role, embedded or web, in Strasbourg or Nancy.
 
-[LinkedIn](https://www.linkedin.com/in/matthias-germain-98b3ba2a4/)
+[LinkedIn](https://www.linkedin.com/in/matthias-germain/)
 
 ### Stack
 
