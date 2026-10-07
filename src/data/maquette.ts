@@ -4,7 +4,7 @@
 
 // Les trois maillons de la chaîne : l'objet, l'outillage, l'interface.
 export type Cat = 'embarque' | 'python' | 'web';
-export type Visual = 'routine' | 'risc' | 'irda' | 'schaeffler' | 'urbanloop' | 'web' | 'spotify' | 'narthex' | 'spotweb';
+export type Visual = 'routine' | 'risc' | 'irda' | 'freertos' | 'schaeffler' | 'urbanloop' | 'web' | 'spotify' | 'narthex' | 'spotweb';
 
 export interface Project {
   title: string;
@@ -13,8 +13,8 @@ export interface Project {
   experience?: string;
   status?: string;
   pitch: string;
-  /** Version courte du pitch, pour le CV (une ligne) */
-  cv?: string;
+  /** Version courte du pitch, pour le CV (une ligne) ; false : absent du CV */
+  cv?: string | false;
   role: string;
   context: string;
   stack: string[];
@@ -103,7 +103,7 @@ export const projects: Project[] = [
     pitch:
       "Automatiser la chaîne qui génère la documentation technique des calculateurs de la transmission hybride DHT : des rapports d'erreurs exploitables par chaque équipe, et une configuration des livraisons vérifiée puis générée automatiquement.",
     role: "Ingénieur logiciel, automatisation (stage de fin d'études), équipe Tools/Script Developers",
-    context: 'Bühl (Allemagne), mars - sept. 2025, en anglais. Code interne, non publié',
+    context: 'Bühl (Allemagne), avr. - sept. 2025, en anglais. Code interne, non publié',
     stack: ['Python', 'Jenkins', 'Windchill', 'Confluence (API REST)', 'ETAS eHandbook'],
     visual: 'schaeffler',
     caseHref: '/experiences/schaeffler',
@@ -120,6 +120,18 @@ export const projects: Project[] = [
     visual: 'urbanloop',
     caseHref: '/experiences/urbanloop',
     codeNote: "Code sur le GitLab interne de l'école : pas de dépôt public",
+  },
+  {
+    title: 'Mesures sous FreeRTOS',
+    cv: "Mesure du CO₂, de la température et de l'humidité sur deux ESP32, déclenchée par ultrasons, tâches FreeRTOS en producteur / consommateur.",
+    cats: ['embarque'],
+    pitch:
+      "Mesure du CO₂, de la température et de l'humidité, déclenchée par un capteur à ultrasons, sur deux ESP32 reliés par liaison série. Les tâches FreeRTOS concurrentes suivent un modèle producteur / consommateur.",
+    role: 'Conception et développement',
+    context: 'Projet scolaire',
+    stack: ['ESP32', 'C / C++', 'FreeRTOS', 'UART'],
+    visual: 'freertos',
+    codeNote: "Projet scolaire : le dépôt n'est plus disponible",
   },
   {
     title: 'spotify_report',
@@ -148,7 +160,8 @@ export const projects: Project[] = [
   },
   {
     title: 'spotlightcrea.fr',
-    cv: "Site de l'association Spotlight : vitrine, contact et newsletter en double opt-in.",
+    // Sur le CV, déjà couvert par l'expérience « Responsable web bénévole »
+    cv: false,
     cats: ['web'],
     pitch:
       "Site de l'association Spotlight : site vitrine, formulaire de contact et newsletter en double opt-in.",
@@ -190,7 +203,7 @@ export const steps: Step[] = [
     when: 'Depuis janv. 2026',
     title: 'Développeur web freelance',
     where: 'Strasbourg',
-    line: "Sites et plateformes web pour des clients, de l'architecture à la mise en production.",
+    line: "chuttt.ch, plateforme multilingue (FR, DE, EN) de mise en relation entre particuliers et artisans, développée seul : authentification, front-end, back-office Payload CMS, Supabase, Vercel. En cours : le site d'un studio de danse.",
     current: true,
   },
   {
@@ -200,7 +213,7 @@ export const steps: Step[] = [
     line: 'Développement et suivi de spotlightcrea.fr.',
   },
   {
-    when: 'Mars - sept. 2025',
+    when: 'Avr. - sept. 2025',
     title: "Ingénieur logiciel, automatisation (stage de fin d'études)",
     where: 'Schaeffler, Bühl (Allemagne)',
     line: "Automatisation de la chaîne qui génère la documentation technique des calculateurs de la transmission hybride DHT : rapports d'erreurs par équipe, configuration des livraisons vérifiée et générée (Python, Jenkins, Windchill, Confluence).",
@@ -212,11 +225,18 @@ export const steps: Step[] = [
     line: "En binôme : logique d'aiguillage sur ESP32 (FreeRTOS) et supervision en temps réel ajoutée au site Flask de la maquette.",
   },
   {
-    when: '2025',
+    when: '2022 - 2025',
     title: "Diplôme d'ingénieur",
     formation: true,
     where: 'TÉLÉCOM Nancy',
     line: 'Filière systèmes et logiciels embarqués.',
+  },
+  {
+    when: '2020 - 2022',
+    title: 'Classe préparatoire (PC)',
+    formation: true,
+    where: 'Lycée Victor Hugo, Besançon',
+    line: 'Filière physique et chimie.',
   },
 ];
 
@@ -307,13 +327,13 @@ export const DESCRIPTION =
 
 /* CV (page /cv et sa version PDF). Les compétences reprennent le tableau du README GitHub. */
 export const PROFILE =
-  "Ingénieur diplômé de TÉLÉCOM Nancy, filière systèmes et logiciels embarqués. Je travaille sur toute la chaîne d'un système connecté : le firmware, l'outillage Python qui l'entoure et l'interface web. Je cherche un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg ou à Nancy.";
+  "Ingénieur diplômé de TÉLÉCOM Nancy, filière systèmes et logiciels embarqués. Je travaille sur toute la chaîne d'un système connecté : le firmware, l'outillage Python qui l'entoure et l'interface web. Je cherche un CDI d'ingénieur logiciel, embarqué ou web, à Strasbourg ou à Nancy, et je suis disponible immédiatement.";
 
 export const skills: { area: string; items: string[] }[] = [
-  { area: 'Embarqué', items: ['C / C++', 'ESP32', 'Arduino', 'PlatformIO', 'FreeRTOS', 'VHDL (Quartus)', 'RISC-V'] },
+  { area: 'Embarqué', items: ['C / C++', 'ESP32', 'Arduino', 'PlatformIO', 'FreeRTOS', 'VHDL (Quartus)', 'FPGA', 'RISC-V'] },
   { area: 'Outillage Python', items: ['Python', 'Flask', 'Jinja2', 'API REST'] },
   { area: 'Web', items: ['TypeScript', 'React', 'Next.js', 'Astro', 'Tailwind CSS', 'Payload CMS', 'Supabase'] },
-  { area: 'Outils', items: ['Git', 'GitHub Actions', 'Jenkins', 'Docker', 'Vercel', 'DigitalOcean', 'Linux'] },
+  { area: 'Outils', items: ['Git', 'GitHub Actions', 'GitLab', 'Jenkins', 'Docker', 'Vercel', 'DigitalOcean', 'Linux', 'Claude Code'] },
 ];
 
 export const links = {
@@ -324,3 +344,10 @@ export const links = {
   github: 'https://github.com/MatthiasGermain',
   site: 'https://matthias-germain.vercel.app',
 };
+
+/** Rubrique « Autres » du CV */
+export const cvExtras = [
+  "Fortin : vice-président d'une association de mémoire entre les générations, dont j'ai développé le site.",
+  'MOOC Gestion de projet, Centrale Lille.',
+  'Permis B.',
+];

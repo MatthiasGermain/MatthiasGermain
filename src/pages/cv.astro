@@ -3,12 +3,12 @@
  * site. « Télécharger en PDF » passe par l'impression du navigateur. */
 import '../styles/maquette.css';
 import SeoHead from '../components/SeoHead.astro';
-import { PROFILE, links, projects, skills, steps } from '../data/maquette';
+import { PROFILE, cvExtras, links, projects, skills, steps } from '../data/maquette';
 
 const experience = steps.filter((s) => !s.formation && s.cv !== false);
 const education = steps.filter((s) => s.formation);
 // Les stages présentés dans Expériences figurent déjà dans les expériences du CV
-const cvProjects = projects.filter((p) => !p.experience);
+const cvProjects = projects.filter((p) => !p.experience && p.cv !== false);
 const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 ---
 
@@ -34,6 +34,14 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
           <p class="cv-role">Ingénieur logiciel <span class="hl">embarqué &amp; IoT</span></p>
           <p class="cv-chain">Du firmware à l'interface web</p>
         </div>
+        <dl class="cv-contact">
+          <div><dt>Tél.</dt><dd><a href={`tel:${links.phone.tel}`}>{links.phone.display}</a></dd></div>
+          <div><dt>Email</dt><dd><a href={`mailto:${links.email}`}>{links.email}</a></dd></div>
+          <div><dt>LinkedIn</dt><dd><a href={links.linkedin}>{short(links.linkedin)}</a></dd></div>
+          <div><dt>GitHub</dt><dd><a href={links.github}>{short(links.github)}</a></dd></div>
+          <div><dt>Site</dt><dd><a href={links.site}>{short(links.site)}</a></dd></div>
+          <div><dt>Basé à</dt><dd>Strasbourg</dd></div>
+        </dl>
       </header>
 
       <div class="cv-cols">
@@ -73,7 +81,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
                       {p.status && <span class="cv-status">{p.status}</span>}
                     </h3>
                     <p>
-                      {p.cv ?? p.pitch} <span class="cv-stack">({p.stack.join(', ')})</span>
+                      {p.cv || p.pitch} <span class="cv-stack">({p.stack.join(', ')})</span>
                     </p>
                   </li>
                 ))
@@ -83,18 +91,6 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
         </div>
 
         <aside class="cv-side">
-          <section>
-            <h2>Contact</h2>
-            <dl class="cv-contact">
-              <div><dt>Téléphone</dt><dd><a href={`tel:${links.phone.tel}`}>{links.phone.display}</a></dd></div>
-              <div><dt>Email</dt><dd><a href={`mailto:${links.email}`}>{links.email}</a></dd></div>
-              <div><dt>LinkedIn</dt><dd><a href={links.linkedin}>{short(links.linkedin)}</a></dd></div>
-              <div><dt>GitHub</dt><dd><a href={links.github}>{short(links.github)}</a></dd></div>
-              <div><dt>Portfolio</dt><dd><a href={links.site}>{short(links.site)}</a></dd></div>
-              <div><dt>Basé à</dt><dd>Strasbourg</dd></div>
-            </dl>
-          </section>
-
           <section>
             <h2>Compétences</h2>
             {
@@ -125,15 +121,18 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
 
           <section>
             <h2>Langues</h2>
-            <div class="cv-skill">
-              <h3>Anglais</h3>
-              <p>B2 (TOEIC), langue de travail de mon stage chez Schaeffler.</p>
-            </div>
+            <p><b>Français :</b> langue maternelle.</p>
+            <p class="cv-lang"><b>Anglais :</b> B2 (TOEIC), langue de travail de mon stage chez Schaeffler.</p>
           </section>
 
           <section>
             <h2>Disponibilité</h2>
-            <p class="cv-avail"><span class="chip-led" aria-hidden="true"></span> Poste embarqué ou web, à Strasbourg ou à Nancy.</p>
+            <p class="cv-avail"><span class="chip-led" aria-hidden="true"></span> Immédiatement, en CDI : poste embarqué ou web, à Strasbourg ou à Nancy.</p>
+          </section>
+
+          <section>
+            <h2>Autres</h2>
+            <ul class="cv-extras">{cvExtras.map((e) => <li>{e}</li>)}</ul>
           </section>
         </aside>
       </div>
@@ -154,7 +153,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
       /* Feuille A4 : 210 × 297 mm à l'écran comme à l'impression */
       .cv-sheet {
         position: relative;
-        width: min(210mm, 100%); min-height: 297mm; margin: 0 auto 48px; padding: 11mm 17mm 11mm 13mm;
+        width: min(210mm, 100%); min-height: 297mm; margin: 0 auto 48px; padding: 10mm 17mm 10mm 13mm;
         background: var(--paper); box-shadow: 0 10px 40px rgba(30, 41, 82, 0.12);
         font-size: 8.9pt; line-height: 1.4; color: var(--ink);
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
@@ -163,30 +162,34 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
       .cv-sheet::before, .cv-sheet::after { content: ''; position: absolute; top: 0; bottom: 0; }
       .cv-sheet::before { right: 2.5mm; width: 4.5mm; background: var(--sun); }
       .cv-sheet::after { right: 0; width: 2.5mm; background: var(--violet); }
-      .cv-head { display: flex; align-items: center; gap: 6mm; padding-bottom: 4.5mm; border-bottom: 2px solid var(--ink); }
+      .cv-head { display: flex; align-items: center; gap: 5mm; padding-bottom: 3.5mm; border-bottom: 2px solid var(--ink); }
       .cv-photo {
-        flex: none; width: 25mm; height: 31mm; object-fit: cover;
+        flex: none; width: 23mm; height: 28.5mm; object-fit: cover;
         border: 2px solid var(--ink); border-radius: 3mm; background: var(--paper);
       }
       .cv-name { font-size: 24pt; }
       .cv-role { margin-top: 1.5mm; font-family: var(--font-display); font-weight: 800; font-size: 12.5pt; }
       .cv-chain { margin-top: 1mm; color: var(--ink-70); font-weight: 500; }
-      .cv-contact { display: grid; gap: 1.6mm; }
-      .cv-contact dt { font-size: 7pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-70); }
+      .cv-head > div { flex: 1; min-width: 0; }
+      /* Contact dans l'en-tête : libellé et valeur sur la même ligne */
+      .cv-contact { display: grid; grid-template-columns: auto auto; gap: 1mm 2.5mm; align-items: baseline; }
+      .cv-contact div { display: contents; }
+      .cv-contact dt { font-size: 6.6pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-70); }
       .cv-contact dd { font-size: 8pt; font-weight: 600; }
       .cv-contact a { color: inherit; text-decoration: none; border-bottom: 1.5px solid var(--sun); white-space: nowrap; }
 
-      .cv-cols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 6mm; margin-top: 5mm; }
-      .cv-main, .cv-side { display: grid; align-content: start; gap: 4.2mm; }
+      .cv-cols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 6mm; margin-top: 4mm; }
+      .cv-main, .cv-side { display: grid; align-content: start; gap: 3.6mm; }
       /* Titres soulignés au surligneur jaune, comme l'accroche du site */
       .cv-sheet h2 {
         width: fit-content; margin-bottom: 2mm; padding: 0 1mm;
         font-family: var(--font-display); font-weight: 900; font-size: 11pt; letter-spacing: 0.06em; text-transform: uppercase;
-        background: linear-gradient(transparent 55%, var(--sun) 55%, var(--sun) 92%, transparent 92%);
+        /* Aplat sans transition (comme .hl) : un dégradé à arrêts nets bave à l'impression */
+        background: linear-gradient(var(--sun), var(--sun)) 0 87.3% / 100% 37% no-repeat;
       }
       /* Pastille de broche devant chaque titre, comme sur le site */
       .cv-sheet h3 { font-weight: 700; font-size: 9.8pt; }
-      .cv-list { display: grid; gap: 2mm; padding: 0; list-style: none; }
+      .cv-list { display: grid; gap: 1.8mm; padding: 0; list-style: none; }
       .cv-row { display: flex; justify-content: space-between; align-items: baseline; gap: 3mm; }
       .cv-when { flex: none; font-size: 7.6pt; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-70); }
       .cv-where { font-weight: 500; color: var(--ink-70); }
@@ -197,7 +200,9 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
       .cv-stack { font-size: 7.8pt; font-weight: 600; color: var(--ink-70); }
       .cv-side { padding-left: 5mm; border-left: 1px solid var(--line); }
       .cv-skill + .cv-skill { margin-top: 2.2mm; }
+      .cv-lang { margin-top: 1.2mm; }
       .cv-avail { display: flex; align-items: center; gap: 2mm; }
+      .cv-extras { display: grid; gap: 1.2mm; padding: 0; list-style: none; }
       .cv-avail .chip-led { flex: none; animation: none; }
       .todo { margin-top: 2mm; padding: 1.5mm 2.5mm; border: 1.5px dashed var(--ink); border-radius: 1.5mm; background: rgba(252, 202, 70, 0.45); font-weight: 600; font-size: 8.4pt; }
 
@@ -205,6 +210,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
       @media screen and (max-width: 760px) {
         .cv-sheet { min-height: 0; padding: 22px calc(18px + 7mm) 22px 18px; box-shadow: none; }
         .cv-head { flex-direction: column; align-items: flex-start; }
+        .cv-head > div { flex: none; }
         .cv-cols { grid-template-columns: 1fr; }
         .cv-side { padding-left: 0; border-left: 0; }
       }

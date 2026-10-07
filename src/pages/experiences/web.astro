@@ -19,7 +19,7 @@ import BrowserShot from '../../components/BrowserShot.astro';
       <div><dt>Depuis</dt><dd>Janvier 2026</dd></div>
       <div><dt>Lieu</dt><dd>Strasbourg, à distance</dd></div>
       <div><dt>Rôle</dt><dd>Conception, développement et mise en production</dd></div>
-      <div><dt>Stack</dt><dd><StackChips items={['Next.js', 'TypeScript', 'React', 'Payload CMS', 'PostgreSQL', 'Tailwind CSS', 'Astro', 'Resend', 'Vercel', 'Docker']} /></dd></div>
+      <div><dt>Stack</dt><dd><StackChips items={['Next.js', 'TypeScript', 'React', 'Payload CMS', 'Supabase', 'PostgreSQL', 'Tailwind CSS', 'Astro', 'Resend', 'Vercel', 'Docker']} /></dd></div>
       <div><dt>Code</dt><dd>Celui des clients : pas de dépôt public</dd></div>
     </dl>
 
@@ -65,13 +65,14 @@ import BrowserShot from '../../components/BrowserShot.astro';
         </figure>
         <p>
           Une plateforme suisse de comparaison de devis : un particulier décrit son projet et reçoit des
-          devis de professionnels vérifiés, avec un cashback et un programme de parrainage. J'y ai assuré
-          le développement front-end et l'intégration, au sein d'une petite équipe.
+          devis de professionnels vérifiés, avec un cashback et un programme de parrainage. Je l'ai
+          développée seul, de bout en bout.
         </p>
         <ul>
           <li>Un site en trois langues (français, allemand, anglais), avec next-intl.</li>
           <li>Un parcours de demande de devis en plusieurs étapes, avec barre de progression : catégorie, budget, coordonnées, récapitulatif.</li>
-          <li>Les services, les catégories et les demandes (devis, inscriptions de professionnels) gérés dans Payload CMS.</li>
+          <li>L'authentification des utilisateurs, et un back-office Payload CMS pour les services, les catégories et les demandes (devis, inscriptions de professionnels).</li>
+          <li>Une base de données Supabase et un déploiement sur Vercel.</li>
           <li>Next.js, TypeScript et Tailwind CSS.</li>
         </ul>
         <p><a class="pill pill-outline pill-sm" href="https://chuttt.ch">Voir le site ↗</a></p>

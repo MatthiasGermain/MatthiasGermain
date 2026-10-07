@@ -16,10 +16,10 @@ En recherche d'un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg o
 
 | Domaine | Outils |
 |---|---|
-| Embarqué | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), RISC-V |
+| Embarqué | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), FPGA, RISC-V |
 | Outillage Python | Python, Flask, Jinja2, API REST |
 | Web | TypeScript, React, Next.js, Astro, Tailwind CSS, Payload CMS, Supabase |
-| Outils | Git, GitHub Actions, Jenkins, Docker, Vercel, DigitalOcean, Linux |
+| Outils | Git, GitHub Actions, GitLab, Jenkins, Docker, Vercel, DigitalOcean, Linux, Claude Code |
 
 ### Projets
 
@@ -58,10 +58,10 @@ Looking for a software engineering role, embedded or web, in Strasbourg or Nancy
 
 | Area | Tools |
 |---|---|
-| Embedded | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), RISC-V |
+| Embedded | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), FPGA, RISC-V |
 | Python tooling | Python, Flask, Jinja2, REST APIs |
 | Web | TypeScript, React, Next.js, Astro, Tailwind CSS, Payload CMS, Supabase |
-| Tooling | Git, GitHub Actions, Jenkins, Docker, Vercel, DigitalOcean, Linux |
+| Tooling | Git, GitHub Actions, GitLab, Jenkins, Docker, Vercel, DigitalOcean, Linux, Claude Code |
 
 ### Projects
 
