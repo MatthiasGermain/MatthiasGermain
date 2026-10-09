@@ -3,7 +3,7 @@
  * mqtt.js n'est chargé qu'à l'appel de watchStation, en différé, pour ne pas alourdir la page ; il
  * se reconnecte seul. L'adresse du broker et les identifiants viennent des variables
  * PUBLIC_STATION_MQTT_URL, _USERNAME et _PASSWORD : ils ne sont écrits dans aucun dépôt. */
-import { TOPICS, parseMessage, type Measurement, type StationEvent } from './protocol';
+import { TOPICS, parseMessage, type Measurement, type Reply, type StationEvent } from './protocol';
 
 /** Une mesure plus vieille que ça n'est plus « en direct » : la station est considérée hors ligne. */
 export const STALE_MS = 15_000;
@@ -27,7 +27,9 @@ export interface StationState {
 export const isLive = (s: StationState, now = Date.now()) =>
   s.broker === 'connected' && s.online !== false && s.measuredAt !== null && now - s.measuredAt <= STALE_MS;
 
-export function watchStation(onChange: (state: StationState) => void): () => void {
+/** `onReply` reçoit les réponses de la station aux commandes (topic replies), pour la vue
+ *  propriétaire qui les retrouve par leur id. */
+export function watchStation(onChange: (state: StationState) => void, onReply?: (reply: Reply) => void): () => void {
   const url = import.meta.env.PUBLIC_STATION_MQTT_URL;
   const username = import.meta.env.PUBLIC_STATION_MQTT_USERNAME;
   const password = import.meta.env.PUBLIC_STATION_MQTT_PASSWORD;
@@ -99,7 +101,7 @@ export function watchStation(onChange: (state: StationState) => void): () => voi
             state.events = [{ event: message.data, receivedAt: now }, ...state.events].slice(0, MAX_EVENTS);
             break;
           case 'reply':
-            // Réponses aux commandes : utiles à l'étape 5
+            onReply?.(message.data);
             return;
         }
         emit();

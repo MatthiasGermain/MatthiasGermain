@@ -4,14 +4,19 @@
  * - `compact` : en haut du tableau de bord (vue propriétaire), dans son style verre, thèmes clair et
  *   sombre ;
  * - `full` : la vue visiteur, en grand, avec les événements reçus depuis l'ouverture de la page.
+ * Avec `controls` (vue propriétaire seulement, rendue pour une session valide), les commandes de la
+ * station : moteur, alarme, seuil de température (étape 5, route pages/api/station/command.ts).
  * Le serveur ne rend que la structure et les libellés ; tout le reste est rempli par le script. */
 import { langOf, tr } from '../../i18n';
+import { THRESHOLD_MAX, THRESHOLD_MIN } from '../../lib/station/protocol';
 
 interface Props {
   variant: 'compact' | 'full';
+  /** Boutons de commande : seulement dans la vue propriétaire (en français) */
+  controls?: boolean;
 }
 
-const { variant } = Astro.props;
+const { variant, controls = false } = Astro.props;
 const lang = langOf(Astro.url);
 const t = tr(lang);
 
@@ -43,7 +48,30 @@ const strings = {
   signal: { good: t('bon', 'good'), fair: t('moyen', 'fair'), weak: t('faible', 'weak') },
   raised: t("Arrêt d'urgence à {t}, réaction {r} µs", 'Emergency stop at {t}, {r} µs reaction'),
   cleared: t('Réarmé sur place à {t}', 'Reset on site at {t}'),
+  threshold: t('seuil {s} °C', 'threshold {s} °C'),
+  aboveThreshold: t('au-dessus du seuil de {s} °C', 'above the {s} °C threshold'),
+  tempHigh: t('Température au-dessus du seuil à {t} : {v} °C (seuil {s} °C)', 'Temperature above the threshold at {t}: {v} °C (threshold {s} °C)'),
+  tempNormal: t('Température revenue sous le seuil à {t} : {v} °C (seuil {s} °C)', 'Temperature back below the threshold at {t}: {v} °C (threshold {s} °C)'),
 };
+
+// Boutons de la vue propriétaire : la commande envoyée à la route, et son nom dans les retours
+const buttons = [
+  {
+    group: 'Moteur',
+    items: [
+      { label: 'Avant', feedback: 'Moteur en avant', cmd: { type: 'motor', action: 'start', direction: 'forward' } },
+      { label: 'Arrière', feedback: 'Moteur en arrière', cmd: { type: 'motor', action: 'start', direction: 'backward' } },
+      { label: 'Stop', feedback: 'Arrêt du moteur', cmd: { type: 'motor', action: 'stop' } },
+    ],
+  },
+  {
+    group: 'Alarme',
+    items: [
+      { label: "Tester l'alarme", feedback: "Test de l'alarme", cmd: { type: 'alarm', action: 'test' } },
+      { label: 'Couper le buzzer', feedback: 'Coupure du buzzer', cmd: { type: 'alarm', action: 'silence' } },
+    ],
+  },
+];
 
 const cards = [
   { field: 'temperature', label: t('Température', 'Temperature') },
@@ -79,6 +107,41 @@ const cards = [
   </div>
 
   {
+    controls && (
+      <div class="station-controls" data-controls>
+        {
+          buttons.map((g) => (
+            <div class="ctl-group" role="group" aria-label={g.group}>
+              <span class="ctl-label">{g.group}</span>
+              {g.items.map((b) => (
+                <button type="button" class="ctl-btn" data-cmd={JSON.stringify(b.cmd)} data-feedback={b.feedback} disabled>
+                  {b.label}
+                </button>
+              ))}
+            </div>
+          ))
+        }
+        <form class="ctl-group" data-threshold>
+          <label class="ctl-label" for="station-threshold">Seuil</label>
+          <input
+            id="station-threshold"
+            class="ctl-input"
+            type="number"
+            min={THRESHOLD_MIN}
+            max={THRESHOLD_MAX}
+            step="1"
+            required
+            disabled
+          />
+          <span class="ctl-unit">°C</span>
+          <button type="submit" class="ctl-btn" disabled>Régler</button>
+        </form>
+        <p class="ctl-feedback" aria-live="polite"></p>
+      </div>
+    )
+  }
+
+  {
     variant === 'full' && (
       <div class="station-events">
         <h3>{t('Derniers événements', 'Latest events')}</h3>
@@ -92,6 +155,8 @@ const cards = [
 
 <script>
   import { watchStation, isLive, type StationState } from '../../lib/station/client';
+  import { REFUSALS } from '../../lib/station/commands';
+  import type { Reply } from '../../lib/station/protocol';
 
   type Strings = {
     locale: string;
@@ -137,6 +202,7 @@ const cards = [
       root.classList.toggle('is-live', live);
       root.classList.toggle('is-stale', !!m && !live);
       root.dataset.alarm = alarm;
+      root.classList.toggle('is-temp-high', !!m?.temperature_high);
       root.querySelector('.station-state')!.textContent = state;
 
       // Heure de la mesure (heure de la station si elle la connaît) et durée depuis le démarrage
@@ -154,6 +220,10 @@ const cards = [
       if (m) {
         const number = new Intl.NumberFormat(str.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
         set('temperature', `${number.format(m.temperature_c)} °C`);
+        // Seuil d'alerte (firmware de l'étape 5) : sous la valeur, ou l'alerte quand on le dépasse
+        const th = m.temperature_threshold_c;
+        root.querySelector('[data-field="temperature"] .card-note')!.textContent =
+          th === undefined ? '' : fill(text(m.temperature_high ? 'aboveThreshold' : 'threshold'), { s: th });
         set('light', `${m.light_pct} %`);
         set('alarm', str.alarm[m.alarm]);
         set('motor', str.motor[m.motor]);
@@ -169,21 +239,140 @@ const cards = [
             const li = document.createElement('li');
             const at = clock(event.time ? Date.parse(event.time) : receivedAt, str.locale, true);
             li.className = `event event--${event.type}`;
+            const number = new Intl.NumberFormat(str.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
             li.textContent =
               event.type === 'alarm_raised'
                 ? fill(text('raised'), { t: at, r: event.reaction_us })
-                : fill(text('cleared'), { t: at });
+                : event.type === 'alarm_cleared'
+                  ? fill(text('cleared'), { t: at })
+                  : fill(text(event.type === 'temperature_high' ? 'tempHigh' : 'tempNormal'), {
+                      t: at,
+                      v: number.format(event.temperature_c),
+                      s: event.threshold_c,
+                    });
             return li;
           }),
         );
       }
     };
 
+    // ---- Commandes (vue propriétaire) ----
+    // Chaque commande part vers la route du site, qui renvoie son id ; la réponse de la station arrive
+    // par le topic replies et se retrouve par cet id. Sans réponse en 10 s, on le dit.
+    const panel = document.querySelector<HTMLElement>('[data-controls]');
+    const feedbackEl = panel?.querySelector<HTMLElement>('.ctl-feedback');
+    const form = panel?.querySelector<HTMLFormElement>('[data-threshold]');
+    const input = form?.querySelector<HTMLInputElement>('input');
+    const REPLY_TIMEOUT_MS = 10_000;
+    const pending = new Map<string, { label: string; timer: number }>();
+    const early = new Map<string, Reply>(); // réponses arrivées avant la réponse de la route
+
+    const feedback = (message: string, state: 'pending' | 'ok' | 'refused') => {
+      if (!feedbackEl) return;
+      feedbackEl.textContent = message;
+      feedbackEl.dataset.state = state;
+    };
+    const settle = (id: string, label: string, reply: Reply) => {
+      clearTimeout(pending.get(id)?.timer);
+      pending.delete(id);
+      if (reply.ok) feedback(`${label} : fait.`, 'ok');
+      else feedback(`${label} : refusé, ${REFUSALS[reply.error ?? ''] ?? reply.error ?? 'sans motif'}.`, 'refused');
+    };
+    const onReply = (reply: Reply) => {
+      if (!reply.id) return;
+      const wait = pending.get(reply.id);
+      if (wait) settle(reply.id, wait.label, reply);
+      else {
+        early.set(reply.id, reply);
+        if (early.size > 20) early.delete(early.keys().next().value!);
+      }
+    };
+    const ROUTE_ERRORS: Record<number, string> = {
+      401: 'session expirée, reconnectez-vous',
+      403: 'origine refusée',
+      413: 'commande trop longue',
+      415: 'format refusé',
+      502: "broker injoignable, rien n'est parti",
+      503: 'commandes non configurées sur le serveur',
+      504: "le broker n'a pas confirmé à temps ; vérifiez l'état de la station avant de réessayer",
+    };
+
+    const send = async (command: object, label: string) => {
+      feedback(`${label} : envoi…`, 'pending');
+      let res: Response;
+      try {
+        res = await fetch('/api/station/command', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(command),
+        });
+      } catch {
+        feedback(`${label} : réseau indisponible, rien n'est parti.`, 'refused');
+        return;
+      }
+      const data: { id?: string; error?: string } = await res.json().catch(() => ({}));
+      if (res.status !== 202 || !data.id) {
+        const reason = (res.status === 400 && REFUSALS[data.error ?? '']) || ROUTE_ERRORS[res.status] || `erreur ${res.status}`;
+        feedback(`${label} : refusé, ${reason}.`, 'refused');
+        return;
+      }
+      const id = data.id;
+      const already = early.get(id);
+      pending.set(id, {
+        label,
+        timer: window.setTimeout(() => {
+          pending.delete(id);
+          feedback(
+            `${label} : pas de réponse en 10 s. Station hors ligne ? Une commande envoyée hors ligne est perdue, elle ne s'exécutera pas plus tard.`,
+            'refused',
+          );
+        }, REPLY_TIMEOUT_MS),
+      });
+      if (already) settle(id, label, already);
+      else feedback(`${label} : envoyée, en attente de la station…`, 'pending');
+    };
+
+    panel?.querySelectorAll<HTMLButtonElement>('[data-cmd]').forEach((btn) =>
+      btn.addEventListener('click', () => send(JSON.parse(btn.dataset.cmd!), btn.dataset.feedback!)),
+    );
+    input?.addEventListener('input', () => (input.dataset.dirty = '1'));
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const value = Number(input!.value);
+      if (!Number.isInteger(value) || value < Number(input!.min) || value > Number(input!.max)) {
+        feedback(`Seuil : entre ${input!.min} et ${input!.max} °C, sans décimale.`, 'refused');
+        return;
+      }
+      delete input!.dataset.dirty;
+      send({ type: 'threshold', action: 'set', temperature_c: value }, `Seuil à ${value} °C`);
+    });
+
+    // Boutons selon l'état : confort seulement, c'est la station qui décide
+    const updateControls = (s: StationState) => {
+      if (!panel) return;
+      const live = isLive(s);
+      const alarm = s.measurement?.alarm ?? 'off';
+      const locked = alarm !== 'off';
+      panel.querySelectorAll<HTMLButtonElement>('[data-cmd]').forEach((btn) => {
+        const c = JSON.parse(btn.dataset.cmd!);
+        let enabled = live;
+        if (c.type === 'motor' && c.action === 'start') enabled &&= !locked;
+        if (c.type === 'alarm' && c.action === 'test') enabled &&= !locked;
+        if (c.type === 'alarm' && c.action === 'silence') enabled &&= alarm === 'on' || alarm === 'test';
+        btn.disabled = !enabled;
+        if (c.type === 'motor' && c.action === 'start') btn.setAttribute('aria-pressed', String(s.measurement?.motor === c.direction));
+      });
+      form!.querySelectorAll<HTMLInputElement | HTMLButtonElement>('input, button').forEach((el) => (el.disabled = !live));
+      const th = s.measurement?.temperature_threshold_c;
+      if (th !== undefined && document.activeElement !== input && !input!.dataset.dirty) input!.value = String(th);
+    };
+
     const renderAll = (s: StationState) => {
       last = s;
       roots.forEach((root) => render(root, s));
+      updateControls(s);
     };
-    watchStation(renderAll);
+    watchStation(renderAll, panel ? onReply : undefined);
     // Le passage à « hors ligne » vient du temps qui passe, pas d'un message : on revérifie chaque seconde
     setInterval(() => last && renderAll(last), 1000);
   }
@@ -233,6 +422,31 @@ const cards = [
   .event::before { content: ''; position: absolute; left: 0; top: 0.45em; width: 10px; height: 10px; border-radius: 50%; background: var(--sun); border: 2px solid var(--ink); }
   .event--alarm_raised::before { background: #d92d20; }
 
+  /* Alerte de température : la carte passe à l'orange (supervision, pas arrêt d'urgence) */
+  .station.is-temp-high [data-field='temperature'] { border-color: #f79009; box-shadow: inset 0 0 0 2px #f79009; }
+  .station.is-temp-high [data-field='temperature'] .card-note { color: #b54708; opacity: 1; font-weight: 700; }
+
+  /* ---- Commandes (vue propriétaire) ---- */
+  .station-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
+  .ctl-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .ctl-label { margin-right: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.75; }
+  .ctl-btn, .ctl-input {
+    height: 32px; padding: 0 12px; border-radius: 16px; font: inherit; font-size: 13px; font-weight: 600;
+    color: inherit; border: 1px solid var(--glass-border); background: var(--glass-soft);
+  }
+  .ctl-btn { cursor: pointer; transition: transform 0.15s, background-color 0.15s; }
+  .ctl-btn:hover:not(:disabled) { transform: translateY(-1px); background: var(--glass); }
+  .ctl-btn[aria-pressed='true'] { background: #fcca46; border-color: #fcca46; color: #1e2952; }
+  .ctl-btn:disabled, .ctl-input:disabled { opacity: 0.4; cursor: not-allowed; }
+  .ctl-input { width: 64px; padding: 0 10px; text-align: center; }
+  .ctl-unit { font-size: 13px; font-weight: 600; }
+  .ctl-feedback { width: 100%; min-height: 1.2em; font-size: 13px; font-weight: 600; }
+  .ctl-feedback[data-state='pending'] { opacity: 0.75; }
+  .ctl-feedback[data-state='ok'] { color: #067647; }
+  .ctl-feedback[data-state='refused'] { color: #d92d20; }
+  :global([data-theme='dark']) .ctl-feedback[data-state='ok'] { color: #75e0a7; }
+  :global([data-theme='dark']) .ctl-feedback[data-state='refused'] { color: #fda29b; }
+
   /* ---- Tableau de bord : compact, dans le verre de la page ---- */
   .station--compact {
     gap: 10px; padding: 14px 18px; border-radius: 18px; color: var(--raisin);
@@ -241,9 +455,29 @@ const cards = [
     box-shadow: 0 4px 16px rgba(30, 41, 82, 0.08);
   }
   .station--compact .station-head { gap: 4px 10px; font-size: 13px; }
+  /* Avec les commandes : sur grand écran, elles prennent place sur la ligne de l'état, pour ne pas
+     voler de hauteur au tableau de bord, qui ne défile pas ; le retour de commande s'affiche dessous */
+  .station--compact:has(.station-controls) {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: 'head controls' 'cards cards';
+    align-items: center;
+  }
+  .station--compact .station-head { grid-area: head; }
+  .station--compact .station-controls { grid-area: controls; justify-content: flex-end; gap: 6px 16px; }
+  .station--compact .station-cards { grid-area: cards; }
+  .station--compact .ctl-feedback { text-align: right; }
+  .station--compact .ctl-feedback:empty { display: none; }
+  @media (max-width: 1100px) {
+    .station--compact:has(.station-controls) { grid-template-columns: 1fr; grid-template-areas: 'head' 'controls' 'cards'; }
+    .station--compact .station-controls { justify-content: flex-start; }
+    .station--compact .ctl-feedback { text-align: left; }
+  }
   .station--compact .station-state { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
   .station--compact .station-cards { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }
   .station--compact .station-card { padding: 8px 12px; border-radius: 12px; border: 1px solid var(--glass-soft-border); background: var(--glass-soft); }
   .station--compact .card-label { font-size: 10px; }
   .station--compact .card-value { font-size: 15px; }
+  /* Format compact : la précision (seuil, qualité du signal) à côté de la valeur, pas dessous */
+  .station--compact .station-card { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+  .station--compact .card-label { flex-basis: 100%; }
 </style>

@@ -7,7 +7,13 @@ export const TOPICS = {
   events: 'routine/station/events',
   status: 'routine/station/status',
   replies: 'routine/station/replies',
+  /** Publié par la route API du site (utilisateur web-command), jamais par la page */
+  commands: 'routine/station/commands',
 } as const;
+
+/** Bornes du seuil d'alerte de température (entier, en °C) */
+export const THRESHOLD_MIN = 10;
+export const THRESHOLD_MAX = 40;
 
 export type AlarmState = 'off' | 'on' | 'silenced' | 'test';
 export type MotorState = 'stopped' | 'forward' | 'backward' | 'locked';
@@ -22,12 +28,17 @@ export interface Measurement {
   alarm: AlarmState;
   motor: MotorState;
   rssi_dbm: number;
+  /** Seuil d'alerte de température en vigueur (depuis l'étape 5 ; absent d'un firmware plus ancien) */
+  temperature_threshold_c?: number;
+  /** Alerte de température en cours (depuis l'étape 5) */
+  temperature_high?: boolean;
 }
 
 /** routine/station/events, non retenu */
 export type StationEvent =
   | { time: string | null; type: 'alarm_raised'; cause: 'touch'; reaction_us: number }
-  | { time: string | null; type: 'alarm_cleared' };
+  | { time: string | null; type: 'alarm_cleared' }
+  | { time: string | null; type: 'temperature_high' | 'temperature_normal'; temperature_c: number; threshold_c: number };
 
 /** routine/station/status, retenu ; { online: false } est le testament publié par le broker */
 export interface Status {
@@ -56,6 +67,7 @@ const isInt = (v: unknown): v is number => Number.isInteger(v);
 const isNumber = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 // Heure ISO lisible, ou null (horloge pas encore synchronisée)
 const isTime = (v: unknown): v is string | null => v === null || (typeof v === 'string' && !Number.isNaN(Date.parse(v)));
+export const isThreshold = (v: unknown): v is number => isInt(v) && v >= THRESHOLD_MIN && v <= THRESHOLD_MAX;
 
 function parseMeasurement(m: Json): Measurement | null {
   const ok =
@@ -65,7 +77,10 @@ function parseMeasurement(m: Json): Measurement | null {
     isInt(m.light_pct) && m.light_pct >= 0 && m.light_pct <= 100 &&
     typeof m.alarm === 'string' && ALARM_STATES.includes(m.alarm) &&
     typeof m.motor === 'string' && MOTOR_STATES.includes(m.motor) &&
-    isInt(m.rssi_dbm);
+    isInt(m.rssi_dbm) &&
+    // Champs de l'étape 5 : facultatifs, mais valides s'ils sont là
+    (m.temperature_threshold_c === undefined || isThreshold(m.temperature_threshold_c)) &&
+    (m.temperature_high === undefined || typeof m.temperature_high === 'boolean');
   if (!ok) return null;
   return {
     time: m.time as string | null,
@@ -75,6 +90,8 @@ function parseMeasurement(m: Json): Measurement | null {
     alarm: m.alarm as AlarmState,
     motor: m.motor as MotorState,
     rssi_dbm: m.rssi_dbm as number,
+    ...(m.temperature_threshold_c !== undefined && { temperature_threshold_c: m.temperature_threshold_c as number }),
+    ...(m.temperature_high !== undefined && { temperature_high: m.temperature_high as boolean }),
   };
 }
 
@@ -85,6 +102,9 @@ function parseEvent(e: Json): StationEvent | null {
     return { time, type: 'alarm_raised', cause: 'touch', reaction_us: e.reaction_us };
   }
   if (e.type === 'alarm_cleared') return { time, type: 'alarm_cleared' };
+  if ((e.type === 'temperature_high' || e.type === 'temperature_normal') && isNumber(e.temperature_c) && isThreshold(e.threshold_c)) {
+    return { time, type: e.type, temperature_c: e.temperature_c, threshold_c: e.threshold_c };
+  }
   return null;
 }
 

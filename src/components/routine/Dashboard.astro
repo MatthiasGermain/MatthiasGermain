@@ -61,8 +61,8 @@ const sortedTodo = prioritizeForDomain(sortTasks(todoTasks, sortKey), domain);
 
     <h1>Où j'en <span>suis</span></h1>
 
-    <!-- Bandeau Station, compact : routine-station en direct (étape 4) -->
-    <div class="station-strip"><StationBand variant="compact" /></div>
+    <!-- Bandeau Station, compact : routine-station en direct (étape 4) et ses commandes (étape 5) -->
+    <div class="station-strip"><StationBand variant="compact" controls /></div>
 
     <div class="layout">
       <aside class="card schedule-card">
@@ -1138,6 +1138,10 @@ const sortedTodo = prioritizeForDomain(sortTasks(todoTasks, sortKey), domain);
       transition: all 0.2s var(--ease-signature);
     }
     .logout-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30, 41, 82, 0.16); }
+    /* Écran étroit : le bouton fixe recouvrirait le titre ; il passe dans le flux, au-dessus */
+    @media (max-width: 700px) {
+      .logout-form { position: static; display: flex; justify-content: center; margin-bottom: 12px; }
+    }
 
     .theme-toggle-btn {
       position: fixed;
