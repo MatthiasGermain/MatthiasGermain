@@ -16,7 +16,6 @@ export const projects: Partial<Record<Visual, ProjectText>> = {
       'Connected monitoring station: an ESP32 reads sensors, drives a stepper motor and sends its readings over MQTT to a web page that shows them live.',
     role: 'Design and development, on my own',
     context: 'Personal project covering the whole chain, built step by step',
-    visualNote: 'Target architecture',
   },
   irda: {
     cv: 'Speed setpoint sent over infrared between two ESP32 boards, applied gradually under FreeRTOS.',
