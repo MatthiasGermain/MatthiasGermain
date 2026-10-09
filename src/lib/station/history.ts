@@ -84,3 +84,81 @@ export async function insertSample(sql: postgres.Sql, sample: Sample): Promise<v
     on conflict (time) do nothing
   `;
 }
+
+/* ---- Lecture : les points des graphes ----------------------------------------------------- */
+
+export type Range = '24h' | '7d' | '30d' | '1y';
+
+/** Chaque période : sa durée, et la taille d'un point (les échantillons bruts sur 24 h, des
+ *  moyennes par heure sur 7 et 30 jours, par jour de l'heure de Paris sur un an). */
+export const RANGES: Record<Range, { interval: string; bucket: 'sample' | 'hour' | 'day'; bucketSeconds: number }> = {
+  '24h': { interval: '24 hours', bucket: 'sample', bucketSeconds: 300 },
+  '7d': { interval: '7 days', bucket: 'hour', bucketSeconds: 3600 },
+  '30d': { interval: '30 days', bucket: 'hour', bucketSeconds: 3600 },
+  '1y': { interval: '1 year', bucket: 'day', bucketSeconds: 86400 },
+};
+
+export const isRange = (value: unknown): value is Range => typeof value === 'string' && value in RANGES;
+
+export interface HistoryPoint {
+  /** Début du point (ISO 8601 UTC) : la tranche de 5 min, l'heure, ou minuit à Paris */
+  time: string;
+  /** Moyenne, minimum et maximum de la température sur le point (égaux pour un échantillon seul) */
+  temperature_c: number;
+  temperature_min_c: number;
+  temperature_max_c: number;
+  /** Moyenne de la lumière */
+  light_pct: number;
+  /** Nombre d'échantillons de 5 min dans le point */
+  samples: number;
+}
+
+export interface History {
+  range: Range;
+  /** Taille d'un point, en secondes : un écart plus grand entre deux points est un trou */
+  bucket_s: number;
+  /** Heure du tout premier échantillon en base (null : historique vide) */
+  since: string | null;
+  points: HistoryPoint[];
+}
+
+const iso = (date: Date) => date.toISOString().replace('.000Z', 'Z');
+
+export async function readHistory(sql: postgres.Sql, range: Range): Promise<History> {
+  const { interval, bucket, bucketSeconds } = RANGES[range];
+  // Moyennes calculées par Postgres ; numeric et bigint convertis en nombres JavaScript
+  const rows =
+    bucket === 'sample'
+      ? await sql`
+          select time as bucket, temperature_c::float8 as t, temperature_c::float8 as t_min,
+                 temperature_c::float8 as t_max, light_pct::float8 as light, 1 as n
+          from public.station_samples
+          where time >= now() - ${interval}::interval
+          order by time`
+      : await sql`
+          select date_trunc(${bucket}, time, 'Europe/Paris') as bucket,
+                 round(avg(temperature_c)::numeric, 1)::float8 as t,
+                 min(temperature_c)::float8 as t_min,
+                 max(temperature_c)::float8 as t_max,
+                 round(avg(light_pct))::float8 as light,
+                 count(*)::int as n
+          from public.station_samples
+          where time >= now() - ${interval}::interval
+          group by 1
+          order by 1`;
+  const [first] = await sql`select min(time) as since from public.station_samples`;
+
+  return {
+    range,
+    bucket_s: bucketSeconds,
+    since: first?.since ? iso(first.since as Date) : null,
+    points: rows.map((r) => ({
+      time: iso(r.bucket as Date),
+      temperature_c: Math.round((r.t as number) * 10) / 10,
+      temperature_min_c: Math.round((r.t_min as number) * 10) / 10,
+      temperature_max_c: Math.round((r.t_max as number) * 10) / 10,
+      light_pct: r.light as number,
+      samples: r.n as number,
+    })),
+  };
+}

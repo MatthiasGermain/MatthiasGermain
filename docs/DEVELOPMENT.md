@@ -70,6 +70,17 @@ Trois variables côté serveur, sans préfixe `PUBLIC_` (type « Sensitive » da
 | `STATION_COMMAND_USERNAME` | `web-command` |
 | `STATION_COMMAND_PASSWORD` | son mot de passe |
 
+## Historique de la station (`/api/station/samples`, `/api/station/history`)
+
+Toutes les 5 min, la station publie un échantillon sur `routine/station/samples` (l'utilisateur `station` doit avoir le droit d'y publier dans EMQX : sans lui, le broker jette l'échantillon sans erreur) ; une règle EMQX (action « HTTP Server ») l'envoie en `POST /api/station/samples`, avec `Authorization: Bearer <jeton>`. La route refuse : mauvais jeton (401), plus de 1 Ko (413), autre chose que du JSON (415), échantillon invalide (400 : exactement `time`, `temperature_c`, `light_pct` ; heure UTC ronde de 5 min, au plus 5 min dans le futur et 7 jours dans le passé ; température de -40 à 125 avec une décimale au plus ; lumière entière de 0 à 100). Sinon, elle l'enregistre dans la table `station_samples` (Supabase) et répond `204` ; un échantillon reçu deux fois n'est gardé qu'une fois. Base injoignable : `502`. Code : `src/lib/station/history.ts`.
+
+| Variable | Rôle |
+|----------|------|
+| `STATION_INGEST_TOKEN` | le jeton secret qu'EMQX envoie (type « Sensitive » dans Vercel) |
+| `STATION_DB_POSTGRES_URL` | l'adresse « poolée » de la base (port 6543, mode transaction), créée par l'intégration Supabase de Vercel ; en local, l'adresse « Transaction pooler » du tableau de bord Supabase. Les autres variables `STATION_DB_*` ne servent pas. |
+
+Les graphes lisent `GET /api/station/history?range=24h|7d|30d|1y`, publique, sans session. Elle renvoie `{ range, bucket_s, since, points }` : les échantillons bruts sur 24 h (`bucket_s` 300), des moyennes par heure sur 7 et 30 jours (3600), par jour de l'heure de Paris sur un an (86400). Chaque point porte la moyenne, le minimum et le maximum de la température, la moyenne de la lumière et le nombre d'échantillons ; deux points plus espacés que `bucket_s` encadrent un trou. `since` est l'heure du tout premier échantillon (`null` si la table est vide). Réponse mise en cache 5 min par Vercel (`s-maxage=300, stale-while-revalidate=600`) ; tout autre paramètre que `range` est refusé (400), pour qu'une adresse inventée ne contourne pas le cache.
+
 La page, elle, lit la station avec `web-viewer` (variables `PUBLIC_STATION_MQTT_URL`, `_USERNAME`, `_PASSWORD`, type « Config » : elles partent dans le navigateur, et cet utilisateur ne peut que lire).
 
 Les formulaires POST (connexion, contact) passent la protection CSRF d'Astro grâce à `security.allowedDomains` dans `astro.config.mjs` : tout domaine réellement utilisé doit y figurer.
