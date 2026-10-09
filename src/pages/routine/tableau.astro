@@ -1,0 +1,15 @@
+---
+/* Vue propriétaire de /routine. /routine la sert à sa propre adresse avec Astro.rewrite quand la
+ * session est valide (pages/routine/index.astro) : une page à part, pour que les styles globaux du
+ * tableau de bord et le CSS de Tailwind ne se chargent jamais avec la vue visiteur. Visitée
+ * directement sans session : retour sur /routine. */
+export const prerender = false;
+
+import Dashboard from '../../components/routine/Dashboard.astro';
+import { isOwner } from '../../lib/routine-auth';
+
+if (!isOwner(Astro.cookies)) return Astro.redirect('/routine', 303);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<Dashboard />

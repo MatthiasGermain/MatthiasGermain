@@ -1,0 +1,11 @@
+---
+/* /en/routine : toujours la vue visiteur, en anglais (la vue propriétaire reste en français, sous
+ * /routine). Rendue côté serveur pour afficher le refus d'un mot de passe. */
+export const prerender = false;
+
+import Visitor from '../../components/routine/Visitor.astro';
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<Visitor />

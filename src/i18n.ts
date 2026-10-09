@@ -24,6 +24,7 @@ const pages: [fr: string, en: string][] = [
   ['/contact', '/en/contact'],
   ['/cv', '/en/cv'],
   ['/mentions-legales', '/en/legal'],
+  ['/routine', '/en/routine'],
 ];
 
 /** Adresse d'une page du site, donnée en français, dans la langue voulue (l'ancre est gardée) */

@@ -1,0 +1,119 @@
+---
+/* Vue visiteur de /routine (et de /en/routine) : la station connectée, dans la mise en page du site.
+ * Ni planning ni tâches : ils restent derrière le mot de passe. Un bouton discret « Accès privé »
+ * ouvre le formulaire de connexion (voir pages/routine/login.ts). */
+import MaquettePage from '../../layouts/MaquettePage.astro';
+import { langOf, tr } from '../../i18n';
+
+const lang = langOf(Astro.url);
+const t = tr(lang);
+// Retour d'un mot de passe refusé (login.ts) : le formulaire s'affiche ouvert, avec le message
+const refused = Astro.url.searchParams.get('acces') === 'refuse';
+const REPO = 'https://github.com/MatthiasGermain/routine-station';
+---
+
+<MaquettePage
+  title={t('Station connectée', 'Connected station')}
+  subtitle={t(
+    'Une station ESP32 publie ses mesures toutes les 5 secondes ; cette page les affiche en direct.',
+    'An ESP32 station publishes its readings every 5 seconds; this page shows them live.',
+  )}
+  description={t(
+    'Station connectée de Matthias Germain : un ESP32 publie ses mesures en MQTT, affichées en direct sur cette page.',
+    "Matthias Germain's connected station: an ESP32 publishes its readings over MQTT, shown live on this page.",
+  )}
+>
+  <div class="wrap station-page">
+    <!-- Bandeau Station (étape 4, partie 3) : cartes de mesures, état de la station, derniers
+         événements. Les courbes viendront en dessous à l'étape 6. -->
+    <section class="station-slot" aria-label={t('La station en direct', 'The station, live')}>
+      <p class="station-soon">{t("L'affichage en direct arrive ici.", 'The live display is coming here.')}</p>
+    </section>
+
+    <div class="case-body station-about">
+      <section>
+        <h2><span class="pin-name">MQTT</span> {t('Comment ça marche', 'How it works')}</h2>
+        <ol>
+          {
+            lang === 'en' ? (
+              <>
+                <li>
+                  <b>The station.</b> An ESP32 measures temperature and light, drives a motor and watches a touch
+                  emergency stop, which reacts on the board without waiting for the network.
+                </li>
+                <li>
+                  <b>The broker.</b> The station publishes its readings over MQTT, encrypted with TLS, to an EMQX
+                  broker in the cloud.
+                </li>
+                <li>
+                  <b>This page.</b> Your browser subscribes to the broker with read-only access and shows each
+                  message as soon as it arrives.
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <b>La station.</b> Un ESP32 mesure la température et la lumière, pilote un moteur et surveille un
+                  arrêt d'urgence tactile, qui réagit sur la carte sans attendre le réseau.
+                </li>
+                <li>
+                  <b>Le broker.</b> La station publie ses mesures en MQTT, chiffrées en TLS, vers un broker EMQX
+                  dans le cloud.
+                </li>
+                <li>
+                  <b>Cette page.</b> Votre navigateur s'abonne au broker avec un accès en lecture seule et affiche
+                  chaque message dès son arrivée.
+                </li>
+              </>
+            )
+          }
+        </ol>
+        <p>
+          <a class="pill pill-outline pill-sm" href={REPO}>
+            {t('Le code et le journal de construction', 'The code and the build log')} ↗
+          </a>
+        </p>
+      </section>
+    </div>
+
+    <details class="routine-access" id="acces-prive" open={refused}>
+      <summary>{t('Accès privé', 'Private access')}</summary>
+      <form method="post" action="/routine/login">
+        <input type="hidden" name="lang" value={lang} />
+        <label for="routine-password">{t('Mot de passe', 'Password')}</label>
+        <div class="access-row">
+          <input id="routine-password" name="password" type="password" autocomplete="current-password" required />
+          <button class="pill pill-solid pill-sm" type="submit">{t('Entrer', 'Enter')}</button>
+        </div>
+        {refused && <p class="access-error" role="alert">{t('Mot de passe incorrect.', 'Wrong password.')}</p>}
+      </form>
+    </details>
+  </div>
+</MaquettePage>
+
+<style>
+  .station-page { display: grid; gap: clamp(48px, 6vw, 80px); }
+  .station-slot {
+    display: grid; place-items: center; min-height: 180px; padding: 24px;
+    border: 2px dashed var(--line); border-radius: 12px;
+  }
+  .station-soon { font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-70); }
+
+  /* Accès privé : discret, en bas de page */
+  .routine-access { width: min(440px, 100%); font-size: 14px; }
+  .routine-access summary {
+    width: fit-content; cursor: pointer; color: var(--ink-70); font-weight: 600;
+    text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px;
+  }
+  .routine-access summary:hover { color: var(--ink); text-decoration-color: var(--sun); }
+  .routine-access form { display: grid; gap: 8px; margin-top: 14px; }
+  .routine-access label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-70); }
+  .access-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .access-row input {
+    width: min(280px, 100%); padding: 9px 12px; border: 2px solid var(--ink); border-radius: 6px;
+    background: var(--paper); color: var(--ink); font: 500 15px/1.4 var(--font-body);
+  }
+  .access-row input:focus { outline: none; box-shadow: 0 0 0 3px rgba(252, 202, 70, 0.6); }
+  .access-row button { cursor: pointer; }
+  .access-error { color: #b42318; font-weight: 600; }
+</style>

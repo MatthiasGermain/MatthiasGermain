@@ -25,6 +25,8 @@ export interface Project {
   repo?: string;
   /** Page de présentation détaillée (stages) */
   caseHref?: string;
+  /** Page du site où le projet tourne en direct (bouton « Voir en direct ») */
+  live?: string;
   /** Sans dépôt public : où est le code (par défaut, code propriétaire) */
   codeNote?: string;
   site?: { label: string; url: string };
@@ -54,6 +56,7 @@ export const projects: Project[] = [
     stack: ['ESP32', 'C++', 'FreeRTOS', 'MQTT', 'Web'],
     visual: 'routine',
     visualNote: 'Architecture visée',
+    live: '/routine',
     repo: 'https://github.com/MatthiasGermain/routine-station',
   },
   {

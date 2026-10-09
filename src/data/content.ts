@@ -49,6 +49,7 @@ export const content = (lang: Lang): Content => {
         ...text,
         stack: p.stack.map((i) => en.skillItems[i] ?? i),
         caseHref: p.caseHref && href('en', p.caseHref),
+        live: p.live && href('en', p.live),
         site: p.site && { ...p.site, label: siteLabel ?? p.site.label },
       };
     }),

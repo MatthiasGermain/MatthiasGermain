@@ -58,6 +58,13 @@ const { catLabel } = content(lang);
         )
       }
       {
+        p.live && (
+          <a class="pill pill-solid pill-sm" href={p.live}>
+            {t('Voir en direct', 'See it live')} →
+          </a>
+        )
+      }
+      {
         p.repo ? (
           <a class="pill pill-outline pill-sm" href={p.repo}>
             Code ↗
