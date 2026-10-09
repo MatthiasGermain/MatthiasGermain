@@ -4,6 +4,7 @@
  * ouvre le formulaire de connexion (voir pages/routine/login.ts). */
 import MaquettePage from '../../layouts/MaquettePage.astro';
 import StationBand from './StationBand.astro';
+import StationHistory from './StationHistory.astro';
 import { langOf, tr } from '../../i18n';
 
 const lang = langOf(Astro.url);
@@ -16,18 +17,18 @@ const REPO = 'https://github.com/MatthiasGermain/routine-station';
 <MaquettePage
   title={t('Station connectée', 'Connected station')}
   subtitle={t(
-    'Une station ESP32 publie ses mesures toutes les 5 secondes ; cette page les affiche en direct.',
-    'An ESP32 station publishes its readings every 5 seconds; this page shows them live.',
+    'Une station ESP32 publie ses mesures toutes les 5 secondes ; cette page les affiche en direct, avec leur historique.',
+    'An ESP32 station publishes its readings every 5 seconds; this page shows them live, along with their history.',
   )}
   description={t(
-    'Station connectée de Matthias Germain : un ESP32 publie ses mesures en MQTT, affichées en direct sur cette page.',
-    "Matthias Germain's connected station: an ESP32 publishes its readings over MQTT, shown live on this page.",
+    'Station connectée de Matthias Germain : un ESP32 publie ses mesures en MQTT, affichées en direct sur cette page avec leur historique.',
+    "Matthias Germain's connected station: an ESP32 publishes its readings over MQTT, shown live on this page along with their history.",
   )}
 >
   <div class="wrap station-page">
-    <!-- La station en direct : mesures, état, derniers événements. Les courbes viendront en dessous
-         à l'étape 6. -->
+    <!-- La station en direct (mesures, état, derniers événements), puis son historique -->
     <StationBand variant="full" />
+    <StationHistory />
 
     <div class="case-body station-about">
       <section>
@@ -48,6 +49,11 @@ const REPO = 'https://github.com/MatthiasGermain/routine-station';
                   <b>This page.</b> Your browser subscribes to the broker with read-only access and shows each
                   message as soon as it arrives.
                 </li>
+                <li>
+                  <b>The history.</b> Every 5 minutes, the station publishes the average of its readings; the
+                  broker forwards it to the site, which stores it in a Postgres database. The graphs above read
+                  from that database.
+                </li>
               </>
             ) : (
               <>
@@ -62,6 +68,10 @@ const REPO = 'https://github.com/MatthiasGermain/routine-station';
                 <li>
                   <b>Cette page.</b> Votre navigateur s'abonne au broker avec un accès en lecture seule et affiche
                   chaque message dès son arrivée.
+                </li>
+                <li>
+                  <b>L'historique.</b> Toutes les 5 minutes, la station publie la moyenne de ses mesures ; le broker
+                  la transmet au site, qui la range dans une base Postgres. Les graphes ci-dessus lisent cette base.
                 </li>
               </>
             )

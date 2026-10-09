@@ -1,0 +1,471 @@
+---
+/* Historique de la station (étape 6), dans la vue visiteur seulement : deux graphes en SVG dessiné à
+ * la main, la température (avec la ligne du seuil en vigueur) et la lumière, sur 24 h, 7 jours,
+ * 30 jours ou un an. Données : GET /api/station/history (pages/api/station/history.ts) ; calculs
+ * dans lib/station/chart.ts. Le serveur ne rend que la structure et les libellés, le script dessine.
+ * Le seuil vient des mesures en direct, reçues par le bandeau Station (événement `station:threshold`). */
+import { langOf, localeOf, tr } from '../../i18n';
+
+const lang = langOf(Astro.url);
+const t = tr(lang);
+
+const ranges = [
+  { value: '24h', label: '24 h' },
+  { value: '7d', label: t('7 jours', '7 days') },
+  { value: '30d', label: t('30 jours', '30 days') },
+  { value: '1y', label: t('1 an', '1 year') },
+];
+
+const average = t(
+  'Moyennes par {unit} ; autour de la température, la bande va du minimum au maximum.',
+  'Averages per {unit}; around the temperature, the band spans the minimum to the maximum.',
+);
+// Textes affichés par le script, dans la langue de la page
+const strings = {
+  locale: localeOf(lang),
+  ranges: { '24h': '24 h', '7d': t('7 jours', '7 days'), '30d': t('30 jours', '30 days'), '1y': t('un an', 'a year') },
+  legend: {
+    '24h': t('Un point par tranche de 5 min : la moyenne de ses mesures.', 'One point per 5-minute slot: the average of its readings.'),
+    '7d': average.replace('{unit}', t('heure', 'hour')),
+    '30d': average.replace('{unit}', t('heure', 'hour')),
+    '1y': average.replace('{unit}', t('jour', 'day')),
+  },
+  gaps: t("La courbe s'interrompt là où la station n'a rien envoyé.", 'The line breaks where the station sent nothing.'),
+  building: t('Historique en cours de constitution, depuis le {d}.', 'History still building up, since {d}.'),
+  empty: t("Historique en cours de constitution : pas encore d'échantillon.", 'History still building up: no sample yet.'),
+  none: t('Aucune mesure sur cette période : station éteinte ou hors ligne.', 'No readings over this period: the station was off or offline.'),
+  error: t('Historique indisponible pour le moment.', 'History unavailable for now.'),
+  over: t('{title} sur {range} : {summary}', '{title} over {range}: {summary}'),
+  between: t('de {min} à {max}', 'from {min} to {max}'),
+  threshold: t('seuil {s} °C', 'threshold {s} °C'),
+  thresholdOut: t('Seuil de {s} °C, hors du graphe.', 'Threshold of {s} °C, outside the graph.'),
+  minMax: 'min {min} · max {max}',
+};
+
+const charts = [
+  { kind: 'temperature', title: t('Température', 'Temperature') },
+  { kind: 'light', title: t('Lumière', 'Light') },
+];
+---
+
+<section class="history" data-history data-strings={JSON.stringify(strings)} aria-labelledby="history-title">
+  <div class="history-head">
+    <h2 id="history-title"><span class="pin-name">SQL</span> {t('Historique', 'History')}</h2>
+    <div class="history-ranges" role="group" aria-label={t('Période', 'Period')}>
+      {
+        ranges.map((r, i) => (
+          <button type="button" class="range-btn" data-range={r.value} aria-pressed={i === 0 ? 'true' : 'false'}>
+            {r.label}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <p class="history-note"></p>
+  <p class="history-status" aria-live="polite">{t("Chargement de l'historique…", 'Loading the history…')}</p>
+
+  <div class="history-charts" hidden>
+    {
+      charts.map((c) => (
+        <figure class="chart" data-chart={c.kind} data-title={c.title}>
+          <figcaption>
+            <span class="chart-title">{c.title}</span>
+            <span class="chart-summary" />
+          </figcaption>
+          <div class="chart-plot">
+            <svg role="img" />
+            <div class="chart-tip" hidden>
+              <span class="tip-time" />
+              <span class="tip-value" />
+            </div>
+          </div>
+          <p class="chart-note" />
+        </figure>
+      ))
+    }
+  </div>
+  <p class="history-legend"></p>
+</section>
+
+<script>
+  import { nearest, niceScale, periodStart, pointTime, segments, spread, temperatureScale, timeTicks, type Scale } from '../../lib/station/chart';
+  import type { History, Range } from '../../lib/station/history';
+
+  type Kind = 'temperature' | 'light';
+  interface Strings {
+    locale: string;
+    ranges: Record<Range, string>;
+    legend: Record<Range, string>;
+    gaps: string;
+    building: string;
+    empty: string;
+    none: string;
+    error: string;
+    over: string;
+    between: string;
+    threshold: string;
+    thresholdOut: string;
+    minMax: string;
+  }
+
+  const root = document.querySelector<HTMLElement>('[data-history]');
+  if (root) {
+    const str = JSON.parse(root.dataset.strings!) as Strings;
+    const fill = (s: string, values: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ''));
+    const REFRESH_MS = 5 * 60_000; // la route est mise en cache 5 min : inutile de la relire plus souvent
+
+    // Formats, dans la langue de la page et le fuseau du navigateur
+    const one = new Intl.NumberFormat(str.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const upToOne = new Intl.NumberFormat(str.locale, { maximumFractionDigits: 1 });
+    const hm = new Intl.DateTimeFormat(str.locale, { hour: '2-digit', minute: '2-digit' });
+    const weekday = new Intl.DateTimeFormat(str.locale, { weekday: 'short', day: 'numeric' });
+    const dayMonth = new Intl.DateTimeFormat(str.locale, { day: 'numeric', month: 'short' });
+    const month = new Intl.DateTimeFormat(str.locale, { month: 'short' });
+    const monthYear = new Intl.DateTimeFormat(str.locale, { month: 'short', year: 'numeric' });
+    const slotDay = new Intl.DateTimeFormat(str.locale, { weekday: 'short', day: 'numeric', month: 'short' });
+    // Les points d'un an sont des jours de l'heure de Paris (la route les découpe ainsi) : leur date
+    // se lit à Paris, quel que soit le fuseau du visiteur
+    const parisDay = new Intl.DateTimeFormat(str.locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/Paris' });
+    const since = new Intl.DateTimeFormat(str.locale, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    const tickLabel = (range: Range, ms: number) => {
+      const d = new Date(ms);
+      if (range === '24h') return d.getHours() === 0 ? weekday.format(d) : hm.format(d);
+      if (range === '7d') return weekday.format(d);
+      if (range === '30d') return dayMonth.format(d);
+      return d.getMonth() === 0 ? monthYear.format(d) : month.format(d);
+    };
+    const slotLabel = (time: string, bucketS: number) => {
+      const start = Date.parse(time);
+      if (bucketS >= 86400) return parisDay.format(start);
+      return `${slotDay.format(start)}, ${hm.format(start)}–${hm.format(start + bucketS * 1000)}`;
+    };
+
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-range]')];
+    const note = root.querySelector<HTMLElement>('.history-note')!;
+    const status = root.querySelector<HTMLElement>('.history-status')!;
+    const chartsEl = root.querySelector<HTMLElement>('.history-charts')!;
+    const legend = root.querySelector<HTMLElement>('.history-legend')!;
+
+    interface Chart {
+      el: HTMLElement;
+      plot: HTMLElement;
+      svg: SVGSVGElement;
+      tip: HTMLElement;
+      /** Coordonnées des points dessinés, pour le curseur */
+      xs: number[];
+      ys: number[];
+      left: number;
+      right: number;
+    }
+    const charts = Object.fromEntries(
+      (['temperature', 'light'] as Kind[]).map((kind) => {
+        const el = root.querySelector<HTMLElement>(`[data-chart="${kind}"]`)!;
+        return [kind, { el, plot: el.querySelector('.chart-plot')!, svg: el.querySelector('svg')!, tip: el.querySelector('.chart-tip')!, xs: [], ys: [], left: 0, right: 0 }];
+      }),
+    ) as Record<Kind, Chart>;
+
+    let range: Range = '24h';
+    let history: History | null = null;
+    let threshold: number | null = null;
+    let request = 0;
+    const cache = new Map<Range, { at: number; data: History }>();
+
+    // ---- Chargement ----
+    const showStatus = (text: string) => {
+      status.textContent = text;
+      status.hidden = false;
+      chartsEl.hidden = true;
+      note.textContent = '';
+      legend.textContent = '';
+    };
+
+    const show = (data: History) => {
+      history = data;
+      if (!data.since) return showStatus(str.empty);
+      if (!data.points.length) return showStatus(str.none);
+      status.hidden = true;
+      chartsEl.hidden = false;
+      // Historique plus court que la période : on le dit, plutôt que de laisser croire à une panne
+      const first = Date.parse(data.since);
+      note.textContent = first > periodStart(data.range, Date.now()) ? fill(str.building, { d: since.format(first) }) : '';
+      legend.textContent = `${str.legend[data.range]} ${str.gaps}`;
+      draw();
+    };
+
+    const load = async (r: Range, refresh = false) => {
+      const id = ++request;
+      const cached = cache.get(r);
+      if (cached && !refresh && Date.now() - cached.at < REFRESH_MS) return show(cached.data);
+      root.setAttribute('aria-busy', 'true');
+      try {
+        const res = await fetch(`/api/station/history?range=${r}`, { signal: AbortSignal.timeout(15_000) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = (await res.json()) as History;
+        cache.set(r, { at: Date.now(), data });
+        if (id === request) show(data);
+      } catch (err) {
+        console.warn('Station : historique indisponible,', err instanceof Error ? err.message : err);
+        // Une relecture qui échoue garde le graphe déjà affiché
+        if (id === request && !(refresh && history?.range === r)) showStatus(str.error);
+      } finally {
+        if (id === request) root.removeAttribute('aria-busy');
+      }
+    };
+
+    // ---- Dessin ----
+    const r1 = (v: number) => Math.round(v * 10) / 10;
+    const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const path = (pts: [number, number][]) => pts.map(([x, y], i) => `${i ? 'L' : 'M'}${r1(x)},${r1(y)}`).join('');
+
+    const drawChart = (kind: Kind, h: History, now: number) => {
+      const c = charts[kind];
+      const width = c.plot.clientWidth;
+      const height = c.plot.clientHeight;
+      if (!width) return;
+      const left = 48;
+      const right = width - 10;
+      const top = 10;
+      const bottom = height - 26;
+      c.left = left;
+      c.right = right;
+
+      const start = periodStart(h.range, now);
+      const x = (ms: number) => left + ((ms - start) / (now - start)) * (right - left);
+      const temperature = kind === 'temperature' ? temperatureScale(h.points, threshold) : null;
+      const scale: Scale = temperature ?? { min: 0, max: 100, ticks: [0, 25, 50, 75, 100] };
+      const y = (v: number) => bottom - ((v - scale.min) / (scale.max - scale.min)) * (bottom - top);
+      const unit = kind === 'temperature' ? '°C' : '%';
+      const value = (v: number) => (kind === 'temperature' ? one.format(v) : String(v));
+
+      const parts: string[] = [];
+      // Graduations : lignes horizontales et valeurs à gauche
+      for (const v of scale.ticks) {
+        parts.push(`<line class="g-grid" x1="${left}" x2="${right}" y1="${r1(y(v))}" y2="${r1(y(v))}"/>`);
+        parts.push(`<text class="g-label" x="${left - 8}" y="${r1(y(v) + 4)}" text-anchor="end">${upToOne.format(v)} ${unit}</text>`);
+      }
+      // Axe du temps : étiquettes qui ne se chevauchent pas, traits verticaux discrets
+      const labels = spread(
+        timeTicks(h.range, start, now).map((ms) => {
+          const text = tickLabel(h.range, ms);
+          return { x: x(ms), text, width: text.length * 6.8 };
+        }),
+        0,
+        width,
+      );
+      for (const l of labels) {
+        parts.push(`<line class="g-tick" x1="${r1(l.x)}" x2="${r1(l.x)}" y1="${top}" y2="${bottom}"/>`);
+        parts.push(`<text class="g-label" x="${r1(l.x)}" y="${height - 6}" text-anchor="middle">${escape(l.text)}</text>`);
+      }
+      parts.push(`<line class="g-axis" x1="${left}" x2="${right}" y1="${bottom}" y2="${bottom}"/>`);
+
+      // Les données, morceau par morceau : la courbe ne traverse pas les trous
+      const xs = h.points.map((p) => x(pointTime(p, h.bucket_s, now)));
+      const ys = h.points.map((p) => y(kind === 'temperature' ? p.temperature_c : p.light_pct));
+      const indexed = h.points.map((p, i) => ({ time: p.time, i }));
+      const data: string[] = [];
+      for (const seg of segments(indexed, h.bucket_s)) {
+        const line = seg.map(({ i }) => [xs[i], ys[i]] as [number, number]);
+        if (kind === 'temperature' && h.bucket_s > 300) {
+          // Bande du minimum au maximum (moyennes par heure ou par jour)
+          const upper = seg.map(({ i }) => [xs[i], y(h.points[i].temperature_max_c)] as [number, number]);
+          const lower = seg.map(({ i }) => [xs[i], y(h.points[i].temperature_min_c)] as [number, number]).reverse();
+          if (seg.length > 1) data.push(`<path class="g-band" d="${path([...upper, ...lower])}Z"/>`);
+          else data.push(`<line class="g-band-line" x1="${r1(upper[0][0])}" x2="${r1(upper[0][0])}" y1="${r1(upper[0][1])}" y2="${r1(lower[0][1])}"/>`);
+        }
+        if (kind === 'light' && seg.length > 1) {
+          data.push(`<path class="g-area" d="${path([[line[0][0], bottom], ...line, [line[line.length - 1][0], bottom]])}Z"/>`);
+        }
+        if (seg.length > 1) data.push(`<path class="g-line" d="${path(line)}"/>`);
+        else data.push(`<circle class="g-dot" cx="${r1(line[0][0])}" cy="${r1(line[0][1])}" r="3"/>`);
+      }
+      parts.push(`<clipPath id="history-clip-${kind}"><rect x="${left}" y="0" width="${right - left}" height="${bottom}"/></clipPath>`);
+      parts.push(`<g clip-path="url(#history-clip-${kind})">${data.join('')}</g>`);
+
+      // Seuil d'alerte en vigueur (température), s'il est dans l'échelle
+      const chartNote = c.el.querySelector<HTMLElement>('.chart-note')!;
+      chartNote.textContent = '';
+      if (temperature && threshold !== null) {
+        if (temperature.thresholdShown) {
+          const ty = r1(y(threshold));
+          const labelY = ty - 6 < top + 10 ? ty + 14 : ty - 6;
+          parts.push(`<line class="g-threshold" x1="${left}" x2="${right}" y1="${ty}" y2="${ty}"/>`);
+          parts.push(`<text class="g-threshold-label" x="${right - 4}" y="${labelY}" text-anchor="end">${escape(fill(str.threshold, { s: threshold }))}</text>`);
+        } else chartNote.textContent = fill(str.thresholdOut, { s: threshold });
+      }
+
+      // Curseur (survol, toucher), placé par setHover
+      parts.push(`<g class="g-cursor" visibility="hidden"><line y1="${top}" y2="${bottom}"/><circle r="4"/></g>`);
+
+      c.svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      c.svg.innerHTML = parts.join('');
+      c.xs = xs;
+      c.ys = ys;
+
+      // Résumé : écrit au-dessus du graphe, et lu par les lecteurs d'écran
+      const lows = h.points.map((p) => (kind === 'temperature' ? p.temperature_min_c : p.light_pct));
+      const highs = h.points.map((p) => (kind === 'temperature' ? p.temperature_max_c : p.light_pct));
+      const min = Math.min(...lows);
+      const max = Math.max(...highs);
+      const summary = min === max ? `${value(min)} ${unit}` : `${fill(str.between, { min: value(min), max: value(max) })} ${unit}`;
+      c.el.querySelector('.chart-summary')!.textContent = summary;
+      const label = fill(str.over, { title: c.el.dataset.title!, range: str.ranges[h.range], summary });
+      c.svg.setAttribute('aria-label', threshold !== null && temperature ? `${label}, ${fill(str.threshold, { s: threshold })}` : label);
+    };
+
+    const draw = () => {
+      if (!history || chartsEl.hidden) return;
+      const now = Date.now();
+      drawChart('temperature', history, now);
+      drawChart('light', history, now);
+      setHover(null);
+    };
+
+    // ---- Curseur : le même point sur les deux graphes ----
+    const setHover = (index: number | null) => {
+      for (const kind of ['temperature', 'light'] as Kind[]) {
+        const c = charts[kind];
+        const cursor = c.svg.querySelector('.g-cursor');
+        if (!cursor) continue;
+        if (index === null || !history || index >= c.xs.length) {
+          cursor.setAttribute('visibility', 'hidden');
+          c.tip.hidden = true;
+          continue;
+        }
+        const p = history.points[index];
+        const cx = r1(c.xs[index]);
+        const cy = r1(c.ys[index]);
+        cursor.setAttribute('visibility', 'visible');
+        cursor.querySelector('line')!.setAttribute('x1', String(cx));
+        cursor.querySelector('line')!.setAttribute('x2', String(cx));
+        cursor.querySelector('circle')!.setAttribute('cx', String(cx));
+        cursor.querySelector('circle')!.setAttribute('cy', String(cy));
+
+        c.tip.querySelector('.tip-time')!.textContent = slotLabel(p.time, history.bucket_s);
+        c.tip.querySelector('.tip-value')!.textContent =
+          kind === 'light'
+            ? `${p.light_pct} %`
+            : p.temperature_min_c === p.temperature_max_c
+              ? `${one.format(p.temperature_c)} °C`
+              : `${one.format(p.temperature_c)} °C (${fill(str.minMax, { min: one.format(p.temperature_min_c), max: one.format(p.temperature_max_c) })})`;
+        c.tip.hidden = false;
+        // Bulle au-dessus du point (dessous s'il est trop haut), sans sortir du graphe
+        const w = c.tip.offsetWidth;
+        const tipH = c.tip.offsetHeight;
+        c.tip.style.left = `${Math.max(0, Math.min(cx - w / 2, c.plot.clientWidth - w))}px`;
+        c.tip.style.top = `${cy - tipH - 12 >= 0 ? cy - tipH - 12 : cy + 12}px`;
+      }
+    };
+
+    const onPointer = (c: Chart) => (e: PointerEvent) => {
+      if (!history || !c.xs.length) return;
+      const px = e.clientX - c.plot.getBoundingClientRect().left;
+      if (px < c.left - 12 || px > c.right + 12) return setHover(null);
+      setHover(nearest(c.xs, px));
+    };
+    for (const c of Object.values(charts)) {
+      c.plot.addEventListener('pointermove', onPointer(c));
+      c.plot.addEventListener('pointerdown', onPointer(c));
+      // Au doigt, la bulle reste jusqu'au prochain toucher ailleurs
+      c.plot.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && setHover(null));
+    }
+    document.addEventListener('pointerdown', (e) => {
+      if (!chartsEl.contains(e.target as Node)) setHover(null);
+    });
+
+    // ---- Période, seuil, taille, relecture ----
+    buttons.forEach((button) =>
+      button.addEventListener('click', () => {
+        const r = button.dataset.range as Range;
+        if (r === range) return;
+        range = r;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+        load(r);
+      }),
+    );
+    document.addEventListener('station:threshold', (e) => {
+      threshold = (e as CustomEvent<number | null>).detail;
+      draw();
+    });
+    // Redessiné à la largeur réelle : le texte reste net, sur téléphone aussi
+    let lastWidth = 0;
+    new ResizeObserver(() => {
+      if (chartsEl.clientWidth !== lastWidth) {
+        lastWidth = chartsEl.clientWidth;
+        draw();
+      }
+    }).observe(chartsEl);
+    setInterval(() => document.visibilityState === 'visible' && load(range, true), REFRESH_MS);
+
+    load(range);
+  }
+</script>
+
+<style>
+  .history { display: grid; gap: 16px; color: var(--ink); }
+  .history-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; }
+  .history h2 {
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--font-display); font-weight: 900; font-size: clamp(24px, 2.6vw, 32px); line-height: 1.1; text-transform: uppercase;
+  }
+  .history h2 .pin-name { font-size: 12px; }
+
+  /* Période : des pastilles comme les boutons du site, la période choisie pleine */
+  .history-ranges { display: flex; flex-wrap: wrap; gap: 6px; }
+  .range-btn {
+    padding: 0.45em 1.1em; border: 2px solid var(--ink); border-radius: 999px; cursor: pointer;
+    background: transparent; color: var(--ink); font: 600 13px/1.2 var(--font-body);
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .range-btn:hover { background: var(--ink); color: var(--sun); }
+  .range-btn[aria-pressed='true'] { background: var(--ink); color: var(--cream); }
+  .range-btn:focus-visible { outline: 3px solid rgba(252, 202, 70, 0.8); outline-offset: 2px; }
+
+  .history-note, .history-legend { font-size: 14px; color: var(--ink-70); }
+  .history-note:empty, .history-legend:empty { display: none; }
+  /* État sans graphe (chargement, vide, erreur) : un cadre en pointillés */
+  .history-status {
+    padding: 44px 20px; border: 2px dashed var(--line); border-radius: 12px; text-align: center;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-70);
+  }
+  .history-status[hidden] { display: none; }
+
+  .history-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; transition: opacity 0.2s; }
+  .history-charts[hidden] { display: none; }
+  .history[aria-busy='true'] .history-charts { opacity: 0.5; }
+  .chart { min-width: 0; margin: 0; padding: 14px 16px 10px; border: 2px solid var(--ink); border-radius: 12px; background: var(--paper); }
+  .chart figcaption { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 8px; }
+  .chart-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-70); }
+  .chart-summary { font-family: var(--font-display); font-size: 18px; font-weight: 800; }
+  .chart-note { margin-top: 4px; font-size: 12px; font-weight: 700; color: #b54708; }
+  .chart-note:empty { display: none; }
+  /* Défilement vertical au doigt, curseur au glissement horizontal */
+  .chart-plot { position: relative; height: 210px; touch-action: pan-y; }
+  .chart-plot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  @media (max-width: 640px) {
+    .chart { padding: 12px 10px 8px; }
+    .chart-plot { height: 180px; }
+  }
+
+  /* Le SVG est écrit par le script : ses éléments n'ont pas l'attribut de portée d'Astro */
+  .chart-plot :global(.g-label) { font: 600 11px var(--font-body); fill: var(--ink-70); }
+  .chart-plot :global(.g-grid) { stroke: var(--line); stroke-width: 1; }
+  .chart-plot :global(.g-tick) { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 4; }
+  .chart-plot :global(.g-axis) { stroke: var(--ink); stroke-width: 1.5; }
+  .chart-plot :global(.g-line) { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart-plot :global(.g-dot) { fill: var(--ink); }
+  .chart-plot :global(.g-band) { fill: var(--violet); opacity: 0.55; }
+  .chart-plot :global(.g-band-line) { stroke: var(--violet); stroke-width: 5; stroke-linecap: round; opacity: 0.7; }
+  .chart-plot :global(.g-area) { fill: var(--sun); opacity: 0.5; }
+  .chart-plot :global(.g-threshold) { stroke: #b54708; stroke-width: 1.5; stroke-dasharray: 6 5; }
+  .chart-plot :global(.g-threshold-label) { font: 700 11px var(--font-body); fill: #b54708; }
+  .chart-plot :global(.g-cursor line) { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; }
+  .chart-plot :global(.g-cursor circle) { fill: var(--sun); stroke: var(--ink); stroke-width: 2; }
+  .chart-tip {
+    position: absolute; z-index: 1; display: grid; gap: 1px; padding: 6px 9px; border-radius: 8px; pointer-events: none;
+    background: var(--ink); color: var(--cream); font-size: 12px; line-height: 1.35; white-space: nowrap;
+  }
+  .chart-tip[hidden] { display: none; }
+  .tip-time { font-weight: 700; }
+</style>

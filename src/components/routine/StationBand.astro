@@ -367,10 +367,17 @@ const cards = [
       if (th !== undefined && document.activeElement !== input && !input!.dataset.dirty) input!.value = String(th);
     };
 
+    // Le seuil en vigueur, transmis au graphe de température de la vue visiteur (StationHistory)
+    let lastThreshold: number | null = null;
     const renderAll = (s: StationState) => {
       last = s;
       roots.forEach((root) => render(root, s));
       updateControls(s);
+      const threshold = s.measurement?.temperature_threshold_c ?? null;
+      if (threshold !== lastThreshold) {
+        lastThreshold = threshold;
+        document.dispatchEvent(new CustomEvent('station:threshold', { detail: threshold }));
+      }
     };
     watchStation(renderAll, panel ? onReply : undefined);
     // Le passage à « hors ligne » vient du temps qui passe, pas d'un message : on revérifie chaque seconde

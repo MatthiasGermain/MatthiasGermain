@@ -81,6 +81,10 @@ Toutes les 5 min, la station publie un échantillon sur `routine/station/samples
 
 Les graphes lisent `GET /api/station/history?range=24h|7d|30d|1y`, publique, sans session. Elle renvoie `{ range, bucket_s, since, points }` : les échantillons bruts sur 24 h (`bucket_s` 300), des moyennes par heure sur 7 et 30 jours (3600), par jour de l'heure de Paris sur un an (86400). Chaque point porte la moyenne, le minimum et le maximum de la température, la moyenne de la lumière et le nombre d'échantillons ; deux points plus espacés que `bucket_s` encadrent un trou. `since` est l'heure du tout premier échantillon (`null` si la table est vide). Réponse mise en cache 5 min par Vercel (`s-maxage=300, stale-while-revalidate=600`) ; tout autre paramètre que `range` est refusé (400), pour qu'une adresse inventée ne contourne pas le cache.
 
+Les graphes sont dans la vue visiteur seulement (`src/components/routine/StationHistory.astro`, calculs testables à part dans `src/lib/station/chart.ts`) : SVG dessiné par le script à la largeur réelle, heures du fuseau du navigateur, courbe interrompue aux trous. La ligne du seuil vient des mesures en direct : le bandeau Station l'annonce par l'événement `station:threshold`.
+
+Côté base, une connexion par instance de fonction et une requête à la fois (`max_pipeline: 0`) : sans ça, le pooler en mode transaction se bloquait dès que deux requêtes se chevauchaient, et toutes les suivantes attendaient sans fin. Garde-fou : sans réponse en 8 s, le client est abandonné et recréé à la requête suivante.
+
 La page, elle, lit la station avec `web-viewer` (variables `PUBLIC_STATION_MQTT_URL`, `_USERNAME`, `_PASSWORD`, type « Config » : elles partent dans le navigateur, et cet utilisateur ne peut que lire).
 
 Les formulaires POST (connexion, contact) passent la protection CSRF d'Astro grâce à `security.allowedDomains` dans `astro.config.mjs` : tout domaine réellement utilisé doit y figurer.
