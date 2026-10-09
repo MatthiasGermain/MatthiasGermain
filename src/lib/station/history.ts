@@ -30,12 +30,32 @@ export function database(): postgres.Sql | null {
     sql = postgres(clean.toString(), {
       prepare: false, // mode transaction du pooler
       ssl: 'require', // connexion chiffrée (le certificat du pooler Supabase n'est pas signé par une autorité publique)
-      max: 1, // une fonction traite une requête à la fois
+      max: 1, // une seule connexion par instance de fonction
+      // Une requête à la fois sur la connexion, sans envoyer la suivante avant la réponse : le pooler
+      // en mode transaction perd le fil quand deux requêtes se chevauchent (deux visiteurs, ou un
+      // échantillon qui arrive pendant une lecture), et toutes les suivantes restaient bloquées
+      max_pipeline: 0,
       connect_timeout: 5,
       idle_timeout: 20,
     });
   }
   return sql;
+}
+
+const QUERY_TIMEOUT_MS = 8000;
+
+/** Garde-fou : sans réponse de la base en 8 s, le client est abandonné (le prochain appel de
+ *  database() en crée un neuf) plutôt que de bloquer les requêtes qui attendent derrière lui. */
+function guard<T>(work: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      sql?.end({ timeout: 0 }).catch(() => {});
+      sql = null;
+      reject(new Error(`pas de réponse de la base en ${QUERY_TIMEOUT_MS / 1000} s`));
+    }, QUERY_TIMEOUT_MS);
+  });
+  return Promise.race([work, timeout]).finally(() => clearTimeout(timer));
 }
 
 const SLOT_MS = 5 * 60 * 1000;
@@ -78,11 +98,11 @@ export function checkSample(input: unknown, now = Date.now()): SampleCheck {
 /** Enregistre un échantillon. L'heure est la clé : un échantillon reçu deux fois n'est gardé
  *  qu'une fois. */
 export async function insertSample(sql: postgres.Sql, sample: Sample): Promise<void> {
-  await sql`
+  await guard(sql`
     insert into public.station_samples (time, temperature_c, light_pct)
     values (${sample.time}, ${sample.temperature_c}, ${sample.light_pct})
     on conflict (time) do nothing
-  `;
+  `);
 }
 
 /* ---- Lecture : les points des graphes ----------------------------------------------------- */
@@ -124,9 +144,15 @@ export interface History {
 
 const iso = (date: Date) => date.toISOString().replace('.000Z', 'Z');
 
-export async function readHistory(sql: postgres.Sql, range: Range): Promise<History> {
+export function readHistory(sql: postgres.Sql, range: Range): Promise<History> {
+  return guard(queryHistory(sql, range));
+}
+
+async function queryHistory(sql: postgres.Sql, range: Range): Promise<History> {
   const { interval, bucket, bucketSeconds } = RANGES[range];
-  // Moyennes calculées par Postgres ; numeric et bigint convertis en nombres JavaScript
+  // Moyennes calculées par Postgres ; numeric et bigint convertis en nombres JavaScript. La
+  // température est un `real` (24.9 y vaut 24.8999996) : elle passe en numeric avant la moyenne,
+  // pour que celle de 25.0 et 24.9 s'arrondisse bien à 25.0.
   const rows =
     bucket === 'sample'
       ? await sql`
@@ -137,7 +163,7 @@ export async function readHistory(sql: postgres.Sql, range: Range): Promise<Hist
           order by time`
       : await sql`
           select date_trunc(${bucket}, time, 'Europe/Paris') as bucket,
-                 round(avg(temperature_c)::numeric, 1)::float8 as t,
+                 round(avg(temperature_c::numeric), 1)::float8 as t,
                  min(temperature_c)::float8 as t_min,
                  max(temperature_c)::float8 as t_max,
                  round(avg(light_pct))::float8 as light,
