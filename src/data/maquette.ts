@@ -55,7 +55,6 @@ export const projects: Project[] = [
     context: 'Projet personnel qui couvre toute la chaîne, construit étape par étape',
     stack: ['ESP32', 'C++', 'FreeRTOS', 'MQTT', 'Web'],
     visual: 'routine',
-    visualNote: 'Architecture visée',
     live: '/routine',
     repo: 'https://github.com/MatthiasGermain/routine-station',
   },

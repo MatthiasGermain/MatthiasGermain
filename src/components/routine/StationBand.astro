@@ -72,6 +72,7 @@ const cards = [
         <div class="station-card" data-field={c.field}>
           <span class="card-label">{c.label}</span>
           <span class="card-value">--</span>
+          <span class="card-note" />
         </div>
       ))
     }
@@ -156,7 +157,8 @@ const cards = [
         set('light', `${m.light_pct} %`);
         set('alarm', str.alarm[m.alarm]);
         set('motor', str.motor[m.motor]);
-        set('signal', `${m.rssi_dbm} dBm, ${str.signal[signal(m.rssi_dbm)]}`);
+        set('signal', `${m.rssi_dbm} dBm`);
+        root.querySelector('[data-field="signal"] .card-note')!.textContent = str.signal[signal(m.rssi_dbm)];
       }
 
       // Événements reçus depuis l'ouverture de la page (vue visiteur)
@@ -200,6 +202,9 @@ const cards = [
   .station-card { display: grid; gap: 4px; min-width: 0; }
   .card-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.75; }
   .card-value { font-weight: 800; overflow-wrap: anywhere; }
+  /* Précision sous la valeur (qualité du signal Wi-Fi) */
+  .card-note { font-size: 12px; font-weight: 600; opacity: 0.7; }
+  .card-note:empty { display: none; }
   /* Mesure périmée ou station hors ligne : on garde les dernières valeurs, grisées */
   .station.is-stale .station-cards, .station.is-waiting .station-cards { opacity: 0.45; filter: grayscale(1); }
   /* Arrêt d'urgence : la carte passe au rouge (orange quand le buzzer est coupé), le test au jaune */
