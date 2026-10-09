@@ -1,0 +1,244 @@
+---
+/* Bandeau Station : les mesures de routine-station en direct (MQTT dans le navigateur, voir
+ * lib/station/client.ts). Deux formats :
+ * - `compact` : en haut du tableau de bord (vue propriétaire), dans son style verre, thèmes clair et
+ *   sombre ;
+ * - `full` : la vue visiteur, en grand, avec les événements reçus depuis l'ouverture de la page.
+ * Le serveur ne rend que la structure et les libellés ; tout le reste est rempli par le script. */
+import { langOf, tr } from '../../i18n';
+
+interface Props {
+  variant: 'compact' | 'full';
+}
+
+const { variant } = Astro.props;
+const lang = langOf(Astro.url);
+const t = tr(lang);
+
+// Textes affichés par le script, dans la langue de la page
+const strings = {
+  locale: lang === 'en' ? 'en-GB' : 'fr-FR',
+  connecting: t('Connexion au broker…', 'Connecting to the broker…'),
+  reconnecting: t('Broker injoignable, nouvel essai…', 'Broker unreachable, retrying…'),
+  unconfigured: t('Affichage en direct indisponible.', 'Live display unavailable.'),
+  waiting: t('En attente de la station…', 'Waiting for the station…'),
+  online: t('En ligne', 'Online'),
+  offline: t('Hors ligne', 'Offline'),
+  offlineSince: t('Hors ligne depuis {t}', 'Offline since {t}'),
+  reading: t('Mesure de {t}', 'Reading from {t}'),
+  timeUnknown: t("heure de la station inconnue", 'station time unknown'),
+  uptime: t('allumée depuis {d}', 'up for {d}'),
+  alarm: {
+    off: t('Au repos', 'Idle'),
+    on: t('Déclenché', 'Triggered'),
+    silenced: t('Déclenché, buzzer coupé', 'Triggered, buzzer off'),
+    test: t('Test en cours', 'Test running'),
+  },
+  motor: {
+    stopped: t('Arrêté', 'Stopped'),
+    forward: t('Avant', 'Forward'),
+    backward: t('Arrière', 'Backward'),
+    locked: t('Bloqué', 'Locked'),
+  },
+  signal: { good: t('bon', 'good'), fair: t('moyen', 'fair'), weak: t('faible', 'weak') },
+  raised: t("Arrêt d'urgence à {t}, réaction {r} µs", 'Emergency stop at {t}, {r} µs reaction'),
+  cleared: t('Réarmé sur place à {t}', 'Reset on site at {t}'),
+};
+
+const cards = [
+  { field: 'temperature', label: t('Température', 'Temperature') },
+  { field: 'light', label: t('Lumière', 'Light') },
+  { field: 'alarm', label: t("Arrêt d'urgence", 'Emergency stop') },
+  { field: 'motor', label: t('Moteur', 'Motor') },
+  { field: 'signal', label: t('Signal Wi-Fi', 'Wi-Fi signal') },
+];
+---
+
+<section
+  class:list={['station', `station--${variant}`, 'is-waiting']}
+  data-station
+  data-strings={JSON.stringify(strings)}
+  aria-label={t('La station en direct', 'The station, live')}
+>
+  <header class="station-head">
+    <span class="station-led" aria-hidden="true"></span>
+    <p class="station-state" aria-live="polite">{strings.connecting}</p>
+    <p class="station-time"></p>
+  </header>
+
+  <div class="station-cards">
+    {
+      cards.map((c) => (
+        <div class="station-card" data-field={c.field}>
+          <span class="card-label">{c.label}</span>
+          <span class="card-value">--</span>
+        </div>
+      ))
+    }
+  </div>
+
+  {
+    variant === 'full' && (
+      <div class="station-events">
+        <h3>{t('Derniers événements', 'Latest events')}</h3>
+        <ol class="events-list" aria-live="polite">
+          <li class="events-empty">{t("Aucun événement depuis l'ouverture de la page.", 'No event since this page was opened.')}</li>
+        </ol>
+      </div>
+    )
+  }
+</section>
+
+<script>
+  import { watchStation, isLive, type StationState } from '../../lib/station/client';
+
+  type Strings = {
+    locale: string;
+    alarm: Record<string, string>;
+    motor: Record<string, string>;
+    signal: Record<string, string>;
+    [key: string]: string | Record<string, string>;
+  };
+
+  const roots = [...document.querySelectorAll<HTMLElement>('[data-station]')];
+  if (roots.length) {
+    let last: StationState | null = null;
+
+    const fill = (s: string, values: Record<string, string | number>) =>
+      s.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ''));
+    const clock = (ms: number, locale: string, seconds = false) =>
+      new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', ...(seconds && { second: '2-digit' }) }).format(ms);
+    const duration = (s: number) => {
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      return h ? `${h} h ${m} min` : m ? `${m} min` : `${s} s`;
+    };
+    const signal = (dbm: number) => (dbm >= -60 ? 'good' : dbm >= -70 ? 'fair' : 'weak');
+
+    const render = (root: HTMLElement, s: StationState) => {
+      const str = JSON.parse(root.dataset.strings!) as Strings;
+      const text = (k: string) => str[k] as string;
+      const now = Date.now();
+      const live = isLive(s, now);
+      const m = s.measurement;
+      const alarm = m?.alarm ?? 'off';
+
+      // État général : connexion au broker, puis station en ligne ou non
+      let state: string;
+      if (s.broker === 'unconfigured') state = text('unconfigured');
+      else if (s.broker !== 'connected') state = text(s.broker);
+      else if (live) state = text('online');
+      else if (!m && s.online === null) state = text('waiting');
+      else if (s.measuredAt) state = fill(text('offlineSince'), { t: clock(s.measuredAt, str.locale) });
+      else state = text('offline');
+
+      root.classList.toggle('is-waiting', !m);
+      root.classList.toggle('is-live', live);
+      root.classList.toggle('is-stale', !!m && !live);
+      root.dataset.alarm = alarm;
+      root.querySelector('.station-state')!.textContent = state;
+
+      // Heure de la mesure (heure de la station si elle la connaît) et durée depuis le démarrage
+      const timeEl = root.querySelector('.station-time')!;
+      if (m) {
+        const at = m.time ? clock(Date.parse(m.time), str.locale, true) : text('timeUnknown');
+        const parts = [fill(text('reading'), { t: at })];
+        if (root.classList.contains('station--full')) parts.push(fill(text('uptime'), { d: duration(m.uptime_s) }));
+        timeEl.textContent = parts.join(' · ');
+      } else timeEl.textContent = '';
+
+      const set = (field: string, value: string) => {
+        root.querySelector(`[data-field="${field}"] .card-value`)!.textContent = value;
+      };
+      if (m) {
+        const number = new Intl.NumberFormat(str.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        set('temperature', `${number.format(m.temperature_c)} °C`);
+        set('light', `${m.light_pct} %`);
+        set('alarm', str.alarm[m.alarm]);
+        set('motor', str.motor[m.motor]);
+        set('signal', `${m.rssi_dbm} dBm, ${str.signal[signal(m.rssi_dbm)]}`);
+      }
+
+      // Événements reçus depuis l'ouverture de la page (vue visiteur)
+      const list = root.querySelector('.events-list');
+      if (list && s.events.length) {
+        list.replaceChildren(
+          ...s.events.map(({ event, receivedAt }) => {
+            const li = document.createElement('li');
+            const at = clock(event.time ? Date.parse(event.time) : receivedAt, str.locale, true);
+            li.className = `event event--${event.type}`;
+            li.textContent =
+              event.type === 'alarm_raised'
+                ? fill(text('raised'), { t: at, r: event.reaction_us })
+                : fill(text('cleared'), { t: at });
+            return li;
+          }),
+        );
+      }
+    };
+
+    const renderAll = (s: StationState) => {
+      last = s;
+      roots.forEach((root) => render(root, s));
+    };
+    watchStation(renderAll);
+    // Le passage à « hors ligne » vient du temps qui passe, pas d'un message : on revérifie chaque seconde
+    setInterval(() => last && renderAll(last), 1000);
+  }
+</script>
+
+<style>
+  /* ---- Commun ---- */
+  .station { display: grid; gap: 14px; }
+  .station-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+  .station-led { flex: none; width: 10px; height: 10px; border-radius: 50%; background: #9aa0b4; }
+  .station.is-live .station-led { background: #fcca46; box-shadow: 0 0 0 3px rgba(252, 202, 70, 0.3); animation: station-led 2.4s ease-in-out infinite; }
+  .station[data-alarm='on'] .station-led, .station[data-alarm='silenced'] .station-led { background: #d92d20; box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.25); }
+  .station-state { font-weight: 700; }
+  .station-time { font-size: 13px; opacity: 0.75; }
+  .station-cards { display: grid; gap: 12px; transition: opacity 0.3s, filter 0.3s; }
+  .station-card { display: grid; gap: 4px; min-width: 0; }
+  .card-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.75; }
+  .card-value { font-weight: 800; overflow-wrap: anywhere; }
+  /* Mesure périmée ou station hors ligne : on garde les dernières valeurs, grisées */
+  .station.is-stale .station-cards, .station.is-waiting .station-cards { opacity: 0.45; filter: grayscale(1); }
+  /* Arrêt d'urgence : la carte passe au rouge (orange quand le buzzer est coupé), le test au jaune */
+  .station[data-alarm='on'] [data-field='alarm'] { background: #d92d20; border-color: #d92d20; color: #fff; }
+  .station[data-alarm='silenced'] [data-field='alarm'] { background: #f79009; border-color: #f79009; color: #1e2952; }
+  .station[data-alarm='test'] [data-field='alarm'] { background: #fcca46; border-color: #fcca46; color: #1e2952; }
+  @keyframes station-led { 50% { opacity: 0.45; } }
+  @media (prefers-reduced-motion: reduce) { .station-led { animation: none !important; } }
+
+  /* ---- Vue visiteur : en grand, aux couleurs du site ---- */
+  .station--full { gap: 20px; color: var(--ink); }
+  .station--full .station-state { font-family: var(--font-display); font-size: clamp(20px, 2.4vw, 28px); font-weight: 900; text-transform: uppercase; }
+  .station--full .station-time { width: 100%; font-weight: 600; color: var(--ink-70); opacity: 1; }
+  .station--full .station-led { width: 14px; height: 14px; }
+  .station--full .station-cards { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+  .station--full .station-card { padding: 16px 18px; border: 2px solid var(--ink); border-radius: 12px; background: var(--paper); }
+  .station--full .card-label { color: var(--ink-70); opacity: 1; }
+  .station--full .card-value { font-family: var(--font-display); font-size: clamp(22px, 2.6vw, 30px); line-height: 1.15; }
+  .station--full[data-alarm='on'] [data-field='alarm'] .card-label,
+  .station--full[data-alarm='silenced'] [data-field='alarm'] .card-label,
+  .station--full[data-alarm='test'] [data-field='alarm'] .card-label { color: inherit; opacity: 0.85; }
+  .station-events h3 { margin-bottom: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-70); }
+  .events-list { display: grid; gap: 6px; padding: 0; list-style: none; font-size: 15px; }
+  .events-empty { color: var(--ink-70); }
+  .event { position: relative; padding-left: 22px; }
+  .event::before { content: ''; position: absolute; left: 0; top: 0.45em; width: 10px; height: 10px; border-radius: 50%; background: var(--sun); border: 2px solid var(--ink); }
+  .event--alarm_raised::before { background: #d92d20; }
+
+  /* ---- Tableau de bord : compact, dans le verre de la page ---- */
+  .station--compact {
+    gap: 10px; padding: 14px 18px; border-radius: 18px; color: var(--raisin);
+    border: 1px solid var(--glass-border); background: var(--glass);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.4); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    box-shadow: 0 4px 16px rgba(30, 41, 82, 0.08);
+  }
+  .station--compact .station-head { gap: 4px 10px; font-size: 13px; }
+  .station--compact .station-state { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .station--compact .station-cards { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }
+  .station--compact .station-card { padding: 8px 12px; border-radius: 12px; border: 1px solid var(--glass-soft-border); background: var(--glass-soft); }
+  .station--compact .card-label { font-size: 10px; }
+  .station--compact .card-value { font-size: 15px; }
+</style>

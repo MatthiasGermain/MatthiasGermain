@@ -3,6 +3,7 @@
  * affiché seulement avec une session valide (voir lib/routine-auth.ts et pages/routine/index.astro).
  * Contenu repris tel quel de l'ancienne page publique ; ajouts : noindex et déconnexion. */
 import Base from '../../layouts/Base.astro';
+import StationBand from './StationBand.astro';
 import { getScheduleWithStatus, getBlockProgress, formatMinutes } from '../../data/schedule';
 import {
   DOMAIN_LABELS,
@@ -59,6 +60,9 @@ const sortedTodo = prioritizeForDomain(sortTasks(todoTasks, sortKey), domain);
     </form>
 
     <h1>Où j'en <span>suis</span></h1>
+
+    <!-- Bandeau Station, compact : routine-station en direct (étape 4) -->
+    <div class="station-strip"><StationBand variant="compact" /></div>
 
     <div class="layout">
       <aside class="card schedule-card">
@@ -603,6 +607,14 @@ const sortedTodo = prioritizeForDomain(sortTasks(todoTasks, sortKey), domain);
 
     :global(html) {
       background: var(--cream, #f4f0ec);
+    }
+
+    /* Bandeau Station, au-dessus des deux colonnes, à la même largeur */
+    .station-strip {
+      flex-shrink: 0;
+      width: 100%;
+      max-width: 1320px;
+      margin: 0 auto 20px;
     }
 
     .layout {
