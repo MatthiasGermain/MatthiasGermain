@@ -6,6 +6,11 @@ import { connectAsync, type MqttClient } from 'mqtt';
 import { isOwner } from '../../../lib/routine-auth';
 import { checkCommand } from '../../../lib/station/commands';
 import { TOPICS } from '../../../lib/station/protocol';
+import {
+  STATION_MQTT_URL as BROKER_URL,
+  STATION_COMMAND_USERNAME as USERNAME,
+  STATION_COMMAND_PASSWORD as PASSWORD,
+} from 'astro:env/server';
 
 /**
  * Commandes de la station depuis la vue propriétaire de /routine (étape 5 de routine-station).
@@ -19,9 +24,6 @@ import { TOPICS } from '../../../lib/station/protocol';
  * Variables, côté serveur seulement : STATION_MQTT_URL (mqtts://<adresse>:8883),
  * STATION_COMMAND_USERNAME, STATION_COMMAND_PASSWORD.
  */
-const BROKER_URL = import.meta.env.STATION_MQTT_URL;
-const USERNAME = import.meta.env.STATION_COMMAND_USERNAME;
-const PASSWORD = import.meta.env.STATION_COMMAND_PASSWORD;
 
 const MAX_BODY_BYTES = 1024;
 // Une fonction Vercel ne doit pas rester bloquée sur un broker injoignable (limite : 10 s). EMQX

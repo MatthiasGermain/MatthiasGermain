@@ -1,6 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
+import { RESEND_API_KEY, CONTACT_TO as CONTACT_TO_ENV, CONTACT_FROM as CONTACT_FROM_ENV } from 'astro:env/server';
 import { BASE } from '../../data/maquette';
 
 /**
@@ -15,10 +16,8 @@ import { BASE } from '../../data/maquette';
  * - CONTACT_FROM : expéditeur. Sans domaine vérifié chez Resend, seule l'adresse de test
  *   onboarding@resend.dev est permise, et elle n'envoie qu'à l'adresse du compte Resend.
  */
-// `import.meta.env` comme dans lib/notion.ts : c'est lui qui lit le `.env` en dev.
-const RESEND_API_KEY = import.meta.env.RESEND_API_KEY;
-const CONTACT_TO = import.meta.env.CONTACT_TO ?? 'matthias.germain.pro@gmail.com';
-const CONTACT_FROM = import.meta.env.CONTACT_FROM ?? 'Portfolio <onboarding@resend.dev>';
+const CONTACT_TO = CONTACT_TO_ENV ?? 'matthias.germain.pro@gmail.com';
+const CONTACT_FROM = CONTACT_FROM_ENV ?? 'Portfolio <onboarding@resend.dev>';
 
 const LIMITS = { name: 100, email: 200, message: 5000 };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

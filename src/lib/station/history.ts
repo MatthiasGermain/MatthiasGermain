@@ -6,6 +6,7 @@
  * aux fonctions Vercel ; dans ce mode, pas de requêtes préparées (`prepare: false`). Les clés
  * Supabase ne servent pas : la table a la RLS activée sans règle, seul ce serveur y accède. */
 import postgres from 'postgres';
+import { STATION_DB_POSTGRES_URL } from 'astro:env/server';
 
 export interface Sample {
   /** Début de la tranche de 5 min, ISO 8601 UTC à heure ronde (2026-10-09T10:05:00Z) */
@@ -19,7 +20,7 @@ let sql: postgres.Sql | null = null;
 /** Le client Postgres, créé au premier appel et réutilisé tant que la fonction reste chaude ; null
  *  si l'adresse de la base manque. */
 export function database(): postgres.Sql | null {
-  const url = import.meta.env.STATION_DB_POSTGRES_URL;
+  const url = STATION_DB_POSTGRES_URL;
   if (!url) return null;
   if (!sql) {
     // On ne garde de l'adresse que l'hôte, le compte et la base : les paramètres ajoutés par

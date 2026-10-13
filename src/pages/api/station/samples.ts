@@ -2,6 +2,7 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { STATION_INGEST_TOKEN as TOKEN } from 'astro:env/server';
 import { checkSample, database, insertSample } from '../../../lib/station/history';
 
 /**
@@ -15,7 +16,7 @@ import { checkSample, database, insertSample } from '../../../lib/station/histor
  *
  * Variables, côté serveur seulement : STATION_INGEST_TOKEN, STATION_DB_POSTGRES_URL.
  */
-const TOKEN = import.meta.env.STATION_INGEST_TOKEN;
+
 const MAX_BODY_BYTES = 1024;
 
 const json = (body: unknown, status: number) =>

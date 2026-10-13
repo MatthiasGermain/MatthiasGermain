@@ -1,4 +1,11 @@
 import { Client } from '@notionhq/client';
+import {
+  NOTION_TOKEN,
+  NOTION_TASKS_DB_ID,
+  NOTION_STATUS_PROPERTY,
+  NOTION_STATUS_IN_PROGRESS_VALUE,
+  NOTION_STATUS_TODO_VALUE,
+} from 'astro:env/server';
 
 /* ============================================================================
  *  Client Notion — lecture seule de la base de tâches existante.
@@ -10,15 +17,11 @@ import { Client } from '@notionhq/client';
  *   - Titre : "Nom de la tâche" (peu importe, détecté par type "title")
  * ========================================================================== */
 
-// `import.meta.env` (pas `process.env`) : Astro/Vite n'expose les variables
-// non préfixées par PUBLIC_ sur `process.env` qu'en prod (Vercel les injecte
-// au runtime) ; en dev, seul `import.meta.env` lit correctement le `.env`.
-const NOTION_TOKEN = import.meta.env.NOTION_TOKEN;
-const NOTION_TASKS_DB_ID = import.meta.env.NOTION_TASKS_DB_ID;
-
-const STATUS_PROPERTY = import.meta.env.NOTION_STATUS_PROPERTY ?? 'État';
-const IN_PROGRESS_VALUE = import.meta.env.NOTION_STATUS_IN_PROGRESS_VALUE ?? 'En cours';
-const TODO_VALUE = import.meta.env.NOTION_STATUS_TODO_VALUE ?? 'Pas commencé';
+// Variables déclarées dans astro.config.mjs (`env.schema`) : `astro:env/server` lit le `.env` en dev
+// et les variables de Vercel à l'exécution.
+const STATUS_PROPERTY = NOTION_STATUS_PROPERTY ?? 'État';
+const IN_PROGRESS_VALUE = NOTION_STATUS_IN_PROGRESS_VALUE ?? 'En cours';
+const TODO_VALUE = NOTION_STATUS_TODO_VALUE ?? 'Pas commencé';
 
 let client: Client | null = null;
 

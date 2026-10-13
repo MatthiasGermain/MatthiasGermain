@@ -9,7 +9,10 @@ npm install      # installer les dépendances (une seule fois)
 npm run dev      # serveur local → http://localhost:4321
 npm run build    # build de production → dossier dist/
 npm run preview  # prévisualiser le build de production
+npm run check    # vérification des types (TypeScript et composants Astro)
 ```
+
+Astro 7 demande **Node 22.12 ou plus**, en local comme sur Vercel (réglage « Node.js Version » du projet).
 
 > Node est géré par **fnm** sur cette machine. Si `node` n'est pas reconnu dans un
 > nouveau terminal PowerShell, lance d'abord :
@@ -35,6 +38,8 @@ src/
 
 Déployé sur Vercel depuis la branche `main` (Astro détecté automatiquement, build `npm run build`, output `dist`).
 La route `/routine` est rendue côté serveur et lit Notion : variables d'environnement à définir dans Vercel (voir `src/lib/notion.ts`).
+
+Les variables côté serveur sont toutes déclarées dans `astro.config.mjs` (`env.schema`) et lues avec `import { … } from 'astro:env/server'` : Astro les lit à l'exécution (`.env` en local, variables du projet sur Vercel) au lieu de les recopier dans le build. Une nouvelle variable serveur doit y être ajoutée. Seules les variables `PUBLIC_…`, destinées au navigateur, restent lues avec `import.meta.env`.
 
 ## Accès privé à `/routine`
 

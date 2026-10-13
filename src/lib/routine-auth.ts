@@ -6,12 +6,10 @@
  *   sessions, il suffit de changer ROUTINE_SESSION_SECRET.
  * - Pas de limite de tentatives (rien n'est stocké) : le mot de passe doit être long et aléatoire.
  *
- * `import.meta.env` comme dans lib/notion.ts : c'est lui qui lit le `.env` en dev. */
+ * Variables déclarées dans astro.config.mjs (`env.schema`), lues à l'exécution. */
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import type { AstroCookies } from 'astro';
-
-const PASSWORD = import.meta.env.ROUTINE_PASSWORD;
-const SECRET = import.meta.env.ROUTINE_SESSION_SECRET;
+import { ROUTINE_PASSWORD as PASSWORD, ROUTINE_SESSION_SECRET as SECRET } from 'astro:env/server';
 
 export const SESSION_COOKIE = 'routine_session';
 const SESSION_DAYS = 30;
