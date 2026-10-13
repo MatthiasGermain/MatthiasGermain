@@ -89,7 +89,7 @@ const charts = [
 </section>
 
 <script>
-  import { nearest, niceScale, periodStart, pointTime, segments, spread, temperatureScale, timeTicks, type Scale } from '../../lib/station/chart';
+  import { nearest, periodStart, pointTime, segments, spread, temperatureScale, timeTicks, type Scale } from '../../lib/station/chart';
   import type { History, Range } from '../../lib/station/history';
 
   type Kind = 'temperature' | 'light';
@@ -160,7 +160,7 @@ const charts = [
       right: number;
     }
     const charts = Object.fromEntries(
-      (['temperature', 'light'] as Kind[]).map((kind) => {
+      (['temperature', 'light'] as Kind[]).map((kind): [Kind, Chart] => {
         const el = root.querySelector<HTMLElement>(`[data-chart="${kind}"]`)!;
         return [kind, { el, plot: el.querySelector('.chart-plot')!, svg: el.querySelector('svg')!, tip: el.querySelector('.chart-tip')!, xs: [], ys: [], left: 0, right: 0 }];
       }),

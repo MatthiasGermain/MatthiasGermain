@@ -33,7 +33,9 @@ export function database(): postgres.Sql | null {
       max: 1, // une seule connexion par instance de fonction
       // Une requête à la fois sur la connexion, sans envoyer la suivante avant la réponse : le pooler
       // en mode transaction perd le fil quand deux requêtes se chevauchent (deux visiteurs, ou un
-      // échantillon qui arrive pendant une lecture), et toutes les suivantes restaient bloquées
+      // échantillon qui arrive pendant une lecture), et toutes les suivantes restaient bloquées.
+      // Option lue par la bibliothèque, mais absente de ses types
+      // @ts-expect-error
       max_pipeline: 0,
       connect_timeout: 5,
       idle_timeout: 20,

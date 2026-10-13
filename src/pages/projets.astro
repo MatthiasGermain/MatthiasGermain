@@ -30,7 +30,7 @@ const defaultFilter = filters.findIndex((f) => f.id === 'tout');
           <span class="switch-knob" aria-hidden="true"></span>
           {
             filters.map((f) => (
-              <button type="button" role="radio" aria-checked={String(f.id === 'tout')} data-filter={f.id}>
+              <button type="button" role="radio" aria-checked={f.id === 'tout' ? 'true' : 'false'} data-filter={f.id}>
                 {f.label}
               </button>
             ))
