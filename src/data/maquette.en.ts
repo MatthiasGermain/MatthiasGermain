@@ -93,11 +93,15 @@ export const projects: Partial<Record<Visual, ProjectText>> = {
 export const catLabel: Record<Cat, string> = { embarque: 'Embedded', python: 'Python', web: 'Web' };
 export const filterLabel: Record<'tout' | Cat, string> = { embarque: 'Embedded', tout: 'All', web: 'Web', python: 'Python' };
 
-export const steps: Record<StepId, { when?: string; cvWhen?: string; title?: string; where?: string; line?: string; chronoLabel?: string }> = {
+export const steps: Record<StepId, { when?: string; cvWhen?: string; title?: string; where?: string; line?: string; cvPoints?: string[]; chronoLabel?: string }> = {
   freelance: {
     when: 'Since Jan. 2026',
     title: 'Freelance web developer',
     line: 'chuttt.ch, a multilingual platform (FR, DE, EN) connecting individuals with tradespeople, built on my own: authentication, front-end, Payload CMS back office, Supabase, Vercel. In progress: the website of a dance studio.',
+    cvPoints: [
+      'ChuTTT: Swiss quote-comparison platform in three languages, built on my own end to end: multi-step quote flow, authentication, Payload CMS back office, Supabase, Vercel.',
+      'BAPZ Studio (in progress): website and admin for a dance studio, whose content the client manages on their own (Next.js, Payload, PostgreSQL).',
+    ],
   },
   spotlight: {
     when: 'Since Oct. 2023',
@@ -111,6 +115,11 @@ export const steps: Record<StepId, { when?: string; cvWhen?: string; title?: str
     title: 'Software engineer, automation (final-year internship)',
     where: 'Schaeffler, Bühl (Germany)',
     line: 'Automated the toolchain that generates the technical documentation for the DHT hybrid transmission control units: error reports per team, delivery configuration checked and generated (Python, Jenkins, Windchill, Confluence).',
+    cvPoints: [
+      'Python report generator run by Jenkins on every build: a log of 10,000+ entries becomes one Excel workbook per category, with pivot tables per team.',
+      'Delivery configuration tool: 5 checks in Windchill before anything is generated, statuses written back to Confluence (REST API), JSON files generated, human review kept.',
+      'About ten support requests on the build toolchain. Both tools are delivered in Jenkins and approved by the team lead.',
+    ],
   },
   urbanloop: {
     when: 'June - July 2024',
@@ -165,19 +174,20 @@ export const DESCRIPTION =
   'Matthias Germain, embedded and IoT software engineer. TÉLÉCOM Nancy graduate, based in Strasbourg. I work across the whole chain of a connected system: the firmware, the Python tooling around it and the web interface.';
 
 export const PROFILE =
-  'Engineering graduate from TÉLÉCOM Nancy, embedded systems and software track. I work across the whole chain of a connected system: the firmware, the Python tooling around it and the web interface. I am looking for a permanent position as a software engineer, embedded or web, in Strasbourg or Nancy, and I am available immediately.';
+  'Engineering graduate from TÉLÉCOM Nancy, embedded systems and software track. Six months at Schaeffler (automotive) designing Python tools integrated with Jenkins, then freelance web developer. I also work on embedded systems with ESP32 (C/C++, FreeRTOS). I am looking for a permanent software engineering position in Strasbourg or Nancy, and I am available immediately.';
 
 export const skillAreas: Record<string, string> = {
+  'Outillage et automatisation': 'Tooling and automation',
+  'Intégration continue': 'Continuous integration',
   Embarqué: 'Embedded',
-  'Outillage Python': 'Python tooling',
   Web: 'Web',
-  Outils: 'Tools',
 };
 // Compétences et étiquettes de stack dont le nom change en anglais
 export const skillItems: Record<string, string> = { 'API REST': 'REST APIs', 'Confluence (API REST)': 'Confluence (REST API)' };
 
 export const cvExtras = [
-  'Fortin: vice-president of an association devoted to memory across generations, whose website I built.',
+  'Spotlight: volunteer web lead since 2023.',
+  'Fortin: association vice-president, built its website.',
   'Project management MOOC, Centrale Lille.',
   "Driver's license (B).",
 ];

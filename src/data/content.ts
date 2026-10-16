@@ -47,6 +47,8 @@ export const content = (lang: Lang): Content => {
       return {
         ...p,
         ...text,
+        // Un projet retiré du CV en français l'est aussi en anglais
+        cv: p.cv === false ? false : (text.cv ?? p.cv),
         stack: p.stack.map((i) => en.skillItems[i] ?? i),
         caseHref: p.caseHref && href('en', p.caseHref),
         live: p.live && href('en', p.live),

@@ -27,8 +27,8 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
     <SeoHead
       title="CV - Matthias Germain"
       description={t(
-        'CV de Matthias Germain, ingénieur logiciel embarqué et IoT à Strasbourg : expériences, projets et compétences.',
-        'CV of Matthias Germain, embedded and IoT software engineer in Strasbourg: experience, projects and skills.',
+        'CV de Matthias Germain, ingénieur logiciel en automatisation et embarqué à Strasbourg : expériences, projets et compétences.',
+        'CV of Matthias Germain, automation and embedded software engineer in Strasbourg: experience, projects and skills.',
       )}
     />
   </head>
@@ -48,12 +48,12 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
           <h1 class="cv-name display"><span class="light">Matthias</span> <span class="strong">GERMAIN</span></h1>
           {
             lang === 'en' ? (
-              <p class="cv-role"><span class="hl">Embedded &amp; IoT</span> software engineer</p>
+              <p class="cv-role"><span class="hl">Automation</span> software engineer</p>
             ) : (
-              <p class="cv-role">Ingénieur logiciel <span class="hl">embarqué &amp; IoT</span></p>
+              <p class="cv-role">Ingénieur logiciel <span class="hl">automatisation</span></p>
             )
           }
-          <p class="cv-chain">{t("Du firmware à l'interface web", 'From firmware to web interface')}</p>
+          <p class="cv-chain">{t('Outillage Python, intégration continue et embarqué (ESP32)', 'Python tooling, continuous integration and embedded (ESP32)')}</p>
         </div>
         <dl class="cv-contact">
           <div><dt>{t('Tél.', 'Phone')}</dt><dd><a href={`tel:${links.phone.tel}`}>{links.phone.display}</a></dd></div>
@@ -84,7 +84,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
                       </h3>
                       <p class="cv-when">{s.cvWhen ?? s.when}</p>
                     </div>
-                    <p>{s.line}</p>
+                    {s.cvPoints ? <ul class="cv-points">{s.cvPoints.map((point) => <li>{point}</li>)}</ul> : <p>{s.line}</p>}
                   </li>
                 ))
               }
@@ -145,7 +145,7 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
             <p><b>{t('Français :', 'French:')}</b> {t('langue maternelle.', 'native.')}</p>
             <p class="cv-lang">
               <b>{t('Anglais :', 'English:')}</b>
-              {t('B2 (TOEIC), langue de travail de mon stage chez Schaeffler.', 'B2 (TOEIC), working language during my internship at Schaeffler.')}
+              {t('B2 (TOEIC), langue de travail chez Schaeffler.', 'B2 (TOEIC), working language at Schaeffler.')}
             </p>
           </section>
 
@@ -155,8 +155,8 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
               <span class="chip-led" aria-hidden="true"></span>
               {
                 t(
-                  'Immédiatement, en CDI : poste embarqué ou web, à Strasbourg ou à Nancy.',
-                  'Immediately, permanent position: embedded or web role, in Strasbourg or Nancy.',
+                  'Immédiatement, en CDI, à Strasbourg ou à Nancy.',
+                  'Immediately, permanent role in Strasbourg or Nancy.',
                 )
               }
             </p>
@@ -236,6 +236,12 @@ const short = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/
       .cv-lang { margin-top: 1.2mm; }
       .cv-avail { display: flex; align-items: center; gap: 2mm; }
       .cv-extras { display: grid; gap: 1.2mm; padding: 0; list-style: none; }
+      /* Réalisations d'une expérience : puces carrées, comme les broches du site */
+      .cv-points { display: grid; gap: 0.6mm; margin-top: 0.6mm; padding: 0; list-style: none; }
+      .cv-points li { position: relative; padding-left: 3.2mm; }
+      .cv-points li::before {
+        content: ''; position: absolute; left: 0.4mm; top: 0.62em; width: 1.3mm; height: 1.3mm; background: var(--ink);
+      }
       .cv-avail .chip-led { flex: none; animation: none; }
 
       /* Écran étroit : la feuille devient une page fluide (jamais à l'impression, qui garde l'A4) */

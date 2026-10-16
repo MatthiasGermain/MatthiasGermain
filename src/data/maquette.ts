@@ -126,7 +126,8 @@ export const projects: Project[] = [
   },
   {
     title: 'Mesures sous FreeRTOS',
-    cv: "Mesure du CO₂, de la température et de l'humidité sur deux ESP32, déclenchée par ultrasons, tâches FreeRTOS en producteur / consommateur.",
+    // Sur le CV, l'embarqué est déjà porté par routine-station et IRDA (fiche gardée dans le dossier de compétences)
+    cv: false,
     cats: ['embarque'],
     pitch:
       "Mesure du CO₂, de la température et de l'humidité, déclenchée par un capteur à ultrasons, sur deux ESP32 reliés par liaison série. Les tâches FreeRTOS concurrentes suivent un modèle producteur / consommateur.",
@@ -150,7 +151,8 @@ export const projects: Project[] = [
   },
   {
     title: 'narthex',
-    cv: 'Plateforme multi-tenant pour les églises : site public et espace de gestion.',
+    // Sur le CV, le web est déjà porté par l'expérience freelance
+    cv: false,
     cats: ['web'],
     status: 'En test',
     pitch:
@@ -206,6 +208,8 @@ export interface Step {
   cv?: false;
   /** Date plus courte pour le CV, quand la ligne y manque de place */
   cvWhen?: string;
+  /** Réalisations en puces sur le CV, à la place de `line` (qui reste celle du parcours) */
+  cvPoints?: string[];
   /** Place dans le chronogramme du parcours : ligne, période (AAAA-MM, `to` absent = en cours)
    *  et étiquette courte au-dessus de l'impulsion (facultative) */
   chrono: { lane: Lane; from: string; to?: string; label?: string };
@@ -228,6 +232,10 @@ export const steps: Step[] = [
     chrono: { lane: 'freelance', from: '2026-01' },
     where: 'Strasbourg',
     line: "chuttt.ch, plateforme multilingue (FR, DE, EN) de mise en relation entre particuliers et artisans, développée seul : authentification, front-end, back-office Payload CMS, Supabase, Vercel. En cours : le site d'un studio de danse.",
+    cvPoints: [
+      'ChuTTT : plateforme suisse de comparaison de devis en trois langues, développée seul de bout en bout : parcours de demande en plusieurs étapes, authentification, back-office Payload CMS, Supabase, Vercel.',
+      "BAPZ Studio (en cours) : site et administration d'un studio de danse, dont la cliente gère seule les contenus (Next.js, Payload, PostgreSQL).",
+    ],
     current: true,
   },
   {
@@ -238,6 +246,8 @@ export const steps: Step[] = [
     chrono: { lane: 'asso', from: '2023-10', label: 'Spotlight' },
     where: 'Association Spotlight',
     line: 'Développement et suivi de spotlightcrea.fr.',
+    // Sur le CV, dans « Autres » (cvExtras)
+    cv: false,
   },
   {
     id: 'schaeffler',
@@ -246,6 +256,11 @@ export const steps: Step[] = [
     chrono: { lane: 'stage', from: '2025-04', to: '2025-09', label: 'Schaeffler' },
     where: 'Schaeffler, Bühl (Allemagne)',
     line: "Automatisation de la chaîne qui génère la documentation technique des calculateurs de la transmission hybride DHT : rapports d'erreurs par équipe, configuration des livraisons vérifiée et générée (Python, Jenkins, Windchill, Confluence).",
+    cvPoints: [
+      "Générateur de rapports en Python, lancé par Jenkins à chaque build : un log de plus de 10 000 entrées devient un classeur Excel par catégorie, avec des tableaux croisés par équipe.",
+      'Outil de configuration des livraisons : 5 contrôles dans Windchill avant toute génération, statuts réécrits dans Confluence (API REST), fichiers JSON générés, revue humaine conservée.',
+      "Une dizaine de demandes de support sur la chaîne de build. Les deux outils sont livrés dans Jenkins et validés par le chef d'équipe.",
+    ],
   },
   {
     id: 'urbanloop',
@@ -360,15 +375,16 @@ export const portraitRows = {
 export const DESCRIPTION =
   "Matthias Germain, ingénieur logiciel embarqué et IoT. Diplômé de TÉLÉCOM Nancy, basé à Strasbourg. Je travaille sur toute la chaîne d'un système connecté : le firmware, l'outillage Python qui l'entoure et l'interface web.";
 
-/* CV (page /cv et sa version PDF). Les compétences reprennent le tableau du README GitHub. */
+/* CV (page /cv et sa version PDF), orienté outillage et automatisation, avec l'embarqué et le web
+ * en appui. Le détail de chaque expérience est dans le dossier de compétences. */
 export const PROFILE =
-  "Ingénieur diplômé de TÉLÉCOM Nancy, filière systèmes et logiciels embarqués. Je travaille sur toute la chaîne d'un système connecté : le firmware, l'outillage Python qui l'entoure et l'interface web. Je cherche un CDI d'ingénieur logiciel, embarqué ou web, à Strasbourg ou à Nancy, et je suis disponible immédiatement.";
+  "Ingénieur diplômé de TÉLÉCOM Nancy, filière systèmes et logiciels embarqués. Six mois chez Schaeffler (automobile) à concevoir des outils Python intégrés à Jenkins, puis développeur web freelance. Je pratique aussi l'embarqué sur ESP32 (C/C++, FreeRTOS). Je cherche un CDI d'ingénieur logiciel à Strasbourg ou à Nancy, et je suis disponible immédiatement.";
 
 export const skills: { area: string; items: string[] }[] = [
-  { area: 'Embarqué', items: ['C / C++', 'ESP32', 'Arduino', 'PlatformIO', 'FreeRTOS', 'VHDL (Quartus)', 'FPGA', 'RISC-V'] },
-  { area: 'Outillage Python', items: ['Python', 'Flask', 'Jinja2', 'API REST'] },
-  { area: 'Web', items: ['TypeScript', 'React', 'Next.js', 'Astro', 'Tailwind CSS', 'Payload CMS', 'Supabase'] },
-  { area: 'Outils', items: ['Git', 'GitHub Actions', 'GitLab', 'Jenkins', 'Docker', 'Vercel', 'DigitalOcean', 'Linux', 'Claude Code'] },
+  { area: 'Outillage et automatisation', items: ['Python', 'API REST', 'Jinja2', 'Flask', 'Excel (COM)', 'Windchill', 'Confluence'] },
+  { area: 'Intégration continue', items: ['Jenkins', 'GitHub Actions', 'Git', 'Docker', 'Batch, PowerShell', 'Linux', 'Claude Code'] },
+  { area: 'Embarqué', items: ['C / C++', 'ESP32', 'FreeRTOS', 'I2C, UART, IrDA', 'MQTT', 'VHDL, FPGA', 'RISC-V'] },
+  { area: 'Web', items: ['TypeScript', 'Next.js', 'React', 'Astro', 'Payload CMS', 'PostgreSQL', 'Vercel'] },
 ];
 
 export const links = {
@@ -382,7 +398,8 @@ export const links = {
 
 /** Rubrique « Autres » du CV */
 export const cvExtras = [
-  "Fortin : vice-président d'une association de mémoire entre les générations, dont j'ai développé le site.",
+  'Spotlight : responsable web bénévole depuis 2023.',
+  "Fortin : vice-président de l'association et auteur de son site.",
   'MOOC Gestion de projet, Centrale Lille.',
   'Permis B.',
 ];
