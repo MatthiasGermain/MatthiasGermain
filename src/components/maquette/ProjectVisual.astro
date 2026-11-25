@@ -314,45 +314,6 @@ const t = tr(langOf(Astro.url));
       <text x="200" y="222" class="t muted" text-anchor="middle">{t('SUR DEUX ESP32 RELIÉS EN SÉRIE (RX / TX)', 'ON TWO ESP32 BOARDS LINKED OVER SERIAL (RX / TX)')}</text>
     </svg>
   )}
-  {visual === 'spotify' && (
-    <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t('Schéma de spotify_report : toutes les heures, les écoutes sont récupérées et enregistrées ; une fois par jour, le rapport de la veille part par email', "spotify_report diagram: every hour, the plays are fetched and stored; once a day, the previous day's report goes out by email")}>
-      <defs>
-        <marker id="arr-spotify" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0 0 L8 4 L0 8 Z" class="ink" />
-        </marker>
-      </defs>
-      <g class="s">
-        <circle cx="30" cy="34" r="12" class="paper" />
-        <path d="M30 27 V34 H36" />
-        <rect x="10" y="62" width="380" height="150" rx="8" class="dash" />
-        <circle cx="58" cy="125" r="32" class="paper" />
-        <path d="M120 98 H172 L186 112 V152 H120 Z" class="paper" />
-        <path d="M172 98 V112 H186 M130 122 H174 M130 132 H174 M130 142 H162" />
-        <rect x="222" y="98" width="74" height="54" rx="4" class="paper" />
-        <rect x="326" y="104" width="58" height="42" rx="3" class="paper" />
-        <path d="M326 106 L355 128 L384 106" />
-        <path d="M90 125 H116" marker-end="url(#arr-spotify)" />
-        <path d="M188 125 H218" marker-end="url(#arr-spotify)" />
-        <path d="M296 125 H322" marker-end="url(#arr-spotify)" />
-      </g>
-      <rect x="234" y="128" width="8" height="16" class="sun" />
-      <rect x="248" y="118" width="8" height="26" class="sun" />
-      <rect x="262" y="124" width="8" height="20" class="sun" />
-      <rect x="276" y="112" width="8" height="32" class="sun" />
-      <text x="50" y="38" class="t">{t('TOUTES LES HEURES · GITHUB ACTIONS', 'EVERY HOUR · GITHUB ACTIONS')}</text>
-      <text x="58" y="123" class="tb" text-anchor="middle">API</text>
-      <text x="58" y="139" class="t" text-anchor="middle">SPOTIFY</text>
-      <text x="58" y="176" class="t muted" text-anchor="middle">{t('50 DERNIÈRES', 'LAST 50')}</text>
-      <text x="58" y="189" class="t muted" text-anchor="middle">{t('ÉCOUTES', 'PLAYS')}</text>
-      <text x="153" y="172" class="t" text-anchor="middle">{t('CSV / JOUR', 'CSV / DAY')}</text>
-      <text x="153" y="185" class="t muted" text-anchor="middle">{t('SANS DOUBLONS', 'NO DUPLICATES')}</text>
-      <text x="259" y="172" class="t" text-anchor="middle">{t('RAPPORT', 'REPORT')}</text>
-      <text x="259" y="185" class="t muted" text-anchor="middle">{t('DE LA VEILLE', 'PREVIOUS DAY')}</text>
-      <text x="355" y="172" class="t" text-anchor="middle">{t('E-MAIL', 'EMAIL')}</text>
-      <text x="355" y="185" class="t muted" text-anchor="middle">{t('1 PAR JOUR', '1 PER DAY')}</text>
-      <text x="18" y="232" class="t muted">{t('RUNNER AUTO-HÉBERGÉ', 'SELF-HOSTED RUNNER')}</text>
-    </svg>
-  )}
   {visual === 'narthex' && (
     <svg class="vis-svg" viewBox="0 0 400 250" role="img" aria-label={t('Aperçu du tableau de bord de narthex', 'Preview of the narthex dashboard')}>
       <g class="s">
@@ -387,7 +348,7 @@ const t = tr(langOf(Astro.url));
     </svg>
   )}
   {visual === 'blindtest' && (
-    <ScrollShot src="/images/blindtest-full.webp" url="matthiasgermain.github.io/own_blindtest" alt={t("Page d'accueil du blindtest : choix de la source de musique et des jeux", 'Blind test home page: choice of music source and games')} width={800} height={736} />
+    <ScrollShot src="/images/blindtest-full.webp" url="github.io/own_blindtest" alt={t("Page d'accueil du blindtest : choix de la source de musique et des jeux", 'Blind test home page: choice of music source and games')} width={800} height={736} />
   )}
   {visual === 'spotweb' && (
     <ScrollShot src="/images/spotlightcrea-full.webp" url="spotlightcrea.fr" alt={t("Page d'accueil de spotlightcrea.fr", 'Home page of spotlightcrea.fr')} width={800} height={3179} />

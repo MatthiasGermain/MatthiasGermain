@@ -16,6 +16,7 @@ export const localeOf = (lang: Lang) => (lang === 'en' ? 'en-GB' : 'fr-FR');
 const pages: [fr: string, en: string][] = [
   ['/', '/en'],
   ['/projets', '/en/projects'],
+  ['/projets/blindtest', '/en/projects/blindtest'],
   ['/experiences', '/en/experience'],
   ['/experiences/schaeffler', '/en/experience/schaeffler'],
   ['/experiences/urbanloop', '/en/experience/urbanloop'],

@@ -67,13 +67,8 @@ export const projects: Partial<Record<Visual, ProjectText>> = {
     context: 'School project',
     codeNote: 'School project: the repository is no longer available',
   },
-  spotify: {
-    cv: 'History of my Spotify listening and a daily email report, run by GitHub Actions.',
-    pitch: 'Python script that keeps the history of my Spotify listening and emails me a report every day.',
-    role: 'Personal project',
-    context: 'Run by GitHub Actions on a self-hosted runner',
-  },
   blindtest: {
+    cv: 'Online blind test on your own music, with a multiplayer mode refereed by a server.',
     pitch:
       'A blind test on your own music (Deezer profile, Spotify or YouTube Music history, Spotify account), with two more games: pixelated album covers to recognise, and "Who listens to this?", a multiplayer game where everyone plays on their own phone.',
     role: 'Design and development, on my own',

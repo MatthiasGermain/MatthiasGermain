@@ -1,0 +1,296 @@
+---
+/* Présentation détaillée du blindtest, en anglais (version française : /projets/blindtest).
+ * Les chiffres viennent du code : barème (scoring.js), salles (server/src/protocol.ts, game.ts),
+ * pochettes (cover.js). */
+import MaquettePage from '../../../layouts/MaquettePage.astro';
+import StackChips from '../../../components/StackChips.astro';
+import BrowserShot from '../../../components/BrowserShot.astro';
+
+const PLAY = 'https://matthiasgermain.github.io/own_blindtest/';
+const REPO = 'https://github.com/MatthiasGermain/own_blindtest';
+---
+
+<MaquettePage
+  current="projets"
+  title="Blind test"
+  subtitle="A blind test on your own music, and two more games to challenge your friends, solo or together."
+  description="Matthias Germain's blind test: an online game on your own music (Deezer, Spotify, YouTube Music), a static JavaScript site and a TypeScript server on Cloudflare that referees multiplayer games."
+>
+  <div class="wrap case">
+    <dl class="case-facts">
+      <div><dt>Project</dt><dd>Personal, live</dd></div>
+      <div><dt>Role</dt><dd>Design and development, on my own</dd></div>
+      <div><dt>For</dt><dd>Anyone, on a phone or a computer, with no account and nothing to install</dd></div>
+      <div><dt>Stack</dt><dd><StackChips items={['JavaScript', 'TypeScript', 'Cloudflare Workers', 'WebSocket', 'Deezer API', 'Spotify API']} /></dd></div>
+      <div><dt>Hosting</dt><dd>GitHub Pages for the site, Cloudflare for the rooms</dd></div>
+      <div><dt>Code</dt><dd>Public, MIT licence</dd></div>
+      <div>
+        <dt>Links</dt>
+        <dd class="case-links">
+          <a class="pill pill-solid pill-sm" href={PLAY}>Play ↗</a>
+          <a class="pill pill-outline pill-sm" href={REPO}>Code ↗</a>
+        </dd>
+      </div>
+    </dl>
+
+    <div class="case-body">
+      <section>
+        <h2><span class="pin-name">01</span> The idea</h2>
+        <p>
+          Online blind tests play everybody's hits. This one plays <b>each player's own</b> music: their most
+          played songs, their favourites, their playlists. You hear a snippet, find the artist, the title,
+          the album and the year, then challenge your friends on your own taste.
+        </p>
+        <p>The game itself is in French.</p>
+        <figure class="case-figure">
+          <BrowserShot src="/images/blindtest.webp" url="github.io/own_blindtest" alt="Blind test home page: choosing where your music comes from" id="blindtest" />
+          <figcaption>The home page: first, you choose where your music comes from.</figcaption>
+        </figure>
+        <p>Three games share the same sources:</p>
+        <ul>
+          <li>
+            <b>Blind test.</b> A 30-second snippet, and questions: artist, title, album, year. In
+            <i>Classic</i> mode, the number of songs is set in advance; in <i>Sudden death</i>, the game goes
+            on as long as you find the artist or the title. You answer by picking one of 4 options (the
+            default on phones), or by typing everything, typos tolerated.
+          </li>
+          <li>
+            <b>Cover surprise.</b> Five covers from your albums, pixelated, sharper after each of the 6
+            tries. Each try gives a hint: the year, the genre, the artist's initials, then a 5-second snippet.
+          </li>
+          <li>
+            <b>Who listens to this?</b> A multiplayer game, everyone on their own phone. Each player brings
+            15 songs, and every round you guess whose song is playing, and which one it is.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">02</span> Where the music comes from</h2>
+        <table class="case-table">
+          <thead>
+            <tr><th scope="col">Source</th><th scope="col">What you need</th><th scope="col">What gets played</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Deezer</th><td>The link to your public profile, no password</td><td>Your top songs, favourites and playlists</td></tr>
+            <tr><th scope="row">File</th><td>The history Spotify or YouTube Music send on request (ZIP or JSON)</td><td>Your most played songs, since day one</td></tr>
+            <tr><th scope="row">Spotify</th><td>A Premium account added as a tester</td><td>Your liked songs, tops and playlists</td></tr>
+          </tbody>
+        </table>
+        <p>
+          With Deezer and the file, the sound comes from Deezer's public snippets: no account needed, and
+          it works on phones. With Spotify, it goes through Spotify's official player, which needs Premium
+          on a computer, and Spotify limits this connection to 5 testers.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">03</span> How it works</h2>
+        <figure class="case-figure">
+          <svg class="fig-wide" viewBox="0 0 710 290" role="img" aria-label="Architecture: the game site runs in the browser, reads history files and challenge links locally; it calls the Deezer and Spotify APIs; it only talks to the rooms server, over WebSocket, for multiplayer games">
+            <defs>
+              <marker id="arr-bt" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="10" y="24" width="318" height="212" rx="8" class="dash" />
+              <rect x="28" y="42" width="282" height="72" rx="6" class="sun" />
+              <rect x="28" y="148" width="134" height="70" rx="6" class="paper" />
+              <path d="M95 148 V118" marker-end="url(#arr-bt)" />
+              <rect x="176" y="148" width="134" height="70" rx="6" class="paper" />
+              <path d="M243 148 V118" marker-end="url(#arr-bt)" />
+              <rect x="420" y="24" width="280" height="54" rx="6" class="paper dash" />
+              <path d="M310 51 H416" marker-end="url(#arr-bt)" />
+              <rect x="420" y="96" width="280" height="54" rx="6" class="paper dash" />
+              <path d="M310 80 H370 V123 H416" marker-end="url(#arr-bt)" />
+              <rect x="420" y="168" width="280" height="68" rx="6" class="sun" />
+              <path d="M314 104 H390 V202 H416" marker-start="url(#arr-bt)" marker-end="url(#arr-bt)" />
+            </g>
+            <text x="10" y="16" class="t muted">IN THE BROWSER, ON A PHONE OR A COMPUTER</text>
+            <text x="169" y="66" class="t" text-anchor="middle">GAME SITE</text>
+            <text x="169" y="83" class="t muted" text-anchor="middle">JAVASCRIPT · GITHUB PAGES</text>
+            <text x="169" y="99" class="t muted" text-anchor="middle">SCREENS · SCORING · CHALLENGES</text>
+            <text x="95" y="174" class="t" text-anchor="middle">HISTORY FILE</text>
+            <text x="95" y="190" class="t muted" text-anchor="middle">ZIP OR JSON</text>
+            <text x="95" y="205" class="t muted" text-anchor="middle">READ LOCALLY</text>
+            <text x="243" y="174" class="t" text-anchor="middle">CHALLENGE LINK</text>
+            <text x="243" y="190" class="t muted" text-anchor="middle">COMPRESSED GAME</text>
+            <text x="243" y="205" class="t muted" text-anchor="middle">IN THE ADDRESS</text>
+            <text x="560" y="47" class="t" text-anchor="middle">DEEZER API</text>
+            <text x="560" y="64" class="t muted" text-anchor="middle">PROFILES · 30 S SNIPPETS</text>
+            <text x="560" y="119" class="t" text-anchor="middle">SPOTIFY API</text>
+            <text x="560" y="136" class="t muted" text-anchor="middle">OAUTH PKCE SIGN-IN · PLAYER</text>
+            <text x="560" y="191" class="t" text-anchor="middle">ROOMS SERVER</text>
+            <text x="560" y="207" class="t muted" text-anchor="middle">CLOUDFLARE WORKER · TYPESCRIPT</text>
+            <text x="560" y="223" class="t muted" text-anchor="middle">ONE DURABLE OBJECT PER ROOM</text>
+            <text x="560" y="256" class="t muted" text-anchor="middle">WEBSOCKET, MULTIPLAYER ONLY</text>
+            <text x="10" y="282" class="t muted">YELLOW: MY CODE · DASHED: EXTERNAL SERVICES</text>
+          </svg>
+          <svg class="fig-tall" viewBox="0 0 340 560" role="img" aria-label="Architecture: the game site runs in the browser, reads history files and challenge links locally; it calls the Deezer and Spotify APIs; it only talks to the rooms server, over WebSocket, for multiplayer games">
+            <defs>
+              <marker id="arr-bt2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="8" y="24" width="324" height="210" rx="8" class="dash" />
+              <rect x="24" y="40" width="292" height="72" rx="6" class="sun" />
+              <rect x="24" y="146" width="140" height="72" rx="6" class="paper" />
+              <path d="M94 146 V116" marker-end="url(#arr-bt2)" />
+              <rect x="176" y="146" width="140" height="72" rx="6" class="paper" />
+              <path d="M246 146 V116" marker-end="url(#arr-bt2)" />
+              <path d="M20 234 V433" />
+              <rect x="40" y="262" width="284" height="54" rx="6" class="paper dash" />
+              <path d="M20 289 H36" marker-end="url(#arr-bt2)" />
+              <rect x="40" y="330" width="284" height="54" rx="6" class="paper dash" />
+              <path d="M20 357 H36" marker-end="url(#arr-bt2)" />
+              <rect x="40" y="398" width="284" height="70" rx="6" class="sun" />
+              <path d="M20 433 H36" marker-end="url(#arr-bt2)" />
+            </g>
+            <text x="8" y="16" class="t muted">IN THE BROWSER</text>
+            <text x="170" y="64" class="t" text-anchor="middle">GAME SITE</text>
+            <text x="170" y="80" class="t muted" text-anchor="middle">JAVASCRIPT · GITHUB PAGES</text>
+            <text x="170" y="96" class="t muted" text-anchor="middle">SCREENS · SCORING · CHALLENGES</text>
+            <text x="94" y="172" class="t" text-anchor="middle">HISTORY FILE</text>
+            <text x="94" y="188" class="t muted" text-anchor="middle">ZIP OR JSON</text>
+            <text x="94" y="203" class="t muted" text-anchor="middle">READ LOCALLY</text>
+            <text x="246" y="172" class="t" text-anchor="middle">CHALLENGE LINK</text>
+            <text x="246" y="188" class="t muted" text-anchor="middle">COMPRESSED GAME</text>
+            <text x="246" y="203" class="t muted" text-anchor="middle">IN THE ADDRESS</text>
+            <text x="182" y="285" class="t" text-anchor="middle">DEEZER API</text>
+            <text x="182" y="302" class="t muted" text-anchor="middle">PROFILES · 30 S SNIPPETS</text>
+            <text x="182" y="353" class="t" text-anchor="middle">SPOTIFY API</text>
+            <text x="182" y="370" class="t muted" text-anchor="middle">OAUTH PKCE SIGN-IN · PLAYER</text>
+            <text x="182" y="421" class="t" text-anchor="middle">ROOMS SERVER</text>
+            <text x="182" y="437" class="t muted" text-anchor="middle">CLOUDFLARE WORKER · TYPESCRIPT</text>
+            <text x="182" y="453" class="t muted" text-anchor="middle">ONE DURABLE OBJECT PER ROOM</text>
+            <text x="182" y="488" class="t muted" text-anchor="middle">WEBSOCKET, MULTIPLAYER ONLY</text>
+            <text x="8" y="530" class="t muted">YELLOW: MY CODE</text>
+            <text x="8" y="546" class="t muted">DASHED: EXTERNAL SERVICES</text>
+          </svg>
+          <figcaption>Solo, everything happens in the browser. The server only steps in for multiplayer games.</figcaption>
+        </figure>
+        <ul>
+          <li>
+            <b>A static site, with no dependencies and no build step.</b> A few JavaScript files served by
+            GitHub Pages: nothing to install, whether you play or develop.
+          </li>
+          <li>
+            <b>The music sources.</b> Deezer's API does not accept calls from another website, so the game
+            uses its JSONP output. Spotify sign-in works without a server, with the OAuth PKCE flow, and the
+            game pauses whenever the API asks it to slow down.
+          </li>
+          <li>
+            <b>History files are read locally.</b> The ZIP from Spotify or Google is opened in the browser;
+            only plays of at least 30 seconds count.
+          </li>
+          <li>
+            <b>Challenges fit in a link.</b> The game (songs, questions, score) is compressed into the address.
+            A friend replays exactly the same songs, with no account and no database. Since the link can come
+            from anyone, every value is checked and bounded when it is opened.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">04</span> Forgiving scoring</h2>
+        <p>
+          When you type your answers, a typo should not cost you a point, but anything should not pass
+          either. Each answer is compared in four steps:
+        </p>
+        <ol>
+          <li>Both texts are simplified: lower case, no accents or punctuation, "&amp;" becomes "and".</li>
+          <li>What varies between versions is removed: "(feat. X)", "- Remastered 2011".</li>
+          <li>
+            Their similarity is measured (Levenshtein distance): at 80% or more, the answer is worth
+            10 points; at 55% or more, 5 points.
+          </li>
+          <li>
+            For a song with several artists, each one is worth an equal share of the 10 points. For a year,
+            the exact year is worth 10 points, one year off 6, three years off 3.
+          </li>
+        </ol>
+        <p>The result is shared as squares, Wordle-style: 🟧 all right, 🟫 partly, ⬛ missed.</p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">05</span> "Who listens to this?": a server that referees</h2>
+        <p>
+          With several players, no phone can be trusted on its own: the server draws the rounds, keeps the
+          answers secret until the reveal, keeps time and scores. Each room is a Cloudflare Durable Object,
+          which holds the game state and talks to every phone over WebSocket.
+        </p>
+        <p>A game, from start to finish:</p>
+        <ol>
+          <li>The host creates a room and gets a 4-letter code, with no I or O so it reads well aloud.</li>
+          <li>Up to 8 players join; two identical nicknames become "Léa" and "Léa 2".</li>
+          <li>Each player brings 15 of their songs, from any of the three sources.</li>
+          <li>
+            The server draws 10 to 15 rounds, the same number for each player, never more than three in a
+            row with the same player's songs, spreading the artists.
+          </li>
+          <li>
+            Each round, the snippet plays on every phone, or only on the host's when everyone is in the same
+            room. Everyone has 20 seconds to answer.
+          </li>
+          <li>A right answer is worth 100 points, plus up to 50 for speed. Not recognising your own song costs 50 points.</li>
+          <li>The reveal shows who voted for whom, then a podium with awards such as "The most predictable" or "Musical soulmates".</li>
+        </ol>
+        <p>
+          On the security side, only the game's own site can open a room, and one address cannot create more
+          than 10 rooms a minute.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">06</span> Reliability and tests</h2>
+        <ul>
+          <li>
+            <b>The rules are kept apart.</b> Drawing the rounds, scoring and awards are pure functions, with
+            no storage and no network: they can be tested on their own.
+          </li>
+          <li>
+            <b>A lobby test</b> checks the awkward cases: a foreign site refused, an unknown code, a room full
+            at 8, only the host can start, invalid music refused, nicknames cleaned, no secret token visible
+            to others, and a phone that reconnects gets its seat back.
+          </li>
+          <li>
+            <b>A full-game test</b> plays three simulated players, with shared songs, right and wrong answers,
+            a timeout and a phone that reconnects mid-round, up to the podium, whose scores must match the
+            lobby's.
+          </li>
+          <li>
+            <b>A development tool</b> simulates several phones in a single tab, to test a room without three
+            devices at hand.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">07</span> Privacy</h2>
+        <ul>
+          <li>Solo, nothing leaves the device: no account, no server, and the history stays in the browser.</li>
+          <li>In a room, only the 15 songs brought and the nickname go through the server, which deletes them 2 hours after the last game.</li>
+          <li>Audience measurement uses no cookies and only receives game facts (source, mode, score range), never a name or a song.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">08</span> What I take away</h2>
+        <ul>
+          <li><b>A complete product, end to end:</b> the idea, the interface, the sources, the server, going live and the documentation.</li>
+          <li><b>Real-time multiplayer:</b> an authoritative server, state shared between phones, and tests that replay a whole game.</li>
+          <li><b>Working within other people's limits:</b> an API the browser cannot call directly, a sign-in limited to 5 testers, history formats that differ from one service to another.</li>
+          <li><b>Privacy by design:</b> whatever can stay on the device stays there.</li>
+        </ul>
+      </section>
+
+      <p class="case-back"><a class="pill pill-outline pill-sm" href="/en/projects">← All projects</a></p>
+    </div>
+  </div>
+</MaquettePage>
+
+<style>
+  .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+</style>

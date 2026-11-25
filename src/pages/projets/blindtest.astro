@@ -1,0 +1,302 @@
+---
+/* Présentation détaillée du blindtest (dépôt own_blindtest), en français (version anglaise :
+ * /en/projects/blindtest). Les chiffres viennent du code : barème (scoring.js), salles
+ * (server/src/protocol.ts, game.ts), pochettes (cover.js). */
+import MaquettePage from '../../layouts/MaquettePage.astro';
+import StackChips from '../../components/StackChips.astro';
+import BrowserShot from '../../components/BrowserShot.astro';
+
+const PLAY = 'https://matthiasgermain.github.io/own_blindtest/';
+const REPO = 'https://github.com/MatthiasGermain/own_blindtest';
+---
+
+<MaquettePage
+  current="projets"
+  title="Blindtest"
+  subtitle="Un blindtest sur sa propre musique, et deux autres jeux pour défier ses amis, en solo ou à plusieurs."
+  description="Le blindtest de Matthias Germain : un jeu en ligne sur sa propre musique (Deezer, Spotify, YouTube Music), un site statique en JavaScript et un serveur Cloudflare en TypeScript qui arbitre les parties à plusieurs."
+>
+  <div class="wrap case">
+    <dl class="case-facts">
+      <div><dt>Projet</dt><dd>Personnel, en ligne</dd></div>
+      <div><dt>Rôle</dt><dd>Conception et développement, seul</dd></div>
+      <div><dt>Pour qui</dt><dd>Tout le monde, sur téléphone ou ordinateur, sans compte ni installation</dd></div>
+      <div><dt>Stack</dt><dd><StackChips items={['JavaScript', 'TypeScript', 'Cloudflare Workers', 'WebSocket', 'API Deezer', 'API Spotify']} /></dd></div>
+      <div><dt>Hébergement</dt><dd>GitHub Pages pour le site, Cloudflare pour les salles</dd></div>
+      <div><dt>Code</dt><dd>Public, licence MIT</dd></div>
+      <div>
+        <dt>Liens</dt>
+        <dd class="case-links">
+          <a class="pill pill-solid pill-sm" href={PLAY}>Jouer ↗</a>
+          <a class="pill pill-outline pill-sm" href={REPO}>Code ↗</a>
+        </dd>
+      </div>
+    </dl>
+
+    <div class="case-body">
+      <section>
+        <h2><span class="pin-name">01</span> L'idée</h2>
+        <p>
+          Les blindtests en ligne passent les tubes de tout le monde. Celui-ci joue la musique <b>de chacun</b> :
+          ses titres les plus écoutés, ses coups de cœur, ses playlists. On écoute un extrait, on trouve
+          l'artiste, le titre, l'album et l'année, puis on défie ses amis sur ses propres goûts.
+        </p>
+        <figure class="case-figure">
+          <BrowserShot src="/images/blindtest.webp" url="github.io/own_blindtest" alt="Accueil du blindtest : choix de la source de musique" id="blindtest" />
+          <figcaption>L'accueil : on choisit d'abord d'où vient sa musique.</figcaption>
+        </figure>
+        <p>Trois jeux partagent les mêmes sources :</p>
+        <ul>
+          <li>
+            <b>Blindtest.</b> Un extrait de 30 secondes, et des questions : artiste, titre, album, année. En
+            mode <i>Classique</i>, le nombre de titres est fixé ; en <i>Mort subite</i>, la partie continue
+            tant qu'on trouve l'artiste ou le titre. On répond en choisissant parmi 4 propositions (par
+            défaut sur téléphone), ou en tapant tout, fautes de frappe tolérées.
+          </li>
+          <li>
+            <b>Pochette surprise.</b> Cinq pochettes de ses albums, pixelisées, de plus en plus nettes à
+            chacun des 6 essais. Chaque essai donne un indice : l'année, le genre, les initiales de
+            l'artiste, puis un extrait de 5 secondes.
+          </li>
+          <li>
+            <b>Qui écoute ça ?</b> À plusieurs, chacun sur son téléphone. Chacun apporte 15 titres, et à
+            chaque manche il faut deviner à qui appartient l'extrait, et lequel c'est.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">02</span> D'où vient la musique</h2>
+        <table class="case-table">
+          <thead>
+            <tr><th scope="col">Source</th><th scope="col">Ce qu'il faut</th><th scope="col">Ce qu'on joue</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Deezer</th><td>Le lien de son profil public, sans mot de passe</td><td>Son top, ses coups de cœur, ses playlists</td></tr>
+            <tr><th scope="row">Fichier</th><td>L'historique que Spotify ou YouTube Music envoient sur demande (ZIP ou JSON)</td><td>Ses titres les plus écoutés, depuis le premier jour</td></tr>
+            <tr><th scope="row">Spotify</th><td>Un compte Premium ajouté comme testeur</td><td>Ses titres likés, ses tops, ses playlists</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Avec Deezer et le fichier, le son vient des extraits publics de Deezer : pas de compte, et ça
+          marche sur téléphone. Avec Spotify, il passe par son lecteur officiel, réservé aux comptes
+          Premium sur ordinateur, et limité par Spotify à 5 testeurs.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">03</span> Comment ça marche</h2>
+        <figure class="case-figure">
+          <svg class="fig-wide" viewBox="0 0 710 290" role="img" aria-label="Architecture : le site du jeu tourne dans le navigateur, lit l'historique sur place et les liens de défi ; il appelle les API Deezer et Spotify ; il ne parle au serveur des salles, par WebSocket, que pour jouer à plusieurs">
+            <defs>
+              <marker id="arr-bt" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="10" y="24" width="318" height="212" rx="8" class="dash" />
+              <rect x="28" y="42" width="282" height="72" rx="6" class="sun" />
+              <rect x="28" y="148" width="134" height="70" rx="6" class="paper" />
+              <path d="M95 148 V118" marker-end="url(#arr-bt)" />
+              <rect x="176" y="148" width="134" height="70" rx="6" class="paper" />
+              <path d="M243 148 V118" marker-end="url(#arr-bt)" />
+              <rect x="420" y="24" width="280" height="54" rx="6" class="paper dash" />
+              <path d="M310 51 H416" marker-end="url(#arr-bt)" />
+              <rect x="420" y="96" width="280" height="54" rx="6" class="paper dash" />
+              <path d="M310 80 H370 V123 H416" marker-end="url(#arr-bt)" />
+              <rect x="420" y="168" width="280" height="68" rx="6" class="sun" />
+              <path d="M314 104 H390 V202 H416" marker-start="url(#arr-bt)" marker-end="url(#arr-bt)" />
+            </g>
+            <text x="10" y="16" class="t muted">DANS LE NAVIGATEUR, SUR TÉLÉPHONE OU ORDINATEUR</text>
+            <text x="169" y="66" class="t" text-anchor="middle">SITE DU JEU</text>
+            <text x="169" y="83" class="t muted" text-anchor="middle">JAVASCRIPT · GITHUB PAGES</text>
+            <text x="169" y="99" class="t muted" text-anchor="middle">ÉCRANS · CORRECTION · DÉFIS</text>
+            <text x="95" y="174" class="t" text-anchor="middle">HISTORIQUE</text>
+            <text x="95" y="190" class="t muted" text-anchor="middle">ZIP OU JSON</text>
+            <text x="95" y="205" class="t muted" text-anchor="middle">LU SUR PLACE</text>
+            <text x="243" y="174" class="t" text-anchor="middle">LIEN DE DÉFI</text>
+            <text x="243" y="190" class="t muted" text-anchor="middle">PARTIE COMPRESSÉE</text>
+            <text x="243" y="205" class="t muted" text-anchor="middle">DANS L'ADRESSE</text>
+            <text x="560" y="47" class="t" text-anchor="middle">API DEEZER</text>
+            <text x="560" y="64" class="t muted" text-anchor="middle">PROFILS · EXTRAITS DE 30 S</text>
+            <text x="560" y="119" class="t" text-anchor="middle">API SPOTIFY</text>
+            <text x="560" y="136" class="t muted" text-anchor="middle">CONNEXION OAUTH PKCE · LECTEUR</text>
+            <text x="560" y="191" class="t" text-anchor="middle">SERVEUR DES SALLES</text>
+            <text x="560" y="207" class="t muted" text-anchor="middle">WORKER CLOUDFLARE · TYPESCRIPT</text>
+            <text x="560" y="223" class="t muted" text-anchor="middle">UN DURABLE OBJECT PAR SALLE</text>
+            <text x="560" y="256" class="t muted" text-anchor="middle">WEBSOCKET, SEULEMENT À PLUSIEURS</text>
+            <text x="10" y="282" class="t muted">EN JAUNE : MON CODE · POINTILLÉS : SERVICES EXTERNES</text>
+          </svg>
+          <svg class="fig-tall" viewBox="0 0 340 560" role="img" aria-label="Architecture : le site du jeu tourne dans le navigateur, lit l'historique sur place et les liens de défi ; il appelle les API Deezer et Spotify ; il ne parle au serveur des salles, par WebSocket, que pour jouer à plusieurs">
+            <defs>
+              <marker id="arr-bt2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" class="ink" />
+              </marker>
+            </defs>
+            <g class="s">
+              <rect x="8" y="24" width="324" height="210" rx="8" class="dash" />
+              <rect x="24" y="40" width="292" height="72" rx="6" class="sun" />
+              <rect x="24" y="146" width="140" height="72" rx="6" class="paper" />
+              <path d="M94 146 V116" marker-end="url(#arr-bt2)" />
+              <rect x="176" y="146" width="140" height="72" rx="6" class="paper" />
+              <path d="M246 146 V116" marker-end="url(#arr-bt2)" />
+              <path d="M20 234 V433" />
+              <rect x="40" y="262" width="284" height="54" rx="6" class="paper dash" />
+              <path d="M20 289 H36" marker-end="url(#arr-bt2)" />
+              <rect x="40" y="330" width="284" height="54" rx="6" class="paper dash" />
+              <path d="M20 357 H36" marker-end="url(#arr-bt2)" />
+              <rect x="40" y="398" width="284" height="70" rx="6" class="sun" />
+              <path d="M20 433 H36" marker-end="url(#arr-bt2)" />
+            </g>
+            <text x="8" y="16" class="t muted">DANS LE NAVIGATEUR</text>
+            <text x="170" y="64" class="t" text-anchor="middle">SITE DU JEU</text>
+            <text x="170" y="80" class="t muted" text-anchor="middle">JAVASCRIPT · GITHUB PAGES</text>
+            <text x="170" y="96" class="t muted" text-anchor="middle">ÉCRANS · CORRECTION · DÉFIS</text>
+            <text x="94" y="172" class="t" text-anchor="middle">HISTORIQUE</text>
+            <text x="94" y="188" class="t muted" text-anchor="middle">ZIP OU JSON</text>
+            <text x="94" y="203" class="t muted" text-anchor="middle">LU SUR PLACE</text>
+            <text x="246" y="172" class="t" text-anchor="middle">LIEN DE DÉFI</text>
+            <text x="246" y="188" class="t muted" text-anchor="middle">PARTIE COMPRESSÉE</text>
+            <text x="246" y="203" class="t muted" text-anchor="middle">DANS L'ADRESSE</text>
+            <text x="182" y="285" class="t" text-anchor="middle">API DEEZER</text>
+            <text x="182" y="302" class="t muted" text-anchor="middle">PROFILS · EXTRAITS DE 30 S</text>
+            <text x="182" y="353" class="t" text-anchor="middle">API SPOTIFY</text>
+            <text x="182" y="370" class="t muted" text-anchor="middle">CONNEXION OAUTH PKCE · LECTEUR</text>
+            <text x="182" y="421" class="t" text-anchor="middle">SERVEUR DES SALLES</text>
+            <text x="182" y="437" class="t muted" text-anchor="middle">WORKER CLOUDFLARE · TYPESCRIPT</text>
+            <text x="182" y="453" class="t muted" text-anchor="middle">UN DURABLE OBJECT PAR SALLE</text>
+            <text x="182" y="488" class="t muted" text-anchor="middle">WEBSOCKET, SEULEMENT À PLUSIEURS</text>
+            <text x="8" y="530" class="t muted">EN JAUNE : MON CODE</text>
+            <text x="8" y="546" class="t muted">POINTILLÉS : SERVICES EXTERNES</text>
+          </svg>
+          <figcaption>En solo, tout se passe dans le navigateur. Le serveur n'intervient que pour jouer à plusieurs.</figcaption>
+        </figure>
+        <ul>
+          <li>
+            <b>Un site statique, sans dépendance ni étape de compilation.</b> Quelques fichiers JavaScript
+            servis par GitHub Pages : il n'y a rien à installer, ni pour jouer, ni pour développer.
+          </li>
+          <li>
+            <b>Les sources de musique.</b> L'API de Deezer n'autorise pas les appels depuis un autre site :
+            le jeu passe par sa version JSONP. Pour Spotify, la connexion se fait sans serveur, avec le
+            protocole OAuth PKCE, et le jeu fait une pause quand l'API demande de ralentir.
+          </li>
+          <li>
+            <b>Les fichiers d'historique sont lus sur place.</b> Le ZIP envoyé par Spotify ou Google est
+            ouvert dans le navigateur ; seules les écoutes d'au moins 30 secondes comptent.
+          </li>
+          <li>
+            <b>Les défis tiennent dans un lien.</b> La partie (titres, questions, score) est compressée et
+            placée dans l'adresse. Un ami rejoue exactement les mêmes titres, sans compte ni base de données.
+            Comme ce lien peut venir de n'importe qui, chaque valeur est vérifiée et bornée à l'ouverture.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">04</span> Une correction tolérante</h2>
+        <p>
+          Quand on tape ses réponses, une faute de frappe ne doit pas coûter un point, mais il ne faut pas
+          non plus accepter n'importe quoi. Chaque réponse est comparée en quatre temps :
+        </p>
+        <ol>
+          <li>Les deux textes sont simplifiés : minuscules, sans accents ni ponctuation, « &amp; » devient « and ».</li>
+          <li>Ce qui varie d'une version à l'autre est retiré : « (feat. X) », « - Remastered 2011 ».</li>
+          <li>
+            Leur ressemblance est mesurée (distance de Levenshtein) : à 80 % ou plus, la réponse vaut
+            10 points ; à 55 % ou plus, 5 points.
+          </li>
+          <li>
+            Pour un titre à plusieurs artistes, chacun vaut une part égale des 10 points. Pour une année,
+            l'année exacte vaut 10 points, à un an près 6, à trois ans près 3.
+          </li>
+        </ol>
+        <p>
+          Le résultat se partage en carrés, comme Wordle : 🟧 tout bon, 🟫 en partie, ⬛ raté.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">05</span> « Qui écoute ça ? » : un serveur qui arbitre</h2>
+        <p>
+          À plusieurs, on ne peut plus faire confiance à chaque téléphone : c'est le serveur qui tire les
+          manches, garde les réponses secrètes jusqu'à la révélation, chronomètre et compte les points.
+          Chaque salle est un Durable Object Cloudflare, qui garde l'état de la partie et parle à tous les
+          téléphones en WebSocket.
+        </p>
+        <p>Une partie, du début à la fin :</p>
+        <ol>
+          <li>L'hôte crée une salle et obtient un code de 4 lettres, sans I ni O pour qu'il se lise à voix haute.</li>
+          <li>Jusqu'à 8 joueurs rejoignent la salle ; deux pseudos identiques deviennent « Léa » et « Léa 2 ».</li>
+          <li>Chacun apporte 15 de ses titres, depuis l'une des trois sources.</li>
+          <li>
+            Le serveur tire entre 10 et 15 manches, le même nombre pour chaque joueur, jamais plus de trois
+            d'affilée avec les titres d'un même joueur, en répartissant les artistes.
+          </li>
+          <li>
+            À chaque manche, l'extrait passe sur chaque téléphone, ou seulement sur celui de l'hôte si tout
+            le monde est dans la même pièce. Chacun a 20 secondes pour répondre.
+          </li>
+          <li>
+            Bonne réponse : 100 points, plus 50 au plus pour la vitesse. Ne pas reconnaître son propre
+            titre coûte 50 points.
+          </li>
+          <li>La révélation montre qui a voté pour qui, puis un podium avec des titres : « Le plus prévisible », « Âmes sœurs musicales »…</li>
+        </ol>
+        <p>
+          Côté sécurité, seul le site du jeu peut ouvrir une salle, et une même adresse ne peut pas en créer
+          plus de 10 par minute.
+        </p>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">06</span> Fiabilité et tests</h2>
+        <ul>
+          <li>
+            <b>Les règles sont séparées du reste.</b> Le tirage des manches, le barème et le podium sont des
+            fonctions pures, sans stockage ni réseau : on peut les tester seules.
+          </li>
+          <li>
+            <b>Un test du salon</b> vérifie les cas qui dérangent : site étranger refusé, code inconnu,
+            salle pleine à 8, seul l'hôte peut lancer, musique invalide refusée, pseudo nettoyé, aucun
+            jeton secret visible des autres, et un téléphone qui se reconnecte retrouve sa place.
+          </li>
+          <li>
+            <b>Un test de partie complète</b> fait jouer trois joueurs simulés, avec des titres en commun,
+            des bonnes et des mauvaises réponses, un temps écoulé et un téléphone qui se reconnecte en
+            pleine manche, jusqu'au podium, dont les scores doivent correspondre à ceux du salon.
+          </li>
+          <li>
+            <b>Un outil de développement</b> simule plusieurs téléphones dans un même onglet, pour tester une
+            salle sans avoir trois appareils sous la main.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">07</span> Vie privée</h2>
+        <ul>
+          <li>En solo, rien ne quitte l'appareil : pas de compte, pas de serveur, et l'historique reste dans le navigateur.</li>
+          <li>Dans une salle, seuls les 15 titres apportés et le pseudo passent par le serveur, qui les efface 2 heures après la dernière partie.</li>
+          <li>La mesure d'audience n'utilise aucun cookie et ne reçoit que des faits de partie (source, mode, tranche de score), jamais un nom ni un titre.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="pin-name">08</span> Ce que j'en retire</h2>
+        <ul>
+          <li><b>Un produit complet, de bout en bout :</b> l'idée, l'interface, les sources, le serveur, la mise en ligne et la documentation.</li>
+          <li><b>Le temps réel à plusieurs :</b> un serveur qui fait autorité, des états partagés entre téléphones, et des tests qui rejouent une partie entière.</li>
+          <li><b>Faire avec les contraintes des autres :</b> une API sans accès direct depuis le navigateur, une connexion limitée à 5 testeurs, des formats d'historique différents d'un service à l'autre.</li>
+          <li><b>La vie privée dès la conception :</b> tout ce qui peut rester sur l'appareil y reste.</li>
+        </ul>
+      </section>
+
+      <p class="case-back"><a class="pill pill-outline pill-sm" href="/projets">← Tous les projets</a></p>
+    </div>
+  </div>
+</MaquettePage>
+
+<style>
+  .case-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+</style>
