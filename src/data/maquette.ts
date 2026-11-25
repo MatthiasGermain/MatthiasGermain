@@ -5,7 +5,7 @@
 
 // Les trois maillons de la chaîne : l'objet, l'outillage, l'interface.
 export type Cat = 'embarque' | 'python' | 'web';
-export type Visual = 'routine' | 'risc' | 'irda' | 'freertos' | 'schaeffler' | 'urbanloop' | 'web' | 'spotify' | 'blindtest' | 'narthex' | 'spotweb';
+export type Visual = 'routine' | 'risc' | 'irda' | 'freertos' | 'schaeffler' | 'urbanloop' | 'web' | 'blindtest' | 'narthex' | 'spotweb';
 
 export interface Project {
   title: string;
@@ -19,6 +19,8 @@ export interface Project {
   role: string;
   context: string;
   stack: string[];
+  /** Stack plus courte pour le CV, quand la ligne y manque de place */
+  cvStack?: string[];
   visual: Visual;
   /** Petite étiquette sur le visuel (ex. « Architecture visée » pour un projet en construction) */
   visualNote?: string;
@@ -137,21 +139,8 @@ export const projects: Project[] = [
     codeNote: "Projet scolaire : le dépôt n'est plus disponible",
   },
   {
-    title: 'spotify_report',
-    cv: 'Historique de mes écoutes Spotify et rapport quotidien par email, lancé par GitHub Actions.',
-    cats: ['python'],
-    pitch:
-      "Script Python qui garde l'historique de mes écoutes Spotify et m'envoie chaque jour un rapport par e-mail.",
-    role: 'Projet personnel',
-    context: 'Lancé par GitHub Actions sur un runner auto-hébergé',
-    stack: ['Python', 'Spotipy', 'GitHub Actions'],
-    visual: 'spotify',
-    repo: 'https://github.com/MatthiasGermain/spotify_report',
-  },
-  {
     title: 'Blindtest',
-    // Pas de place sur le CV (une page)
-    cv: false,
+    cv: 'Blindtest en ligne sur sa propre musique, avec un mode à plusieurs arbitré par un serveur.',
     cats: ['web'],
     pitch:
       "Un blindtest sur sa propre musique (profil Deezer, historique Spotify ou YouTube Music, compte Spotify), avec deux autres jeux : des pochettes d'albums pixelisées à reconnaître, et « Qui écoute ça ? », une partie à plusieurs où chacun joue sur son téléphone.",
@@ -159,8 +148,10 @@ export const projects: Project[] = [
     context:
       "Projet personnel en ligne. Site statique sans dépendance ; les parties à plusieurs passent par un serveur qui arbitre les manches, testé par une partie simulée à trois joueurs",
     stack: ['JavaScript', 'TypeScript', 'Cloudflare Workers', 'WebSocket', 'API Deezer', 'API Spotify'],
+    cvStack: ['JavaScript', 'TypeScript', 'Cloudflare Workers'],
     visual: 'blindtest',
     visualNote: 'Faites défiler la page',
+    caseHref: '/projets/blindtest',
     repo: 'https://github.com/MatthiasGermain/own_blindtest',
     site: { label: 'Jouer', url: 'https://matthiasgermain.github.io/own_blindtest/' },
   },

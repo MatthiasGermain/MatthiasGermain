@@ -19,7 +19,7 @@ En recherche d'un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg o
 | Embarqué | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), FPGA, RISC-V |
 | Outillage Python | Python, Flask, Jinja2, API REST |
 | Web | TypeScript, React, Next.js, Astro, Tailwind CSS, Payload CMS, Supabase |
-| Outils | Git, GitHub Actions, GitLab, Jenkins, Docker, Vercel, DigitalOcean, Linux, Claude Code |
+| Outils | Git, GitHub Actions, GitLab, Jenkins, Docker, Vercel, Cloudflare, DigitalOcean, Linux, Claude Code |
 
 ### Projets
 
@@ -28,7 +28,7 @@ En recherche d'un poste d'ingénieur logiciel, embarqué ou web, à Strasbourg o
 | [routine-station](https://github.com/MatthiasGermain/routine-station) | Station de supervision connectée : ESP32, capteurs, moteur pas-à-pas, MQTT et page web de contrôle. En cours, construite étape par étape. |
 | [IRDA_FOR_BELOOP](https://github.com/MatthiasGermain/IRDA_FOR_BELOOP) | Firmware C++ (ESP32) de communication infrarouge, réalisé en bureau d'études UrbanLoop en 3e année : signalisation, gestion vitesse et arrêt, affichage OLED. |
 | [RISC-V-Processor](https://github.com/MatthiasGermain/RISC-V-Processor) | Processeur RISC-V en VHDL (instructions R, I, L), avec un script Python de vérification et un [simulateur web](https://matthiasgermain.github.io/RISC-V-Processor/). |
-| [spotify_report](https://github.com/MatthiasGermain/spotify_report) | Rapport d'écoute Spotify en Python : historique en CSV, statistiques du jour, envoi par e-mail, lancé par un workflow GitHub Actions sur un runner auto-hébergé. |
+| [own_blindtest](https://github.com/MatthiasGermain/own_blindtest) | Blindtest en ligne sur sa propre musique (Deezer, Spotify, YouTube Music) : trois jeux, dont « Qui écoute ça ? », une partie à plusieurs sur téléphone arbitrée par un serveur Cloudflare en TypeScript. [Jouer](https://matthiasgermain.github.io/own_blindtest/) · [présentation](https://matthias-germain.vercel.app/projets/blindtest) |
 | [narthex](https://github.com/MatthiasGermain/narthex) | Plateforme multi-tenant pour les églises : un site public par église et un espace de gestion (membres, événements, cultes). Next.js, Payload CMS, PostgreSQL, déploiement Docker par GitHub Actions. |
 | [spotweb](https://github.com/MatthiasGermain/spotweb) | Site de l'association Spotlight, dont je suis responsable web bénévole : Next.js, Tailwind CSS, formulaire de contact et newsletter (Resend). |
 
@@ -61,7 +61,7 @@ Looking for a software engineering role, embedded or web, in Strasbourg or Nancy
 | Embedded | C / C++, ESP32, Arduino, PlatformIO, FreeRTOS, VHDL (Quartus), FPGA, RISC-V |
 | Python tooling | Python, Flask, Jinja2, REST APIs |
 | Web | TypeScript, React, Next.js, Astro, Tailwind CSS, Payload CMS, Supabase |
-| Tooling | Git, GitHub Actions, GitLab, Jenkins, Docker, Vercel, DigitalOcean, Linux, Claude Code |
+| Tooling | Git, GitHub Actions, GitLab, Jenkins, Docker, Vercel, Cloudflare, DigitalOcean, Linux, Claude Code |
 
 ### Projects
 
@@ -70,7 +70,7 @@ Looking for a software engineering role, embedded or web, in Strasbourg or Nancy
 | [routine-station](https://github.com/MatthiasGermain/routine-station) | Connected monitoring station: ESP32, sensors, stepper motor, MQTT and a web control page. In progress, built step by step. |
 | [IRDA_FOR_BELOOP](https://github.com/MatthiasGermain/IRDA_FOR_BELOOP) | C++ (ESP32) infrared communication firmware, built during a 3rd-year UrbanLoop engineering project: signalling, speed and stop handling, OLED display. |
 | [RISC-V-Processor](https://github.com/MatthiasGermain/RISC-V-Processor) | RISC-V processor in VHDL (R, I, L instructions), with a Python checking script and a [web simulator](https://matthiasgermain.github.io/RISC-V-Processor/). |
-| [spotify_report](https://github.com/MatthiasGermain/spotify_report) | Spotify listening report in Python: history stored as CSV, daily stats, sent by email, run by a GitHub Actions workflow on a self-hosted runner. |
+| [own_blindtest](https://github.com/MatthiasGermain/own_blindtest) | Online blind test on your own music (Deezer, Spotify, YouTube Music): three games, including "Who listens to this?", a multiplayer game played on phones and refereed by a TypeScript server on Cloudflare. [Play](https://matthiasgermain.github.io/own_blindtest/) · [write-up](https://matthias-germain.vercel.app/en/projects/blindtest) |
 | [narthex](https://github.com/MatthiasGermain/narthex) | Multi-tenant platform for churches: a public website per church and a management area (members, events, services). Next.js, Payload CMS, PostgreSQL, Docker deployment through GitHub Actions. |
 | [spotweb](https://github.com/MatthiasGermain/spotweb) | Website of the Spotlight association, where I am the volunteer web lead: Next.js, Tailwind CSS, contact form and newsletter (Resend). |
 
