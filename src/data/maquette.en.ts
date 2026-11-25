@@ -73,6 +73,15 @@ export const projects: Partial<Record<Visual, ProjectText>> = {
     role: 'Personal project',
     context: 'Run by GitHub Actions on a self-hosted runner',
   },
+  blindtest: {
+    pitch:
+      'A blind test on your own music (Deezer profile, Spotify or YouTube Music history, Spotify account), with two more games: pixelated album covers to recognise, and "Who listens to this?", a multiplayer game where everyone plays on their own phone.',
+    role: 'Design and development, on my own',
+    context:
+      'Live personal project. A static site with no dependencies; multiplayer games go through a server that referees the rounds, tested by a simulated three-player game',
+    visualNote: 'Scroll the page',
+    siteLabel: 'Play',
+  },
   narthex: {
     cv: 'Multi-tenant platform for churches: public website and management area.',
     status: 'In testing',
@@ -174,7 +183,12 @@ export const skillAreas: Record<string, string> = {
   Outils: 'Tools',
 };
 // Compétences et étiquettes de stack dont le nom change en anglais
-export const skillItems: Record<string, string> = { 'API REST': 'REST APIs', 'Confluence (API REST)': 'Confluence (REST API)' };
+export const skillItems: Record<string, string> = {
+  'API REST': 'REST APIs',
+  'Confluence (API REST)': 'Confluence (REST API)',
+  'API Deezer': 'Deezer API',
+  'API Spotify': 'Spotify API',
+};
 
 export const cvExtras = [
   'Fortin: vice-president of an association devoted to memory across generations, whose website I built.',

@@ -386,6 +386,9 @@ const t = tr(langOf(Astro.url));
       <rect x="120" y="198" width="186" height="6" rx="3" class="ink-soft" />
     </svg>
   )}
+  {visual === 'blindtest' && (
+    <ScrollShot src="/images/blindtest-full.webp" url="matthiasgermain.github.io/own_blindtest" alt={t("Page d'accueil du blindtest : choix de la source de musique et des jeux", 'Blind test home page: choice of music source and games')} width={800} height={736} />
+  )}
   {visual === 'spotweb' && (
     <ScrollShot src="/images/spotlightcrea-full.webp" url="spotlightcrea.fr" alt={t("Page d'accueil de spotlightcrea.fr", 'Home page of spotlightcrea.fr')} width={800} height={3179} />
   )}

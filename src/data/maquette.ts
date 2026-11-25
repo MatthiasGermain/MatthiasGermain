@@ -5,7 +5,7 @@
 
 // Les trois maillons de la chaîne : l'objet, l'outillage, l'interface.
 export type Cat = 'embarque' | 'python' | 'web';
-export type Visual = 'routine' | 'risc' | 'irda' | 'freertos' | 'schaeffler' | 'urbanloop' | 'web' | 'spotify' | 'narthex' | 'spotweb';
+export type Visual = 'routine' | 'risc' | 'irda' | 'freertos' | 'schaeffler' | 'urbanloop' | 'web' | 'spotify' | 'blindtest' | 'narthex' | 'spotweb';
 
 export interface Project {
   title: string;
@@ -147,6 +147,22 @@ export const projects: Project[] = [
     stack: ['Python', 'Spotipy', 'GitHub Actions'],
     visual: 'spotify',
     repo: 'https://github.com/MatthiasGermain/spotify_report',
+  },
+  {
+    title: 'Blindtest',
+    // Pas de place sur le CV (une page)
+    cv: false,
+    cats: ['web'],
+    pitch:
+      "Un blindtest sur sa propre musique (profil Deezer, historique Spotify ou YouTube Music, compte Spotify), avec deux autres jeux : des pochettes d'albums pixelisées à reconnaître, et « Qui écoute ça ? », une partie à plusieurs où chacun joue sur son téléphone.",
+    role: 'Conception et développement, seul',
+    context:
+      "Projet personnel en ligne. Site statique sans dépendance ; les parties à plusieurs passent par un serveur qui arbitre les manches, testé par une partie simulée à trois joueurs",
+    stack: ['JavaScript', 'TypeScript', 'Cloudflare Workers', 'WebSocket', 'API Deezer', 'API Spotify'],
+    visual: 'blindtest',
+    visualNote: 'Faites défiler la page',
+    repo: 'https://github.com/MatthiasGermain/own_blindtest',
+    site: { label: 'Jouer', url: 'https://matthiasgermain.github.io/own_blindtest/' },
   },
   {
     title: 'narthex',
